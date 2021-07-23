@@ -177,7 +177,7 @@ CAGVideoWnd::CAGVideoWnd()
 
 CAGVideoWnd::~CAGVideoWnd()
 {
-	m_imgBackGround.DeleteImageList();
+	//m_imgBackGround.DeleteImageList();
 }
 
 

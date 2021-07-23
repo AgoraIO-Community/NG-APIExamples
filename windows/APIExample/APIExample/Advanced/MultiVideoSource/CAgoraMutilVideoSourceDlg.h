@@ -1,93 +1,149 @@
 ﻿#pragma once
 #include "AGVideoWnd.h"
-class CAgoraMultiVideoSourceEventHandler : public agora::rtc::IRtcEngineEventHandler
+class CMultiVideoSourceRteSceneEventHandler
+	: public agora::rte::IAgoraRteSceneEventHandler
 {
 public:
+	virtual ~CMultiVideoSourceRteSceneEventHandler() = default;
+
+	// Inherited via IAgoraRteSceneEventHandler
+	virtual void OnConnectionStateChanged(agora::rte::ConnectionState old_state, agora::rte::ConnectionState new_state,
+		agora::rte::ConnectionChangedReason reason) override {
+		if (m_hMsgHanlder)
+			::PostMessage(m_hMsgHanlder, WM_MSGID(EID_CONNECTION_STATE), (int)old_state, (int)reason);
+
+	}
+
+	virtual void OnRemoteUserJoined(const std::vector<agora::rte::UserInfo>& users) override {
+		
+	}
+	virtual void OnRemoteUserLeft(const std::vector<agora::rte::UserInfo>& users) override {
+		
+	}
 	//set the message notify window handler
 	void SetMsgReceiver(HWND hWnd) { m_hMsgHanlder = hWnd; }
+	virtual void OnRemoteStreamAdded(const std::vector<agora::rte::StreamInfo>& streams)  override {
+		
+	}
 
-	int GetChannelId() { return m_channelId; };
-	void SetChannelId(int id) { m_channelId = id; };
-	conn_id_t GetConnectionId() { return m_connid; }
-	void SetConnectionId(conn_id_t id) { m_connid = id; }
-
-	std::string GetChannelName() { return m_strChannel; }
-	/*
-	note:
-		Join the channel callback.This callback method indicates that the client
-		successfully joined the specified channel.Channel ids are assigned based
-		on the channel name specified in the joinChannel. If IRtcEngine::joinChannel
-		is called without a user ID specified. The server will automatically assign one
-	parameters:
-		channel:channel name.
-		uid: user ID。If the UID is specified in the joinChannel, that ID is returned here;
-		Otherwise, use the ID automatically assigned by the Agora server.
-		elapsed: The Time from the joinChannel until this event occurred (ms).
-	*/
-	virtual void onJoinChannelSuccess(const char* channel, agora::rtc::uid_t uid, int elapsed) override;
-	/*
-	note:
-		In the live broadcast scene, each anchor can receive the callback
-		of the new anchor joining the channel, and can obtain the uID of the anchor.
-		Viewers also receive a callback when a new anchor joins the channel and
-		get the anchor's UID.When the Web side joins the live channel, the SDK will
-		default to the Web side as long as there is a push stream on the
-		Web side and trigger the callback.
-	parameters:
-		uid: remote user/anchor ID for newly added channel.
-		elapsed: The joinChannel is called from the local user to the delay triggered
-		by the callback(ms).
-	*/
-	virtual void onUserJoined(agora::rtc::uid_t uid, int elapsed) override;
-	/*
-	note:
-		Remote user (communication scenario)/anchor (live scenario) is called back from
-		the current channel.A remote user/anchor has left the channel (or dropped the line).
-		There are two reasons for users to leave the channel, namely normal departure and
-		time-out:When leaving normally, the remote user/anchor will send a message like
-		"goodbye". After receiving this message, determine if the user left the channel.
-		The basis of timeout dropout is that within a certain period of time
-		(live broadcast scene has a slight delay), if the user does not receive any
-		packet from the other side, it will be judged as the other side dropout.
-		False positives are possible when the network is poor. We recommend using the
-		Agora Real-time messaging SDK for reliable drop detection.
-	parameters:
-		uid: The user ID of an offline user or anchor.
-		reason:Offline reason: USER_OFFLINE_REASON_TYPE.
-	*/
-	virtual void onUserOffline(agora::rtc::uid_t uid, agora::rtc::USER_OFFLINE_REASON_TYPE reason) override;
-	/*
-	note:
-		When the App calls the leaveChannel method, the SDK indicates that the App
-		has successfully left the channel. In this callback method, the App can get
-		the total call time, the data traffic sent and received by THE SDK and other
-		information. The App obtains the call duration and data statistics received
-		or sent by the SDK through this callback.
-	parameters:
-		stats: Call statistics.
-	*/
-	virtual void onLeaveChannel(const agora::rtc::RtcStats& stats) override;
 	/**
-		Occurs when the remote video state changes.
-		@note This callback does not work properly when the number of users (in the Communication profile) or broadcasters (in the Live-broadcast profile) in the channel exceeds 17.
-
-		@param uid ID of the remote user whose video state changes.
-		@param state State of the remote video. See #REMOTE_VIDEO_STATE.
-		@param reason The reason of the remote video state change. See
-		#REMOTE_VIDEO_STATE_REASON.
-		@param elapsed Time elapsed (ms) from the local user calling the
-		\ref agora::rtc::IRtcEngine::joinChannel "joinChannel" method until the
-		SDK triggers this callback.
+	 * Occurs when remote streams are removed.
+	 *
+	 * @param streams Removed remote streams.
 	 */
-	virtual void onRemoteVideoStateChanged(agora::rtc::uid_t uid, agora::rtc::REMOTE_VIDEO_STATE state, agora::rtc::REMOTE_VIDEO_STATE_REASON reason, int elapsed) override;
+	virtual void OnRemoteStreamRemoved(const std::vector<agora::rte::StreamInfo>& streams)  override {
+	}
+
+	/**
+	 * Occurs when the media state of the local stream changes.
+	 *
+	 * @param streams Information of the local stream.
+	 * @param media_type Media type of the local stream.
+	 * @param old_state Old state of the local stream.
+	 * @param new_state New state of the local stream.
+	 * @param reason The reason of the state change.
+	 */
+	virtual void OnLocalStreamStateChanged(const agora::rte::StreamInfo& streams, agora::rte::MediaType media_type,
+		agora::rte::StreamMediaState old_state, agora::rte::StreamMediaState new_state,
+		agora::rte::StreamStateChangedReason reason) override {
+		if (m_hMsgHanlder) {
+
+			RemoteVideoStateChanged* videoState = new RemoteVideoStateChanged(streams, media_type, old_state, new_state, reason);
+			::PostMessage(m_hMsgHanlder, WM_MSGID(EID_LOCAL_VIDEO_STATE_CHANGED), (WPARAM)videoState, 0);
+		}
+	}
+
+	/**
+	 * Occurs when the media state of the remote stream changes.
+	 *
+	 * @param streams Information of the remote stream.
+	 * @param media_type Media type of the remote stream.
+	 * @param old_state Old state of the remote stream.
+	 * @param new_state New state of the remote stream.
+	 * @param reason The reason of the state change.
+	 */
+	virtual void OnRemoteStreamStateChanged(const agora::rte::StreamInfo& streams, agora::rte::MediaType media_type,
+		agora::rte::StreamMediaState old_state, agora::rte::StreamMediaState new_state,
+		agora::rte::StreamStateChangedReason reason) override {
+		if (m_hMsgHanlder) {
+
+			::PostMessage(m_hMsgHanlder, WM_MSGID(EID_LOCAL_VIDEO_STATE_CHANGED), (int)old_state, (int)reason);
+		}
+	}
+
+	/**
+	 * Reports the volume information of users.
+	 *
+	 * @param speakers The volume information of users.
+	 * @param totalVolume Total volume after audio mixing. The value ranges between 0 (lowest volume) and 255 (highest volume).
+	 */
+	virtual void OnAudioVolumeIndication(const std::vector<agora::rte::AudioVolumeInfo>& speakers,
+		int totalVolume) override {}
+
+	/**
+	 * Occurs when the token will expire in 30 seconds for the user.
+	 *
+	 * //TODO (yejun): expose APIto renew scene token
+	 * @param token The token that will expire in 30 seconds.
+	 */
+	virtual void OnSceneTokenWillExpired(const std::string& scene_id, const std::string& token) override {}
+
+	/**
+	 * Occurs when the token has expired for a user.
+	 *
+	 * //TODO (yejun): expose APIto renew scene token
+	 *
+	 * @param stream_id The ID of the scene.
+	 */
+	virtual void OnSceneTokenExpired(const std::string& scene_id)override {}
+
+	/**
+	 * Occurs when the token of a stream expires in 30 seconds.
+	 * If the token you specified when calling 'CreateOrUpdateRTCStream' expires,
+	 * the user will drop offline. This callback is triggered 30 seconds before the token expires, to
+	 * remind you to renew the token by calling 'CreateOrUpdateRTCStream' again with new token.
+	 * //TODO (yejun): Need to tell how to generate new token, ETA for new token facility
+	 * Upon receiving this callback, generate a new token at your app server
+	 *
+	 * @param stream_id
+	 * @param token
+	 */
+
+	virtual void OnStreamTokenWillExpire(const std::string& stream_id, const std::string& token) override {}
+
+	/**
+	 * Occurs when the token has expired for a stream.
+	 *
+	 * Upon receiving this callback, you must generate a new token on your server and call
+	 * "CreateOrUpdateRTCStream" to pass the new token to the SDK.
+	 *
+	 * @param stream_id The ID of the scene.
+	 */
+	virtual void OnStreamTokenExpired(const std::string& stream_id) override {}
+
+	virtual void OnBypassCdnStateChanged(
+		const std::string& stream_id, const std::string& target_cdn_url,
+		agora::rte::CDNBYPASS_STREAM_PUBLISH_STATE state,
+		agora::rte::CDNBYPASS_STREAM_PUBLISH_ERROR err_code) override {}
+
+	virtual void OnBypassCdnPublished(
+		const std::string& stream_id, const std::string& target_cdn_url,
+		agora::rte::CDNBYPASS_STREAM_PUBLISH_ERROR err_code) override {}
+
+	virtual void OnBypassCdnUnpublished(const std::string& stream_id,
+		const std::string& target_cdn_url) override {}
+
+	virtual void OnBypassTranscodingUpdated(const std::string& stream_id) override {}
+
+	virtual void OnSceneStats(const agora::rte::SceneStats& stats) override {}
+
+	virtual void OnLocalStreamStats(const std::string& stream_id, const agora::rte::LocalStreamStats& stats) override{}
+
+	virtual void OnRemoteStreamStats(const std::string& stream_id, const agora::rte::RemoteStreamStats& stats) override{}
+
 private:
 	HWND m_hMsgHanlder;
-	std::string m_strChannel;
-	int m_channelId;
-	conn_id_t m_connid = 0xfffffff;
 };
-
-
 
 class CAgoraMutilVideoSourceDlg : public CDialogEx
 {
@@ -118,14 +174,26 @@ private:
 	std::string m_strChannel;
 
 	agora::rtc::IRtcEngine* m_rtcEngine = nullptr;
-	std::vector<CAgoraMultiVideoSourceEventHandler *> m_vecVidoeSourceEventHandler;
-	conn_id_t m_conn_screen;
-	conn_id_t m_conn_camera;
+	
+	//conn_id_t m_conn_screen;
+	//conn_id_t m_conn_camera;
 	
 	bool m_bPublishScreen = false;
 	CAGVideoWnd m_videoWnds[VIDOE_COUNT];
 
 	agora::rtc::uid_t m_screenUid = 0;
+
+	std::shared_ptr<CMultiVideoSourceRteSceneEventHandler> m_sceneEventHandler;
+	std::shared_ptr<agora::rte::IAgoraRteScene> m_scene = nullptr;
+	std::shared_ptr<agora::rte::IAgoraRteScreenVideoTrack> screen_track_ = nullptr;
+	std::shared_ptr<agora::rte::IAgoraRteMediaFactory> media_control_ = nullptr;
+	std::shared_ptr<agora::rte::IAgoraRteCameraVideoTrack> camera_track_ = nullptr;
+	std::shared_ptr<agora::rte::IAgoraRteMicrophoneAudioTrack> microphone_ = nullptr;
+	std::string local_camera_id_ = "ms_camera_stream_id";
+	std::string local_screen_id_ = "ms_screen_stream_id";
+	std::string local_user_id_ = "ms_user_id";
+	std::string local_microphone_id_ = "ms_mic_id";
+	std::vector<std::string> connectionStates;
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);  
 	// agora sdk message window handler
@@ -133,7 +201,9 @@ protected:
 	LRESULT OnEIDLeaveChannel(WPARAM wParam, LPARAM lParam);
 	LRESULT OnEIDUserJoined(WPARAM wParam, LPARAM lParam);
 	LRESULT OnEIDUserOffline(WPARAM wParam, LPARAM lParam);
-	LRESULT OnEIDRemoteVideoStateChanged(WPARAM wParam, LPARAM lParam);
+	LRESULT OnEIDLocalVideoStateChanged(WPARAM wParam, LPARAM lParam);
+	afx_msg void OnSelchangeListInfoBroadcasting();
+	afx_msg LRESULT OnEIDConnectionStateChanged(WPARAM wParam, LPARAM lParam);
 	DECLARE_MESSAGE_MAP()
 public:
 	CStatic m_staVideoArea;

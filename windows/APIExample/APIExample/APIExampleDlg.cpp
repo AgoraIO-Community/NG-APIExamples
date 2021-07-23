@@ -207,10 +207,9 @@ void CAPIExampleDlg::InitSceneDialog()
     //basic list
     m_vecBasic.push_back(basicLiveBroadcasting);
 
-   m_pLiveBroadcasting = new CLiveBroadcastingDlg(&m_staMainArea);
+	m_pLiveBroadcasting = std::make_unique<CLiveBroadcastingDlg>(&m_staMainArea);
    RECT rcArea, rcWnd;
    m_staMainArea.GetWindowRect(&rcArea);
-   
    m_pLiveBroadcasting->Create(CLiveBroadcastingDlg::IDD);
    m_pLiveBroadcasting->GetWindowRect(&rcWnd);
    int w = rcWnd.right - rcWnd.left;
@@ -218,11 +217,23 @@ void CAPIExampleDlg::InitSceneDialog()
    rcWnd = { rcArea.left, rcArea.top - MAIN_AREA_TOP, rcArea.left + w, rcArea.top + h};
    m_pLiveBroadcasting->MoveWindow(&rcWnd);
 
+
+   //multi video source
+   m_pMultiVideoSourceDlg = std::make_unique<CAgoraMutilVideoSourceDlg>(&m_staMainArea);
+   m_pMultiVideoSourceDlg->Create(CAgoraMutilVideoSourceDlg::IDD);
+   m_pMultiVideoSourceDlg->MoveWindow(&rcWnd);
+   m_vecAdvanced.push_back(advancedMultiVideoSource);
+
+   //media player
+   m_pmediaPlayerDlg = std::make_unique<CAgoraMediaPlayer>(&m_staMainArea);
+   m_pmediaPlayerDlg->Create(CAgoraMediaPlayer::IDD);
+   m_pmediaPlayerDlg->MoveWindow(&rcWnd);
+   m_vecAdvanced.push_back(advancedMediaPlayer);
    //advanced list
   /* m_vecAdvanced.push_back(advancedRtmpInject);
    m_vecAdvanced.push_back(advancedRtmpStreaming);
    m_vecAdvanced.push_back(advancedVideoMetadata);
-   m_vecAdvanced.push_back(advancedMediaPlayer);
+
    m_vecAdvanced.push_back(advancedScreenCap);
    m_vecAdvanced.push_back(advancedAudioProfile);
    m_vecAdvanced.push_back(advancedAudioMixing);
@@ -233,7 +244,7 @@ void CAPIExampleDlg::InitSceneDialog()
    m_vecAdvanced.push_back(advancedOriginalAudio);
    m_vecAdvanced.push_back(advancedCustomEncrypt);
    m_vecAdvanced.push_back(advancedMultiChannel);
-   m_vecAdvanced.push_back(advancedMultiVideoSource);
+
    m_vecAdvanced.push_back(advancedPerCallTest);
    m_vecAdvanced.push_back(advancedAudioVolume);
    m_vecAdvanced.push_back(advancedReportInCall);
@@ -301,15 +312,9 @@ void CAPIExampleDlg::InitSceneDialog()
    m_pCustomEncryptDlg->MoveWindow(&rcWnd);
 
 
-   //multi video source
-   m_pMultiVideoSourceDlg = new CAgoraMutilVideoSourceDlg(&m_staMainArea);
-   m_pMultiVideoSourceDlg->Create(CAgoraMutilVideoSourceDlg::IDD);
-   m_pMultiVideoSourceDlg->MoveWindow(&rcWnd);
+  
 
-   //media player
-   m_pmediaPlayerDlg = new CAgoraMediaPlayer(&m_staMainArea);
-   m_pmediaPlayerDlg->Create(CAgoraMediaPlayer::IDD);
-   m_pmediaPlayerDlg->MoveWindow(&rcWnd);
+
 
    //per call test
    m_pPerCallTestDlg = new CAgoraPerCallTestDlg(&m_staMainArea);
@@ -474,6 +479,14 @@ void CAPIExampleDlg::CreateScene(CTreeCtrl& treeScene, CString selectedText)
         m_pLiveBroadcasting->InitAgora();
         m_pLiveBroadcasting->ShowWindow(SW_SHOW);
     }
+	else if (selectedText.Compare(advancedMultiVideoSource) == 0) {
+		m_pMultiVideoSourceDlg->InitAgora();
+		m_pMultiVideoSourceDlg->ShowWindow(SW_SHOW);
+	}
+	else if (selectedText.Compare(advancedMediaPlayer) == 0) {
+		m_pmediaPlayerDlg->InitAgora();
+		m_pmediaPlayerDlg->ShowWindow(SW_SHOW);
+	}
 	/*else if (selectedText.Compare(advancedRtmpInject) == 0) {
         m_pRtmpInjectDlg->InitAgora();
         m_pRtmpInjectDlg->ShowWindow(SW_SHOW);
@@ -510,9 +523,6 @@ void CAPIExampleDlg::CreateScene(CTreeCtrl& treeScene, CString selectedText)
 	}else if (selectedText.Compare(advancedMultiChannel) == 0) {
 		m_pMultiChannelDlg->InitAgora();
 		m_pMultiChannelDlg->ShowWindow(SW_SHOW);
-	}else if (selectedText.Compare(advancedMultiVideoSource) == 0) {
-		m_pMultiVideoSourceDlg->InitAgora();
-		m_pMultiVideoSourceDlg->ShowWindow(SW_SHOW);
 	}else if (selectedText.Compare(advancedPerCallTest) == 0) {
 		m_pPerCallTestDlg->InitAgora();
 		m_pPerCallTestDlg->ShowWindow(SW_SHOW);
@@ -531,10 +541,7 @@ void CAPIExampleDlg::CreateScene(CTreeCtrl& treeScene, CString selectedText)
 		m_pEffectDlg->InitAgora();
 		m_pEffectDlg->ShowWindow(SW_SHOW);
 	}
-	else if (selectedText.Compare(advancedMediaPlayer) == 0) {
-		m_pmediaPlayerDlg->InitAgora();
-		m_pmediaPlayerDlg->ShowWindow(SW_SHOW);
-	}
+	
 	else if (selectedText.Compare(MultiCameara) == 0) {
 		m_pMultiCameraDlg->InitAgora();
 		m_pMultiCameraDlg->ShowWindow(SW_SHOW);
@@ -556,6 +563,14 @@ void CAPIExampleDlg::ReleaseScene(CTreeCtrl& treeScene, HTREEITEM& hSelectItem)
         m_pLiveBroadcasting->UnInitAgora();
         m_pLiveBroadcasting->ShowWindow(SW_HIDE);
     }
+	else if (str.Compare(advancedMultiVideoSource) == 0) {
+		m_pMultiVideoSourceDlg->UnInitAgora();
+		m_pMultiVideoSourceDlg->ShowWindow(SW_HIDE);
+	}
+	else if (str.Compare(advancedMediaPlayer) == 0) {
+		m_pmediaPlayerDlg->UnInitAgora();
+		m_pmediaPlayerDlg->ShowWindow(SW_HIDE);
+	}
 	/*else if (str.Compare(advancedRtmpInject) == 0) {
         m_pRtmpInjectDlg->UnInitAgora();
         m_pRtmpInjectDlg->ShowWindow(SW_HIDE);
@@ -592,9 +607,6 @@ void CAPIExampleDlg::ReleaseScene(CTreeCtrl& treeScene, HTREEITEM& hSelectItem)
 	}else if (str.Compare(advancedMultiChannel) == 0) {
 		m_pMultiChannelDlg->UnInitAgora();
 		m_pMultiChannelDlg->ShowWindow(SW_HIDE);
-	}else if (str.Compare(advancedMultiVideoSource) == 0) {
-		m_pMultiVideoSourceDlg->UnInitAgora();
-		m_pMultiVideoSourceDlg->ShowWindow(SW_HIDE);
 	}else if (str.Compare(advancedPerCallTest) == 0) {
 		m_pPerCallTestDlg->UnInitAgora();
 		m_pPerCallTestDlg->ShowWindow(SW_HIDE);
@@ -622,11 +634,8 @@ void CAPIExampleDlg::ReleaseScene(CTreeCtrl& treeScene, HTREEITEM& hSelectItem)
 		m_pLocalVideoTranscodingDlg->UnInitAgora();
 		m_pLocalVideoTranscodingDlg->ShowWindow(SW_HIDE);
 	}
-	else if (str.Compare(advancedMediaPlayer) == 0) {
-		m_pmediaPlayerDlg->UnInitAgora();
-		m_pmediaPlayerDlg->ShowWindow(SW_HIDE);
-	}*/
-	Sleep(500);
+	*/
+	
 }
 
 LRESULT CAPIExampleDlg::OnEIDJoinLeaveChannel(WPARAM wParam, LPARAM lParam)

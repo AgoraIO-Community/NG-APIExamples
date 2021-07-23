@@ -257,6 +257,8 @@ if exist en.ini (copy en.ini $(SolutionDir)$(Platform)\$(Configuration))
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Advanced\MediaPlayer\CAgoraMediaPlayer.h" />
+    <ClInclude Include="Advanced\MultiVideoSource\CAgoraMutilVideoSourceDlg.h" />
     <ClInclude Include="AgoraRteBase.h" />
     <ClInclude Include="AgoraRteLog.h" />
     <ClInclude Include="AgoraRteSdk.hpp" />
@@ -274,6 +276,8 @@ if exist en.ini (copy en.ini $(SolutionDir)$(Platform)\$(Configuration))
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Advanced\MediaPlayer\CAgoraMediaPlayer.cpp" />
+    <ClCompile Include="Advanced\MultiVideoSource\CAgoraMutilVideoSourceDlg.cpp" />
     <ClCompile Include="AGVideoTestWnd.cpp" />
     <ClCompile Include="AGVideoWnd.cpp" />
     <ClCompile Include="APIExample.cpp" />

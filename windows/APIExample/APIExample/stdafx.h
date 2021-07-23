@@ -84,7 +84,7 @@ constexpr int id_random_len = 10;
 #define RECV_METADATA_MSG				0x00000008
 #define MEIDAPLAYER_STATE_CHANGED		0x00000009
 #define MEIDAPLAYER_POSTION_CHANGED		0x0000000A
-#define EID_LOCAL_VIDEO_STATE_CHANGED				0x0000000B
+
 #define EID_LASTMILE_QUAILTY						0x0000000C
 #define EID_LASTMILE_PROBE_RESULT					0x0000000D
 #define EID_AUDIO_VOLUME_INDICATION					0x0000000E
@@ -111,6 +111,8 @@ constexpr int id_random_len = 10;
 #define EID_LOCAL_STREAM_STATS           0x00000024
 #define EID_REMOTE_STREAM_STATS          0x00000025
 #define EID_REMOTE_VIDEO_STATE_CHANGED   0x00000026
+#define EID_LOCAL_VIDEO_STATE_CHANGED    0x00000026
+#define EID_CAMERA_STATE_CHANED          0x00000028
 #define MAX_VIDEO_COUNT  16
 std::string GenerateUserId();
 std::string GenerateRandomString(const std::string& prefix, int random_number_appended);
@@ -160,7 +162,7 @@ struct RemoteVideoStateChanged {
 		const agora::rte::StreamInfo& s, agora::rte::MediaType m,
 		agora::rte::StreamMediaState o, agora::rte::StreamMediaState n,
 		agora::rte::StreamStateChangedReason r)
-		: streams{s.user_id, s.stream_id}
+		: streams{ s.stream_id, s.user_id}
 		, media_type(m)
 		, old_state(o)
 		, new_state(n)
@@ -176,7 +178,7 @@ struct RemoteVideoStateChanged {
 };
 
 
-#define ID_BASEWND_VIDEO      20000
+#define ID_BASEWND_VIDEO      2000
 #define MAIN_AREA_TOP 20
 #ifdef _UNICODE
 #if defined _M_IX86

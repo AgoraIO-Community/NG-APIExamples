@@ -4,6 +4,8 @@
 
 #pragma once
 #include "Basic/LiveBroadcasting/CLiveBroadcastingDlg.h"
+#include "Advanced/MultiVideoSource/CAgoraMutilVideoSourceDlg.h"
+#include "Advanced/MediaPlayer/CAgoraMediaPlayer.h"
 /*#include "Advanced/RTMPinject/AgoraRtmpInjectionDlg.h"
 #include "Advanced/RTMPStream/AgoraRtmpStreaming.h"
 #include "Advanced/VideoMetadata/CAgoraMetaDataDlg.h"
@@ -16,14 +18,14 @@
 #include "Advanced/OriginalAudio/CAgoraOriginalAudioDlg.h"
 #include "Advanced/CustomEncrypt/CAgoraCustomEncryptDlg.h"
 #include "Advanced/MultiChannel/CAgoraMultiChannelDlg.h"
-#include "Advanced/MultiVideoSource/CAgoraMutilVideoSourceDlg.h"
+
 #include "Advanced/PerCallTest/CAgoraPerCallTestDlg.h"
 #include "Advanced/AudioVolume/CAgoraAudioVolumeDlg.h"
 
 #include "Advanced/RegionConn/CAgoraRegionConnDlg.h"
 #include "Advanced/MediaEncrypt/CAgoraMediaEncryptDlg.h"
 #include "Advanced/AudioEffect/CAgoraEffectDlg.h"
-#include "Advanced/MediaPlayer/CAgoraMediaPlayer.h"
+
 #include "Advanced/MultiCamera/CMultiCameraDlg.h"
 #include "Advanced/LocalVideoTranscoding/CLocalVideoTranscodingDlg.h"*/
 #include <mutex>
@@ -72,8 +74,9 @@ private:
     
     void ReleaseScene(CTreeCtrl& treeScene, HTREEITEM& hSelectItem);
     void CreateScene(CTreeCtrl& treeScene, CString selectedText);
-    CLiveBroadcastingDlg        *m_pLiveBroadcasting = nullptr;
-	
+    std::unique_ptr<CLiveBroadcastingDlg>           m_pLiveBroadcasting = nullptr;
+	std::unique_ptr < CAgoraMutilVideoSourceDlg>	m_pMultiVideoSourceDlg = nullptr;
+	std::unique_ptr < CAgoraMediaPlayer	>		    m_pmediaPlayerDlg = nullptr;
   /*  CAgoraRtmpInjectionDlg      *m_pRtmpInjectDlg    = nullptr;
     CAgoraRtmpStreamingDlg      *m_pRtmpStreamingDlg = nullptr;
     CAgoraMetaDataDlg           *m_pVideoSEIDlg      = nullptr;
@@ -86,13 +89,13 @@ private:
 	CAgoraOriginalAudioDlg		*m_pOriginalAudioDlg = nullptr;
 	CAgoraCustomEncryptDlg		*m_pCustomEncryptDlg = nullptr;
 	CAgoraMultiChannelDlg		*m_pMultiChannelDlg   = nullptr;
-	CAgoraMutilVideoSourceDlg	*m_pMultiVideoSourceDlg = nullptr;
+	
 	CAgoraPerCallTestDlg		*m_pPerCallTestDlg		= nullptr;
 	
 	CAgoraRegionConnDlg			*m_pRegionConnDlg		= nullptr;
 	CAgoraMediaEncryptDlg		*m_pMediaEncrptDlg		= nullptr;
 	CAgoraEffectDlg				*m_pEffectDlg			= nullptr;
-	CAgoraMediaPlayer			*m_pmediaPlayerDlg = nullptr;
+	
 	CAgoraAudioVolumeDlg		*m_pAudioVolumeDlg = nullptr;
 	CMultiCameraDlg             *m_pMultiCameraDlg = nullptr;
 	CLocalVideoTranscodingDlg   *m_pLocalVideoTranscodingDlg = nullptr;*/

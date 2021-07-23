@@ -25,6 +25,12 @@
     <Filter Include="NGAPI">
       <UniqueIdentifier>{dc0ae96f-4272-4a52-b772-b40c233b96bc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Advanced\MultiVideoSource">
+      <UniqueIdentifier>{dd819b27-7235-4c04-9f1c-0318783dca04}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Advanced\MediaPlayer">
+      <UniqueIdentifier>{bd0b2aba-8aa5-410a-b627-ea1558480351}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="APIExample.h">
@@ -72,6 +78,12 @@
     <ClInclude Include="AgoraRteSdk.hpp">
       <Filter>NGAPI</Filter>
     </ClInclude>
+    <ClInclude Include="Advanced\MultiVideoSource\CAgoraMutilVideoSourceDlg.h">
+      <Filter>Advanced\MultiVideoSource</Filter>
+    </ClInclude>
+    <ClInclude Include="Advanced\MediaPlayer\CAgoraMediaPlayer.h">
+      <Filter>Advanced\MediaPlayer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="APIExample.cpp">
@@ -97,6 +109,12 @@
     </ClCompile>
     <ClCompile Include="AGVideoTestWnd.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Advanced\MultiVideoSource\CAgoraMutilVideoSourceDlg.cpp">
+      <Filter>Advanced\MultiVideoSource</Filter>
+    </ClCompile>
+    <ClCompile Include="Advanced\MediaPlayer\CAgoraMediaPlayer.cpp">
+      <Filter>Advanced\MediaPlayer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
