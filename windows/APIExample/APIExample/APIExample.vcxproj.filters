@@ -31,6 +31,9 @@
     <Filter Include="Advanced\MediaPlayer">
       <UniqueIdentifier>{bd0b2aba-8aa5-410a-b627-ea1558480351}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Advanced\CustomAVCapture">
+      <UniqueIdentifier>{bc670cc0-2e27-486a-99ff-43650afc7641}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="APIExample.h">
@@ -84,6 +87,12 @@
     <ClInclude Include="Advanced\MediaPlayer\CAgoraMediaPlayer.h">
       <Filter>Advanced\MediaPlayer</Filter>
     </ClInclude>
+    <ClInclude Include="Advanced\CustomAVCapture\CAgoraAVCaptureDlg.h">
+      <Filter>Advanced\CustomAVCapture</Filter>
+    </ClInclude>
+    <ClInclude Include="Advanced\CustomAVCapture\WASAPISource.h">
+      <Filter>Advanced\CustomAVCapture</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="APIExample.cpp">
@@ -115,6 +124,12 @@
     </ClCompile>
     <ClCompile Include="Advanced\MediaPlayer\CAgoraMediaPlayer.cpp">
       <Filter>Advanced\MediaPlayer</Filter>
+    </ClCompile>
+    <ClCompile Include="Advanced\CustomAVCapture\CAgoraAVCaptureDlg.cpp">
+      <Filter>Advanced\CustomAVCapture</Filter>
+    </ClCompile>
+    <ClCompile Include="Advanced\CustomAVCapture\WASAPISource.cpp">
+      <Filter>Advanced\CustomAVCapture</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -94,7 +94,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>false</SDLCheck>
       <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions);</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)libs\include;$(solutionDir)ThirdParty\libYUV;$(ProjectDir);$(ProjectDir)include\rtc</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)libs\include;$(ProjectDir);$(ProjectDir)include\rtc;$(SolutionDir)ThirdParty\libdshow;$(SolutionDir)ThirdParty\libYUV</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <LanguageStandard>stdcpp14</LanguageStandard>
     </ClCompile>
@@ -139,14 +139,14 @@ copy $(SolutionDir)APIExample\Advanced\LocalVideoTranscoding\agora.jpg $(Solutio
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_WINDOWS;_DEBUG;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions);_WIN32_WINNT</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)libs\include;$(solutionDir)ThirdParty\libYUV;$(ProjectDir);$(ProjectDir)include\rtc</AdditionalIncludeDirectories>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <AdditionalIncludeDirectories>$(SolutionDir)libs\include;$(ProjectDir);$(ProjectDir)include\rtc;$(SolutionDir)ThirdParty\libdshow;$(SolutionDir)ThirdParty\libYUV</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <AdditionalLibraryDirectories>$(SolutionDir)\libs\x86_64;$(SolutionDir)ThirdParty\libyuv\debug;$(SolutionDir)ThirdParty\DShow</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)\libs\x86_64;$(SolutionDir)ThirdParty\libyuv\x64\debug;$(SolutionDir)ThirdParty\libdshow</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>libcmt.lib</IgnoreSpecificDefaultLibraries>
-      <AdditionalDependencies>agora_rtc_sdk.lib</AdditionalDependencies>
+      <AdditionalDependencies>agora_rtc_sdk.lib;libdshowcapture.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -257,6 +257,8 @@ if exist en.ini (copy en.ini $(SolutionDir)$(Platform)\$(Configuration))
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Advanced\CustomAVCapture\CAgoraAVCaptureDlg.h" />
+    <ClInclude Include="Advanced\CustomAVCapture\WASAPISource.h" />
     <ClInclude Include="Advanced\MediaPlayer\CAgoraMediaPlayer.h" />
     <ClInclude Include="Advanced\MultiVideoSource\CAgoraMutilVideoSourceDlg.h" />
     <ClInclude Include="AgoraRteBase.h" />
@@ -276,6 +278,8 @@ if exist en.ini (copy en.ini $(SolutionDir)$(Platform)\$(Configuration))
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Advanced\CustomAVCapture\CAgoraAVCaptureDlg.cpp" />
+    <ClCompile Include="Advanced\CustomAVCapture\WASAPISource.cpp" />
     <ClCompile Include="Advanced\MediaPlayer\CAgoraMediaPlayer.cpp" />
     <ClCompile Include="Advanced\MultiVideoSource\CAgoraMutilVideoSourceDlg.cpp" />
     <ClCompile Include="AGVideoTestWnd.cpp" />

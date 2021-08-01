@@ -33,7 +33,7 @@ wchar_t advancedBeauty[INFO_LEN]				= { 0 };
 wchar_t advancedBeautyAudio[INFO_LEN]			= { 0 };
 wchar_t advancedAudioProfile[INFO_LEN]			= { 0 };
 wchar_t advancedAudioMixing[INFO_LEN]			= { 0 };
-wchar_t advancedCustomVideoCapture[INFO_LEN]	= { 0 };
+wchar_t advancedCustomAVCapture[INFO_LEN]	= { 0 };
 wchar_t advancedOriginalVideo[INFO_LEN]			= { 0 };
 wchar_t advancedCustomAudioCapture[INFO_LEN]	= { 0 };
 wchar_t advancedOriginalAudio[INFO_LEN]			= { 0 };
@@ -238,22 +238,6 @@ wchar_t AudioVolumeCtrlPlaybackVol[INFO_LEN] = { 0 };
 wchar_t AudioVolumeCtrlPlaybackSigVol[INFO_LEN] = { 0 };
 
 
-//report in call
-wchar_t ReportInCallCtrlGopTotal[INFO_LEN];
-wchar_t ReportInCallCtrlGopRemoteVideo[INFO_LEN];
-wchar_t ReportInCallCtrlGopRemoteAudio[INFO_LEN];
-wchar_t ReportInCallCtrlTotalUpDownLink[INFO_LEN];
-wchar_t ReportInCallCtrlTotalBytes[INFO_LEN];
-wchar_t ReportInCallCtrlTotalBitrate[INFO_LEN];
-wchar_t ReportInCallCtrlVideoNetWorkDelay[INFO_LEN];
-wchar_t ReportInCallCtrlVideoBytes[INFO_LEN];
-wchar_t ReportInCallCtrlVideoBitrate[INFO_LEN];
-wchar_t ReportInCallCtrlAudioNetWorkDelay[INFO_LEN];
-wchar_t ReportInCallCtrlAudioBytes[INFO_LEN];
-wchar_t ReportInCallCtrlAudioBitrate[INFO_LEN];
-wchar_t ReportInCallCtrlLocalResoultion[INFO_LEN];
-wchar_t ReportInCallCtrlLocalFPS[INFO_LEN];
-
 //area code
 wchar_t RegionConnCtrlAreaCode[INFO_LEN];
 
@@ -402,7 +386,7 @@ void InitKeyInfomation()
 	_tcscpy_s(advancedAudioProfile, INFO_LEN, Str(_T("Advanced.AudioProfile")));
 	_tcscpy_s(advancedAudioMixing, INFO_LEN, Str(_T("Advanced.AudioMixing")));
 
-    _tcscpy_s(advancedCustomVideoCapture, INFO_LEN, Str(_T("Advanced.CustomVideoCapture")));
+    _tcscpy_s(advancedCustomAVCapture, INFO_LEN, Str(_T("Advanced.CustomVideoCapture")));
 	_tcscpy_s(advancedOriginalVideo, INFO_LEN, Str(_T("Advanced.OriginalVideo")));
 
     _tcscpy_s(advancedCustomAudioCapture, INFO_LEN, Str(_T("Advanced.CustomAudioCapture")));
@@ -616,24 +600,6 @@ void InitKeyInfomation()
 	_tcscpy_s(AudioVolumeCtrlCapSigVol, INFO_LEN, Str(_T("AudioVolume.Ctrl.AudioCapSigVol")));
 	_tcscpy_s(AudioVolumeCtrlPlaybackVol, INFO_LEN, Str(_T("AudioVolume.Ctrl.AudioPlaybackVol")));
 	_tcscpy_s(AudioVolumeCtrlPlaybackSigVol, INFO_LEN, Str(_T("AudioVolume.Ctrl.AudioPlaybackSigVol")));
-
-
-
-
-	_tcscpy_s(ReportInCallCtrlLocalFPS, INFO_LEN, Str(_T("ReportInCall.Ctrl.LocalFPS")));
-	_tcscpy_s(ReportInCallCtrlLocalResoultion, INFO_LEN, Str(_T("ReportInCall.Ctrl.LocaLResoultion")));
-	_tcscpy_s(ReportInCallCtrlAudioBitrate, INFO_LEN, Str(_T("ReportInCall.Ctrl.AudioBitrate")));
-	_tcscpy_s(ReportInCallCtrlAudioBytes, INFO_LEN, Str(_T("ReportInCall.Ctrl.AudioBytes")));
-	_tcscpy_s(ReportInCallCtrlAudioNetWorkDelay, INFO_LEN, Str(_T("ReportInCall.Ctrl.AudioNetWorkDelay")));
-	_tcscpy_s(ReportInCallCtrlGopRemoteAudio, INFO_LEN, Str(_T("ReportInCall.Ctrl.GopRemoteAudio")));
-	_tcscpy_s(ReportInCallCtrlGopRemoteVideo, INFO_LEN, Str(_T("ReportInCall.Ctrl.GopRemoteVideo")));
-	_tcscpy_s(ReportInCallCtrlGopTotal, INFO_LEN, Str(_T("ReportInCall.Ctrl.GopTotal")));
-	_tcscpy_s(ReportInCallCtrlTotalBitrate, INFO_LEN, Str(_T("ReportInCall.Ctrl.TotalBitrate")));
-	_tcscpy_s(ReportInCallCtrlTotalBytes, INFO_LEN, Str(_T("ReportInCall.Ctrl.TotalBytes")));
-	_tcscpy_s(ReportInCallCtrlTotalUpDownLink, INFO_LEN, Str(_T("ReportInCall.Ctrl.TotalUpDownLink")));
-	_tcscpy_s(ReportInCallCtrlVideoNetWorkDelay, INFO_LEN, Str(_T("ReportInCall.Ctrl.VideoNetWorkDelay")));
-	_tcscpy_s(ReportInCallCtrlVideoBitrate, INFO_LEN, Str(_T("ReportInCall.Ctrl.VideoBitrate")));
-	_tcscpy_s(ReportInCallCtrlVideoBytes, INFO_LEN, Str(_T("ReportInCall.Ctrl.VideoBytes")));
 
 
 	_tcscpy_s(RegionConnCtrlAreaCode, INFO_LEN, Str(_T("RegionConn.Ctrl.AreaCode")));

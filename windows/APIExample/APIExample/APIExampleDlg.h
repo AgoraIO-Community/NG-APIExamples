@@ -6,27 +6,25 @@
 #include "Basic/LiveBroadcasting/CLiveBroadcastingDlg.h"
 #include "Advanced/MultiVideoSource/CAgoraMutilVideoSourceDlg.h"
 #include "Advanced/MediaPlayer/CAgoraMediaPlayer.h"
-/*#include "Advanced/RTMPinject/AgoraRtmpInjectionDlg.h"
+#include "Advanced/CustomAVCapture/CAgoraAVCaptureDlg.h"
+/*
+#include "Advanced/MultiChannel/CAgoraMultiChannelDlg.h"
+#include "Advanced/MultiCamera/CMultiCameraDlg.h"
+#include "Advanced/OriginalVideo/CAgoraOriginalVideoDlg.h"
+#include "Advanced/OriginalAudio/CAgoraOriginalAudioDlg.h"
+#include "Advanced/RTMPinject/AgoraRtmpInjectionDlg.h"
 #include "Advanced/RTMPStream/AgoraRtmpStreaming.h"
 #include "Advanced/VideoMetadata/CAgoraMetaDataDlg.h"
 #include "Advanced/ScreenShare/AgoraScreenCapture.h"
-#include "Advanced/CustomAudioCapture/CAgoraCaptureAudioDlg.h"
-#include "Advanced/CustomVideoCapture/CAgoraCaptureVideoDlg.h"
+
 #include "Advanced/AudioProfile/CAgoraAudioProfile.h"
 #include "Advanced/AudioMixing/CAgoraAudioMixingDlg.h"
-#include "Advanced/OriginalVideo/CAgoraOriginalVideoDlg.h"
-#include "Advanced/OriginalAudio/CAgoraOriginalAudioDlg.h"
 #include "Advanced/CustomEncrypt/CAgoraCustomEncryptDlg.h"
-#include "Advanced/MultiChannel/CAgoraMultiChannelDlg.h"
-
 #include "Advanced/PerCallTest/CAgoraPerCallTestDlg.h"
 #include "Advanced/AudioVolume/CAgoraAudioVolumeDlg.h"
-
 #include "Advanced/RegionConn/CAgoraRegionConnDlg.h"
 #include "Advanced/MediaEncrypt/CAgoraMediaEncryptDlg.h"
 #include "Advanced/AudioEffect/CAgoraEffectDlg.h"
-
-#include "Advanced/MultiCamera/CMultiCameraDlg.h"
 #include "Advanced/LocalVideoTranscoding/CLocalVideoTranscodingDlg.h"*/
 #include <mutex>
 #include <vector>
@@ -77,12 +75,12 @@ private:
     std::unique_ptr<CLiveBroadcastingDlg>           m_pLiveBroadcasting = nullptr;
 	std::unique_ptr < CAgoraMutilVideoSourceDlg>	m_pMultiVideoSourceDlg = nullptr;
 	std::unique_ptr < CAgoraMediaPlayer	>		    m_pmediaPlayerDlg = nullptr;
+	std::unique_ptr <CAgoraAVCaptureDlg>            m_pCaputreVideoDlg = nullptr;
+	
   /*  CAgoraRtmpInjectionDlg      *m_pRtmpInjectDlg    = nullptr;
     CAgoraRtmpStreamingDlg      *m_pRtmpStreamingDlg = nullptr;
     CAgoraMetaDataDlg           *m_pVideoSEIDlg      = nullptr;
     CAgoraScreenCapture         *m_pScreenCap        = nullptr;
-    CAgoraCaptureVideoDlg       *m_pCaputreVideoDlg  = nullptr;
-    CAgoraCaptureAduioDlg       *m_pCaptureAudioDlg  = nullptr;
 	CAgoraAudioProfile			*m_pAudioProfileDlg  = nullptr;
 	CAgoraAudioMixingDlg		*m_pAudioMixingDlg   = nullptr;
 	CAgoraOriginalVideoDlg		*m_pOriginalVideoDlg = nullptr;

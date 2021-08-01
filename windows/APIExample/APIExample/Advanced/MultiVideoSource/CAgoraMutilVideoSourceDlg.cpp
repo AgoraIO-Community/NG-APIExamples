@@ -81,7 +81,6 @@ bool CAgoraMutilVideoSourceDlg::InitAgora()
 		local_camera_id_ = GenerateUserId();
 
 	}
-
 	else {
 		local_user_id_ = GenerateRandomString(local_user_id_, id_random_len);
 		local_screen_id_ = GenerateRandomString(local_screen_id_, id_random_len);

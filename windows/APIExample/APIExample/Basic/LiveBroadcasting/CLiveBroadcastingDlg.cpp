@@ -71,8 +71,6 @@ BEGIN_MESSAGE_MAP(CLiveBroadcastingDlg, CDialogEx)
 	ON_MESSAGE(WM_MSGID(EID_REMOTE_VIDEOSTREAM_REMOVE), &CLiveBroadcastingDlg::OnRemoteStreamRemove)
     ON_MESSAGE(WM_MSGID(EID_USER_OFFLINE), &CLiveBroadcastingDlg::OnEIDUserOffline)
 	ON_MESSAGE(WM_MSGID(EID_CONNECTION_STATE), &CLiveBroadcastingDlg::OnEIDConnectionStateChanged)
-
-
 	ON_MESSAGE(WM_MSGID(EID_LOCAL_STREAM_STATS), &CLiveBroadcastingDlg::OnEIDLocalStreamStats)
 	ON_MESSAGE(WM_MSGID(EID_REMOTE_STREAM_STATS), &CLiveBroadcastingDlg::OnEIDRemoteStreamStats)
 
@@ -382,13 +380,13 @@ void CLiveBroadcastingDlg::RenderLocalVideo()
 		canvas.view = m_videoWnds[0].GetSafeHwnd();
 		
 		camera_track_->SetPreviewCanvas(canvas);
-		m_lstInfo.InsertString(m_lstInfo.GetCount() - 1, _T("CameraTrack SetPreviewCanvas"));
+		m_lstInfo.InsertString(m_lstInfo.GetCount(), _T("CameraTrack SetPreviewCanvas"));
 		
 		agora::rte::CameraCallbackFun cameraCallback = [this](agora::rte::CameraState state, agora::rte::CameraSource) {
 			//::PostMessage(this->m_hWnd, 0, 0, 0);
 		};
 		camera_track_->StartCapture(cameraCallback);
-		m_lstInfo.InsertString(m_lstInfo.GetCount() - 1, _T("CameraTrack StartCapture"));
+		m_lstInfo.InsertString(m_lstInfo.GetCount(), _T("CameraTrack StartCapture"));
 	}
 }
 
@@ -545,15 +543,11 @@ LRESULT CLiveBroadcastingDlg::OnEIDRemoteVideoStateChanged(WPARAM wParam, LPARAM
 		int streamCount = 0;
 		for (int i = 1; i < m_maxVideoCount; i++) {
 			if (m_videoWnds[i].GetUID().empty()) {
-
-
 				agora::rte::VideoCanvas canvas;
-
 				canvas.view = m_videoWnds[i].GetSafeHwnd();
 				canvas.renderMode = agora::media::base::RENDER_MODE_FIT;
 				//setup remote video in engine to the canvas.
 				m_scene->SetRemoteVideoCanvas(videoState->streams.stream_id, canvas);
-
 				m_lstInfo.InsertString(m_lstInfo.GetCount(), _T("SetRemoteVideoCanvas "));
 				m_lstInfo.InsertString(m_lstInfo.GetCount(), utf82cs(videoState->streams.stream_id));
 				m_videoWnds[i].SetUID(videoState->streams.stream_id);
@@ -562,9 +556,7 @@ LRESULT CLiveBroadcastingDlg::OnEIDRemoteVideoStateChanged(WPARAM wParam, LPARAM
 				break;
 			}
 		}
-
 	}
-
 
 	if (videoState) {
 		delete videoState;
@@ -782,58 +774,6 @@ BOOL CLiveBroadcastingDlg::PreTranslateMessage(MSG* pMsg)
 	return CDialogEx::PreTranslateMessage(pMsg);
 }
 
-
-void CLiveBroadcastingRtcEngineEventHandler::OnLocalStreamStats(const std::string& stream_id, const agora::rte::LocalStreamStats& stats) 
-{
-	if (m_hMsgHanlder) {
-		PLocalStats stat = new LocalStats;
-		stat->strmid = stream_id;
-		stat->stats = stats;
-		if (m_hMsgHanlder)
-			::PostMessage(m_hMsgHanlder, WM_MSGID(EID_LOCAL_STREAM_STATS), (WPARAM)stat, 0);
-
-	}
-}
-
-void CLiveBroadcastingRtcEngineEventHandler::OnRemoteStreamStats(const std::string& stream_id, const agora::rte::RemoteStreamStats& stats) 
-{
-	if (m_hMsgHanlder) {
-		PRemoteStats stat = new RemoteStats;
-		stat->strmid = stream_id;
-		stat->stats = stats;
-		if (m_hMsgHanlder)
-			::PostMessage(m_hMsgHanlder, WM_MSGID(EID_REMOTE_STREAM_STATS), (WPARAM)stat, 0);
-
-	}
-}
-
-void CLiveBroadcastingRtcEngineEventHandler::OnConnectionStateChanged(agora::rte::ConnectionState old_state, agora::rte::ConnectionState new_state,
-	agora::rte::ConnectionChangedReason reason)
-{
-
-	if (m_hMsgHanlder)
-		::PostMessage(m_hMsgHanlder, WM_MSGID(EID_CONNECTION_STATE), (int)old_state, (int)reason);
-	/*switch (new_state) {
-	case agora::rte::ConnectionState::kDisconnecting:
-		
-		break;
-	case agora::rte::ConnectionState::kConnecting:
-		break;
-	case agora::rte::ConnectionState::kConnected:
-		//connect_success_sempahore.Notify();
-		break;
-	case agora::rte::ConnectionState::kReconnecting:
-		break;
-	case agora::rte::ConnectionState::kFailed:
-	case agora::rte::ConnectionState::kDisconnected:
-		//connect_gone_sempahore.Notify();
-		break;
-	default:
-		break;
-	}*/
-}
-
-
 void CLiveBroadcastingDlg::OnSelchangeComboCameraList()
 {
 	int sel = m_cmbAudioProfile.GetCurSel();
@@ -948,4 +888,38 @@ void CLiveBroadcastingDlg::OnClickedCheckReportIncall()
 	for (int i = 0; i < m_strmIds.size(); ++i) {
 		m_videoWnds[i].ShowVideoInfo(m_chkReportInCall.GetCheck());
 	}
+}
+
+
+void CLiveBroadcastingRtcEngineEventHandler::OnLocalStreamStats(const std::string& stream_id, const agora::rte::LocalStreamStats& stats)
+{
+	if (m_hMsgHanlder) {
+		PLocalStats stat = new LocalStats;
+		stat->strmid = stream_id;
+		stat->stats = stats;
+		if (m_hMsgHanlder)
+			::PostMessage(m_hMsgHanlder, WM_MSGID(EID_LOCAL_STREAM_STATS), (WPARAM)stat, 0);
+
+	}
+}
+
+void CLiveBroadcastingRtcEngineEventHandler::OnRemoteStreamStats(const std::string& stream_id, const agora::rte::RemoteStreamStats& stats)
+{
+	if (m_hMsgHanlder) {
+		PRemoteStats stat = new RemoteStats;
+		stat->strmid = stream_id;
+		stat->stats = stats;
+		if (m_hMsgHanlder)
+			::PostMessage(m_hMsgHanlder, WM_MSGID(EID_REMOTE_STREAM_STATS), (WPARAM)stat, 0);
+
+	}
+}
+
+void CLiveBroadcastingRtcEngineEventHandler::OnConnectionStateChanged(agora::rte::ConnectionState old_state, agora::rte::ConnectionState new_state,
+	agora::rte::ConnectionChangedReason reason)
+{
+
+	if (m_hMsgHanlder)
+		::PostMessage(m_hMsgHanlder, WM_MSGID(EID_CONNECTION_STATE), (int)old_state, (int)reason);
+
 }

@@ -31,7 +31,7 @@ extern wchar_t advancedAudioProfile[INFO_LEN];
 extern wchar_t advancedAudioMixing[INFO_LEN];
 extern wchar_t advancedBeauty[INFO_LEN];
 extern wchar_t advancedBeautyAudio[INFO_LEN];
-extern wchar_t advancedCustomVideoCapture[INFO_LEN];
+extern wchar_t advancedCustomAVCapture[INFO_LEN];
 extern wchar_t advancedOriginalVideo[INFO_LEN];
 extern wchar_t advancedCustomAudioCapture[INFO_LEN];
 extern wchar_t advancedOriginalAudio[INFO_LEN];
@@ -259,23 +259,6 @@ extern wchar_t AudioVolumeCtrlCapSigVol[INFO_LEN];
 extern wchar_t AudioVolumeCtrlPlaybackVol[INFO_LEN];
 extern wchar_t AudioVolumeCtrlPlaybackSigVol[INFO_LEN];
 
-
-
-//report in call
-extern wchar_t ReportInCallCtrlGopTotal[INFO_LEN];
-extern wchar_t ReportInCallCtrlGopRemoteVideo[INFO_LEN];
-extern wchar_t ReportInCallCtrlGopRemoteAudio[INFO_LEN];
-extern wchar_t ReportInCallCtrlTotalUpDownLink[INFO_LEN];
-extern wchar_t ReportInCallCtrlTotalBytes[INFO_LEN];
-extern wchar_t ReportInCallCtrlTotalBitrate[INFO_LEN];
-extern wchar_t ReportInCallCtrlVideoNetWorkDelay[INFO_LEN];
-extern wchar_t ReportInCallCtrlVideoBytes[INFO_LEN];
-extern wchar_t ReportInCallCtrlVideoBitrate[INFO_LEN];
-extern wchar_t ReportInCallCtrlAudioNetWorkDelay[INFO_LEN];
-extern wchar_t ReportInCallCtrlAudioBytes[INFO_LEN];
-extern wchar_t ReportInCallCtrlAudioBitrate[INFO_LEN];
-extern wchar_t ReportInCallCtrlLocalResoultion[INFO_LEN];
-extern wchar_t ReportInCallCtrlLocalFPS[INFO_LEN];
 
 extern wchar_t MultiCameara[INFO_LEN];
 extern wchar_t MultiCamearaPublishCamera2[INFO_LEN];

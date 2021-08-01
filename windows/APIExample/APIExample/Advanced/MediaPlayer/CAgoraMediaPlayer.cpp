@@ -596,9 +596,11 @@ LRESULT CAgoraMediaPlayer::OnEIDConnectionStateChanged(WPARAM wParam, LPARAM lPa
 void CAgoraMediaPlayer::OnDestroy()
 {
 	CDialogEx::OnDestroy();
-	media_player_->UnregisterMediaPlayerObserver(player_observer_);
-	m_lstInfo.InsertString(m_lstInfo.GetCount(), _T("UnregisterMediaPlayerObserver"));
-	media_player_.reset();
+	if (media_player_) {
+		media_player_->UnregisterMediaPlayerObserver(player_observer_);
+		m_lstInfo.InsertString(m_lstInfo.GetCount(), _T("UnregisterMediaPlayerObserver"));
+		media_player_.reset();
+	}
 }
 
 
