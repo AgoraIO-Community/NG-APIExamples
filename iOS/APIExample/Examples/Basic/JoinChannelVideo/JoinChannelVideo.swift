@@ -137,10 +137,9 @@ class JoinChannelVideoMain: BaseViewController {
         scene = agoraKit.createRteScene(withSceneId: channelName, sceneConfig: config)
         
         scene?.setSceneDelegate(self)
-        
         let videoConfig = AgoraVideoEncoderConfiguration(size: resolution, frameRate: AgoraVideoFrameRate(rawValue: fps) ?? .fps15, bitrate: AgoraVideoBitrateStandard, orientationMode: orientation, mirrorMode: .auto)
         
-        let mediaControl = agoraKit.getRteMediaFactory()
+        let mediaControl = agoraKit.rteMediaFactory()
         cameraTrack = mediaControl?.createCameraVideoTrack()
         microphoneTrack = mediaControl?.createMicrophoneAudioTrack()
         
@@ -158,6 +157,7 @@ class JoinChannelVideoMain: BaseViewController {
         
         let streamOption = AgoraRteRtcStreamOptions()
         streamOption.token = ""
+        cameraTrack.startCapture();
         scene?.createOrUpdateRTCStream(LOCAL_STREAM_ID, rtcStreamOptions: streamOption)
         scene?.publishLocalAudioTrack(LOCAL_STREAM_ID, rteAudioTrack: microphoneTrack!)
         scene.publishLocalVideoTrack(LOCAL_STREAM_ID, rteVideoTrack: cameraTrack!)
@@ -298,33 +298,33 @@ class JoinChannelVideoMain: BaseViewController {
 //}
 
 extension JoinChannelVideoMain: AgoraRteSceneDelegate {
-    
-    func agoraRteScene(_ rteScene: AgoraRteSceneProtocol, didRemoteUserJoined userInfos: [AgoraRteStreamInfo]?) {
-        guard let infos = userInfos else { return }
-        for info in infos {
-            rteScene.subscribeRemoteAudio(info.streamId!)
-            let option = AgoraRteVideoSubscribeOptions()
-            rteScene.subscribeRemoteVideo(info.streamId!, videoSubscribeOptions: option)
-            
-            DispatchQueue.main.async { [weak self] in
-                guard let strongSelf = self else {
-                    return
-                }
-                // Only one remote video view is available for this
-                // tutorial. Here we check if there exists a surface
-                // view tagged as this uid.
-                let videoCanvas = AgoraRtcVideoCanvas()
-                videoCanvas.uid = UInt(info.streamId!)!
-                // the view to be binded
-                videoCanvas.view = strongSelf.remoteVideo.videoView
-                videoCanvas.renderMode = .hidden
-                rteScene.setRemoteVideoCanvas(info.streamId!, videoCanvas: videoCanvas)
-            }
-        }
+    //
+    func agoraRteScene(_ rteScene: AgoraRteSceneProtocol, remoteUserDidJoin userInfos: [AgoraRteUserInfo]?) {
+        print("didRemoteUserDidJoin")
     }
-    
-    func agoraRteObjcScene(_ rteScene: AgoraRteSceneProtocol, didRemoteStreamAdded streams: [Any]?) {
-        print("didRemoteStreamAdded")
+    // one user --> more streams so subscribe user by streamId
+    func agoraRteScene(_ rteScene: AgoraRteSceneProtocol, remoteStreamesDidAdd streams: [AgoraRteStreamInfo]?) {
+        if streams?.count == 0 {
+            print("没有stream 添加进来")
+        }
+        guard let infos = streams else { return }
+        for info in infos {
+            // Only one remote video view is available for this
+            // tutorial. Here we check if there exists a surface
+            // view tagged as this uid.
+            let videoCanvas = AgoraRtcVideoCanvas()
+            videoCanvas.uid = UInt(info.streamId!)!
+            videoCanvas.userId = info.userId
+            // the view to be binded
+            videoCanvas.view = remoteVideo.videoView
+            videoCanvas.renderMode = .hidden
+            rteScene.setRemoteVideoCanvas(info.streamId!, videoCanvas: videoCanvas)
+            let option = AgoraRteVideoSubscribeOptions()
+            rteScene.subscribeRemoteAudio(info.streamId!)
+            rteScene.subscribeRemoteVideo(info.streamId!, videoSubscribeOptions: option)
+            print("didRemoteStreamAdded" + "stream_id == \(String(describing: info.streamId))")
+
+        }
     }
     
     func agoraRteScene(_ rteScene: AgoraRteSceneProtocol, didConnectionStateChanged oldState: AgoraConnectionState, newState state: AgoraConnectionState, changedReason reason: AgoraConnectionChangedReason) {
@@ -335,12 +335,12 @@ extension JoinChannelVideoMain: AgoraRteSceneDelegate {
         print("didLocalStreamStateChanged \(String(describing: streams?.streamId)), audio sentBitrate: \(String(describing: newState))")
     }
     
-    func agoraRteScene(_ rteScene: AgoraRteSceneProtocol, didLocalStreamStats streamId: String?, stats: AgoraRteLocalStreamStats?) {
+    func agoraRteScene(_ rteScene: AgoraRteSceneProtocol, localStreamDidStats streamId: String?, stats: AgoraRteLocalStreamStats?) {
         print("didLocalStreamStats \(String(describing: streamId)), audio sentBitrate: \(String(describing: stats?.audioStats?.sentBitrate))")
         remoteVideo.statsInfo?.updateLocalVideoStats(stats!)
     }
     
-    func agoraRteScene(_ rteScene: AgoraRteSceneProtocol, didSceneStats stats: AgoraRteSceneStats?) {
+    func agoraRteScene(_ rteScene: AgoraRteSceneProtocol, sceneStats stats: AgoraRteSceneStats?) {
         print("didSceneStats")
         guard stats != nil else {
             return
