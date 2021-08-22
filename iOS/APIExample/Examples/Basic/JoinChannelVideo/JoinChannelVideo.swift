@@ -99,11 +99,14 @@ class JoinChannelVideoMain: BaseViewController {
     @IBOutlet weak var container: AGEVideoContainer!
     
     var agoraKit: AgoraRteSdk!
+    var player : AgoraRteMediaPlayerProtocol!
+    @IBOutlet weak var playerView: UIView!
+    
     var scene: AgoraRteSceneProtocol!
     var microphoneTrack: AgoraRteMicrophoneAudioTrackProtocol!
     var cameraTrack: AgoraRteCameraVideoTrackProtocol!
     let LOCAL_STREAM_ID = String(UInt.random(in: 1000...2000))
-    
+    let PLAYER_STREAM_ID =  String(UInt.random(in: 2000...3000))
     // indicate if current instance has joined channel
     var isJoined: Bool = false
     
@@ -142,7 +145,8 @@ class JoinChannelVideoMain: BaseViewController {
         let mediaControl = agoraKit.rteMediaFactory()
         cameraTrack = mediaControl?.createCameraVideoTrack()
         microphoneTrack = mediaControl?.createMicrophoneAudioTrack()
-        
+        player = mediaControl?.createMediaPlayer()
+        player.setView(playerView)
         let joinOption = AgoraRteJoinOptions()
         joinOption.isUserVisibleToRemote = true
         
@@ -161,7 +165,8 @@ class JoinChannelVideoMain: BaseViewController {
         scene?.createOrUpdateRTCStream(LOCAL_STREAM_ID, rtcStreamOptions: streamOption)
         scene?.publishLocalAudioTrack(LOCAL_STREAM_ID, rteAudioTrack: microphoneTrack!)
         scene.publishLocalVideoTrack(LOCAL_STREAM_ID, rteVideoTrack: cameraTrack!)
-        
+        scene?.createOrUpdateRTCStream(PLAYER_STREAM_ID, rtcStreamOptions: streamOption)
+        scene.publishMediaPlayer(PLAYER_STREAM_ID, mediaPlayer: player)
         
 //
 //        // set up local video to render your local camera preview
@@ -198,6 +203,17 @@ class JoinChannelVideoMain: BaseViewController {
 //        }
     }
     
+    @IBAction func stop(_ sender: Any) {
+        
+        player.stop();
+    }
+    @IBAction func play(_ sender: Any) {
+        player.play()
+    }
+    
+    @IBAction func open(_ sender: Any) {
+        player.openUrl("http://114.236.93.153:8080/download/video/15songs.mp4", startPos: 0)
+    }
     override func willMove(toParent parent: UIViewController?) {
         if parent == nil {
             // leave channel when exiting the view
@@ -296,18 +312,16 @@ class JoinChannelVideoMain: BaseViewController {
 //        remoteVideo.statsInfo?.updateAudioStats(stats)
 //    }
 //}
-
+var users:Int = 0
 extension JoinChannelVideoMain: AgoraRteSceneDelegate {
     //
     func agoraRteScene(_ rteScene: AgoraRteSceneProtocol, remoteUserDidJoin userInfos: [AgoraRteUserInfo]?) {
         print("didRemoteUserDidJoin")
     }
     // one user --> more streams so subscribe user by streamId
-    func agoraRteScene(_ rteScene: AgoraRteSceneProtocol, remoteStreamesDidAdd streams: [AgoraRteStreamInfo]?) {
-        if streams?.count == 0 {
-            print("没有stream 添加进来")
-        }
-        guard let infos = streams else { return }
+    func agoraRteScene(_ rteScene: AgoraRteSceneProtocol, remoteStreamesDidAddWith streamInfos: [AgoraRteStreamInfo]?) {
+        
+        guard let infos = streamInfos else { return }
         for info in infos {
             // Only one remote video view is available for this
             // tutorial. Here we check if there exists a surface
@@ -316,13 +330,19 @@ extension JoinChannelVideoMain: AgoraRteSceneDelegate {
             videoCanvas.uid = UInt(info.streamId!)!
             videoCanvas.userId = info.userId
             // the view to be binded
-            videoCanvas.view = remoteVideo.videoView
+            if users != 0 {
+                videoCanvas.view = playerView
+            }else
+            {
+                videoCanvas.view = remoteVideo.videoView
+            }
             videoCanvas.renderMode = .hidden
             rteScene.setRemoteVideoCanvas(info.streamId!, videoCanvas: videoCanvas)
             let option = AgoraRteVideoSubscribeOptions()
             rteScene.subscribeRemoteAudio(info.streamId!)
             rteScene.subscribeRemoteVideo(info.streamId!, videoSubscribeOptions: option)
             print("didRemoteStreamAdded" + "stream_id == \(String(describing: info.streamId))")
+            users = (users + 1)%2
 
         }
     }

@@ -88,7 +88,7 @@ class JoinChannelAudioMain: BaseViewController {
         audioConfig.profile = audioProfile
         scene?.setAudioEncoderConfiguration(LOCAL_STREAM_ID, audioEncoderConfiguration: audioConfig)
         
-        let mediaControl = agoraKit.getRteMediaFactory()
+        let mediaControl = agoraKit.rteMediaFactory()
         microphoneTrack = mediaControl?.createMicrophoneAudioTrack()
         
         let joinOption = AgoraRteJoinOptions()
@@ -205,6 +205,9 @@ class JoinChannelAudioMain: BaseViewController {
 
 extension JoinChannelAudioMain: AgoraRteSceneDelegate {
     
+    func agoraRteScene(_ rteScene: AgoraRteSceneProtocol, remoteStreamesDidAdd streams: [AgoraRteStreamInfo]?) {
+        
+    }
     func agoraRteScene(_ rteScene: AgoraRteSceneProtocol, didRemoteUserJoined userInfos: [AgoraRteStreamInfo]?) {
         guard let infos = userInfos else { return }
         for info in infos {
