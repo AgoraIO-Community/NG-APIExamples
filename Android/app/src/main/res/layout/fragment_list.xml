@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_view_fg_list"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        tools:itemCount="20"
+        tools:listitem="@android:layout/test_list_item"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        android:orientation="vertical"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"/>
