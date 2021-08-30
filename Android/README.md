@@ -10,6 +10,6 @@
 <br/>
 <br/>
 
-[basicAudio]: src/main/java/io/agora/ng_api/ui/fragment/JoinChannelAudioFragment.java
-[basicVideo]: src/main/java/io/agora/ng_api/ui/fragment/JoinChannelVideoFragment.java
-[advancedMediaPlayer]: src/main/java/io/agora/ng_api/ui/fragment/MediaPlayerFragment.java
+[basicAudio]: app/src/main/java/io/agora/ng_api/ui/fragment/JoinChannelAudioFragment.java
+[basicVideo]: app/src/main/java/io/agora/ng_api/ui/fragment/JoinChannelVideoFragment.java
+[advancedMediaPlayer]: app/src/main/java/io/agora/ng_api/ui/fragment/MediaPlayerFragment.java
