@@ -116,7 +116,7 @@ public class DescriptionFragment extends BaseFragment<FragmentDescriptionBinding
                 if (appIdInStrings.isEmpty() && appIdInSP.isEmpty())
                     showInputAppIdDialog(false);
                 else
-                    handlePermissionStuff(ExampleUtil.getPermissions(demoInfo.getPermissionFlag()));
+                    handlePermissionStuff();
             }
         });
 
@@ -134,10 +134,9 @@ public class DescriptionFragment extends BaseFragment<FragmentDescriptionBinding
     }
 
     /**
-     * @param requiredPermissions 需要的权限
      * @see <a href="https://developer.android.com/images/training/permissions/workflow-runtime.svg"/>
      */
-    private void handlePermissionStuff(@NonNull String[] requiredPermissions) {
+    private void handlePermissionStuff() {
         // 小于 M 无需控制
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             toNextFragment();
@@ -146,6 +145,7 @@ public class DescriptionFragment extends BaseFragment<FragmentDescriptionBinding
 
         // 检查权限是否通过
         boolean needRequest = false;
+        String[]requiredPermissions = ExampleUtil.getPermissions(demoInfo.getPermissionFlag());
         for (String permission : requiredPermissions) {
             if (requireContext().checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED) {
                 needRequest = true;
@@ -263,7 +263,7 @@ public class DescriptionFragment extends BaseFragment<FragmentDescriptionBinding
                 }else {
                     ExampleUtil.getSp(requireContext()).edit().putString(ExampleUtil.APPID, appId).apply();
                     dialog.dismiss();
-                    toNextFragment();
+                    handlePermissionStuff();
                 }
             }
         });

@@ -1,6 +1,7 @@
 package io.agora.ng_api.view;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.os.Build;
@@ -19,6 +20,7 @@ import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
 import com.google.android.material.card.MaterialCardView;
 import io.agora.ng_api.R;
+import io.agora.ng_api.util.ExampleUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -97,6 +99,14 @@ public class DynamicView extends ConstraintLayout {
                 demoAddView(view);
             }
         }
+    }
+
+
+    @Override
+    protected void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        if(this.scrollContainer != null)
+            this.scrollContainer.setBackgroundColor(ExampleUtil.getColorInt(getContext(),R.attr.colorSurface));
     }
 
     /**

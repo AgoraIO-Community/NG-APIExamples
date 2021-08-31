@@ -1,15 +1,15 @@
 package io.agora.ng_api.ui.fragment;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.Editable;
-import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.view.View;
-import android.view.ViewGroup;
 import android.webkit.URLUtil;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import com.google.android.material.slider.Slider;
+
 import io.agora.ng_api.MyApp;
 import io.agora.ng_api.base.BaseDemoFragment;
 import io.agora.ng_api.databinding.FragmentMediaPlayerBinding;
@@ -17,6 +17,7 @@ import io.agora.ng_api.util.ExampleUtil;
 import io.agora.ng_api.view.VideoView;
 import io.agora.rte.AgoraRteSDK;
 import io.agora.rte.media.data.AgoraRteMediaPlayerObserver;
+import io.agora.rte.media.data.AgoraRteVideoFrame;
 import io.agora.rte.media.media_player.*;
 import io.agora.rte.media.stream.AgoraRtcStreamOptions;
 import io.agora.rte.media.stream.AgoraRteMediaStreamInfo;
@@ -25,7 +26,6 @@ import io.agora.rte.media.video.AgoraRteVideoSubscribeOptions;
 import io.agora.rte.scene.AgoraRteConnectionChangedReason;
 import io.agora.rte.scene.AgoraRteSceneConnState;
 import io.agora.rte.scene.AgoraRteSceneEventHandler;
-import io.agora.rte.statistics.AgoraRteLocalVideoStats;
 
 import java.util.List;
 import java.util.Random;
@@ -36,6 +36,7 @@ public class MediaPlayerFragment extends BaseDemoFragment<FragmentMediaPlayerBin
     private AgoraRteMediaPlayerObserver mPlayerObserver;
     private VideoView mVideoView;
 
+    boolean initVideoView = false;
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -99,6 +100,18 @@ public class MediaPlayerFragment extends BaseDemoFragment<FragmentMediaPlayerBin
     private void initListener() {
         mPlayerObserver = new AgoraRteMediaPlayerObserver() {
             @Override
+            public void onVideoFrame(AgoraRteFileInfo fileInfo, AgoraRteVideoFrame videoFrame) {
+                super.onVideoFrame(fileInfo, videoFrame);
+                if(!initVideoView){
+                    initVideoView = true;
+                    new Handler(Looper.getMainLooper()).postAtFrontOfQueue(() -> {
+                        mVideoView.mTextureView.getLayoutParams().height = mVideoView.mTextureView.getMeasuredWidth() * videoFrame.getHeight() / videoFrame.getWidth();
+                        mVideoView.mTextureView.requestLayout();
+                    });
+                }
+            }
+
+            @Override
             public void onPlayerStateChanged(AgoraRteFileInfo fileInfo, AgoraRteMediaPlayerState state, AgoraRteMediaPlayerError error) {
                 super.onPlayerStateChanged(fileInfo, state, error);
                 ExampleUtil.utilLog(fileInfo.beginTime + "/" + fileInfo.duration + "state: " + state + ", error: " + error);
@@ -122,24 +135,9 @@ public class MediaPlayerFragment extends BaseDemoFragment<FragmentMediaPlayerBin
         };
         agoraListener = new AgoraRteSceneEventHandler() {
             @Override
-            public void onLocalStreamVideoStats(String streamId, AgoraRteLocalVideoStats stats) {
-                super.onLocalStreamVideoStats(streamId, stats);
-                ExampleUtil.utilLog("streamId:" + streamId + "," + stats.getEncodedFrameWidth() + "*" + stats.getEncodedFrameHeight());
-                if (stats.getEncodedFrameWidth() != 0
-                        && mVideoView.mSurfaceView.getLayoutParams().height == ViewGroup.LayoutParams.WRAP_CONTENT
-                        && streamId.contains("media")) {
-                    ExampleUtil.utilLog("change bound");
-                    ViewGroup.LayoutParams lp = mVideoView.mSurfaceView.getLayoutParams();
-
-                    // desiredHeight / mVideoView.getMeasuredWidth() = frameHeight / frameWidth
-                    lp.height = stats.getEncodedFrameHeight() * mVideoView.getMeasuredWidth() / stats.getEncodedFrameWidth();
-                    mVideoView.mSurfaceView.setLayoutParams(lp);
-                }
-            }
-
-            @Override
             public void onConnectionStateChanged(AgoraRteSceneConnState oldState, AgoraRteSceneConnState newState, AgoraRteConnectionChangedReason reason) {
                 if (newState == AgoraRteSceneConnState.CONN_STATE_CONNECTED) {
+                    ExampleUtil.utilLog("onConnectionStateChanged,Thread:"+Thread.currentThread().getName());
                     // RTC stream prepare
                     sid = "local_" + scene.getLocalUserInfo().getUserId();
                     AgoraRtcStreamOptions option = new AgoraRtcStreamOptions();
@@ -196,7 +194,7 @@ public class MediaPlayerFragment extends BaseDemoFragment<FragmentMediaPlayerBin
 
     private void addMediaView() {
         mBinding.containerFgPlayer.demoAddView(mVideoView, false);
-        mPlayer.setView(mVideoView.mSurfaceView);
+        mPlayer.setView(mVideoView.mTextureView);
     }
 
     private void addCameraView() {

@@ -7,8 +7,9 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.AttributeSet;
 import android.view.Gravity;
-import android.view.SurfaceView;
-import android.view.View;
+import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
+import android.view.TextureView;
 import android.widget.CheckBox;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
@@ -20,9 +21,11 @@ import com.google.android.material.slider.Slider;
 import io.agora.ng_api.R;
 import io.agora.ng_api.util.ExampleUtil;
 
-public class VideoView extends FrameLayout {
+public class VideoView extends FrameLayout implements ScaleGestureDetector.OnScaleGestureListener {
+    private final ScaleGestureDetector detector = new ScaleGestureDetector(getContext(),this);
+
     private final Handler mHandler = new Handler(Looper.getMainLooper());
-    public final SurfaceView mSurfaceView = new SurfaceView(getContext());
+    public final TextureView mTextureView = new TextureView(getContext());
     public final CheckBox mPlayBtn = new CheckBox(getContext());
     public final ProgressBar mLoadingView = new ProgressBar(getContext());
     public final Slider mProgressSlider = new Slider(getContext());
@@ -112,6 +115,8 @@ public class VideoView extends FrameLayout {
         }).start();
     };
 
+    private boolean wantClick;
+
     public VideoView(@NonNull Context context) {
         this(context, null);
     }
@@ -134,7 +139,7 @@ public class VideoView extends FrameLayout {
     private void init() {
         LayoutParams lp4SurfaceView = new FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
         lp4SurfaceView.gravity = Gravity.CENTER_VERTICAL;
-        mSurfaceView.setLayoutParams(lp4SurfaceView);
+        mTextureView.setLayoutParams(lp4SurfaceView);
 
         LayoutParams lp4Slider = new FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
         lp4Slider.gravity = Gravity.BOTTOM;
@@ -157,7 +162,7 @@ public class VideoView extends FrameLayout {
         mPlayBtn.setVisibility(GONE);
         mPlayBtn.setAlpha(0f);
 
-        this.addView(mSurfaceView);
+        this.addView(mTextureView);
         this.addView(mLoadingView);
         this.addView(mPlayBtn);
         this.addView(mProgressSlider);
@@ -167,6 +172,30 @@ public class VideoView extends FrameLayout {
                 hideOverlay();
             else showOverlay();
         });
+    }
+
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        if(event.getActionMasked() == MotionEvent.ACTION_DOWN){
+            wantClick = true;
+        }else if(event.getActionMasked() == MotionEvent.ACTION_POINTER_DOWN){
+            wantClick = false;
+        }else if(event.getActionMasked() == MotionEvent.ACTION_UP){
+            if(wantClick) performClick();
+        }
+        detector.onTouchEvent(event);
+        return true;
+    }
+
+    @Override
+    public boolean performClick() {
+        super.performClick();
+        if(!wantClick) return true;
+        if (mPlayBtn.getVisibility() == VISIBLE)
+            hideOverlay();
+        else showOverlay();
+        return true;
     }
 
     public void hideOverlay(){
@@ -181,4 +210,38 @@ public class VideoView extends FrameLayout {
     }
 
 
+    @Override
+    public boolean onScale(ScaleGestureDetector detector) {
+        float desireScale = getDesiredScale(detector.getScaleFactor());
+
+        // scale
+        this.mTextureView.setScaleX(desireScale);
+        this.mTextureView.setScaleY(desireScale);
+
+        // TODO finish rotate
+//        double nowAngle = Math.atan(detector.getCurrentSpanY() / detector.getCurrentSpanX());
+//        double previousAngle = Math.atan(detector.getPreviousSpanY() / detector.getPreviousSpanX());
+//        float offsetAngle = (float) (nowAngle - previousAngle);
+//        this.mTextureView.setRotation(getRotation()+offsetAngle);
+
+        return true;
+    }
+
+    @Override
+    public boolean onScaleBegin(ScaleGestureDetector detector) {
+        return true;
+    }
+
+    @Override
+    public void onScaleEnd(ScaleGestureDetector detector) {
+
+    }
+
+
+    private float getDesiredScale(float factor){
+        float desiredScale = this.mTextureView.getScaleX() * factor;
+        desiredScale = Math.max(0.5f, desiredScale);
+        desiredScale = Math.min(3f, desiredScale);
+        return desiredScale;
+    }
 }
