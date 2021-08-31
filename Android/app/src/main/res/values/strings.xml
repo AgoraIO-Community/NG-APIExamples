@@ -37,6 +37,8 @@
     <string name="play">播放</string>
     <string name="pause">暂停</string>
 
+    <!--    屏幕共享-->
+
     <!-- 数据相关-->
     <string name="demo_string_basic">基本</string>
     <string name="demo_string_advanced">高级</string>
@@ -57,6 +59,8 @@
     <string name="desc_join_channel_audio">加入音频通话agora加入音频通话agora\n加入音频通话agora加入音频通话agora</string>
     <string name="title_media_player">媒体播放器</string>
     <string name="desc_media_player">媒体播放器agora媒体播放器agora\n媒体播放器agora媒体播放器agora</string>
+    <string name="title_screen_share">屏幕共享</string>
+    <string name="desc_screen_share">屏幕共享agora屏幕共享agora\n屏幕共享agora屏幕共享agora</string>
 
 
 </resources>

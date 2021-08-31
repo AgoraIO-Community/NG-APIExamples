@@ -11,6 +11,7 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
+
 import androidx.annotation.IntRange;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -18,7 +19,9 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
+
 import com.google.android.material.card.MaterialCardView;
+
 import io.agora.ng_api.R;
 import io.agora.ng_api.util.ExampleUtil;
 
@@ -105,8 +108,8 @@ public class DynamicView extends ConstraintLayout {
     @Override
     protected void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        if(this.scrollContainer != null)
-            this.scrollContainer.setBackgroundColor(ExampleUtil.getColorInt(getContext(),R.attr.colorSurface));
+        if (this.scrollContainer != null)
+            this.scrollContainer.setBackgroundColor(ExampleUtil.getColorInt(getContext(), R.attr.colorSurface));
     }
 
     /**
@@ -269,19 +272,20 @@ public class DynamicView extends ConstraintLayout {
 
         scrollView.setBackgroundColor(surface);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) scrollView.setElevation(dp2px(2));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+            scrollView.setElevation(dp2px(2));
 
 
         return scrollView;
     }
 
     public void demoAddView(View child) {
-        demoAddView(child, false);
+        demoAddView(child, null);
     }
 
-    public void demoAddView(View child, boolean insideInnerContainer) {
+    public void demoAddView(View child, Boolean insideInnerContainer) {
         if (layoutStyle == DynamicView.STYLE_LAYOUT_FLEX_GRID) {
-            if (insideInnerContainer)
+            if (Boolean.TRUE == insideInnerContainer)
                 throw new IllegalStateException("layoutStyle STYLE_LAYOUT_FLEX_GRID do not allow the ScrollContainer exist.");
             if (enableInsideAnimation)
                 helper.addChildInFlexLayout(child);
@@ -289,13 +293,19 @@ public class DynamicView extends ConstraintLayout {
                 addView(child);
                 regroupChildren();
             }
+        } else if (insideInnerContainer == null) {
+            if (this.getChildAt(0) == scrollContainer) {
+                addView(child);
+            } else {
+                scrollContainer.addView(child);
+            }
         } else if (insideInnerContainer) {
             if (enableDefaultClickListener)
                 throw new IllegalStateException("DynamicView cannot handle this situation.");
             else innerContainer.addView(child);
-        } else if (getChildCount() == 1)
-            addView(child, 0);
-        else innerContainer.addView(child);
+        } else {
+            innerContainer.addView(child);
+        }
     }
 
     public void demoAddView() {

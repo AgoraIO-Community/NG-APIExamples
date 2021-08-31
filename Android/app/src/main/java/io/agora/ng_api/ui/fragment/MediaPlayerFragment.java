@@ -53,7 +53,6 @@ public class MediaPlayerFragment extends BaseDemoFragment<FragmentMediaPlayerBin
     @Override
     public void onDestroyView() {
         if (mPlayer != null) {
-            mPlayer.setView(null);
             mPlayer.stop();
             mPlayer.destroy();
         }
@@ -133,25 +132,25 @@ public class MediaPlayerFragment extends BaseDemoFragment<FragmentMediaPlayerBin
             }
 
         };
-        agoraListener = new AgoraRteSceneEventHandler() {
+        mAgoraHandler = new AgoraRteSceneEventHandler() {
             @Override
             public void onConnectionStateChanged(AgoraRteSceneConnState oldState, AgoraRteSceneConnState newState, AgoraRteConnectionChangedReason reason) {
                 if (newState == AgoraRteSceneConnState.CONN_STATE_CONNECTED) {
                     ExampleUtil.utilLog("onConnectionStateChanged,Thread:"+Thread.currentThread().getName());
                     // RTC stream prepare
-                    sid = "local_" + scene.getLocalUserInfo().getUserId();
+                    sid = "local_" + mScene.getLocalUserInfo().getUserId();
                     AgoraRtcStreamOptions option = new AgoraRtcStreamOptions();
-                    scene.createOrUpdateRTCStream(sid, option);
+                    mScene.createOrUpdateRTCStream(sid, option);
                     // 准备视频采集
-                    localVideoTrack = AgoraRteSDK.getRteMediaFactory().createCameraVideoTrack();
+                    mLocalVideoTrack = AgoraRteSDK.getRteMediaFactory().createCameraVideoTrack();
                     // 必须先添加setPreviewCanvas，然后才能 startCapture
                     addCameraView();
-                    localVideoTrack.startCapture(null);
-                    scene.publishLocalVideoTrack(sid, localVideoTrack);
+                    mLocalVideoTrack.startCapture(null);
+                    mScene.publishLocalVideoTrack(sid, mLocalVideoTrack);
                     // 准备音频采集
-                    localAudioTrack = AgoraRteSDK.getRteMediaFactory().createMicrophoneAudioTrack();
-                    localAudioTrack.startRecording();
-                    scene.publishLocalAudioTrack(sid, localAudioTrack);
+                    mLocalAudioTrack = AgoraRteSDK.getRteMediaFactory().createMicrophoneAudioTrack();
+                    mLocalAudioTrack.startRecording();
+                    mScene.publishLocalAudioTrack(sid, mLocalAudioTrack);
 
                     // MediaPlayer initiate
                     mPlayer = AgoraRteSDK.getRteMediaFactory().createMediaPlayer();
@@ -184,8 +183,8 @@ public class MediaPlayerFragment extends BaseDemoFragment<FragmentMediaPlayerBin
         addMediaView();
         mPlayer.open(url, 0);
 
-        scene.createOrUpdateRTCStream(localMediaStreamId, new AgoraRtcStreamOptions());
-        scene.publishMediaPlayer(localMediaStreamId, mPlayer);
+        mScene.createOrUpdateRTCStream(localMediaStreamId, new AgoraRtcStreamOptions());
+        mScene.publishMediaPlayer(localMediaStreamId, mPlayer);
     }
 
     public void joinChannel() {
@@ -202,7 +201,7 @@ public class MediaPlayerFragment extends BaseDemoFragment<FragmentMediaPlayerBin
         view.setZOrderMediaOverlay(true);
         mBinding.containerFgPlayer.demoAddView(view, true);
         AgoraRteVideoCanvas canvas = new AgoraRteVideoCanvas(view);
-        localVideoTrack.setPreviewCanvas(canvas);
+        mLocalVideoTrack.setPreviewCanvas(canvas);
     }
 
     private void addRemoteView(String streamId) {
@@ -211,10 +210,10 @@ public class MediaPlayerFragment extends BaseDemoFragment<FragmentMediaPlayerBin
         view.setTag(streamId);
         mBinding.containerFgPlayer.demoAddView(view, true);
         AgoraRteVideoCanvas canvas = new AgoraRteVideoCanvas(view);
-        scene.setRemoteVideoCanvas(streamId, canvas);
+        mScene.setRemoteVideoCanvas(streamId, canvas);
 
-        scene.subscribeRemoteVideo(streamId, new AgoraRteVideoSubscribeOptions());
-        scene.subscribeRemoteAudio(streamId);
+        mScene.subscribeRemoteVideo(streamId, new AgoraRteVideoSubscribeOptions());
+        mScene.subscribeRemoteAudio(streamId);
     }
 
     @Override

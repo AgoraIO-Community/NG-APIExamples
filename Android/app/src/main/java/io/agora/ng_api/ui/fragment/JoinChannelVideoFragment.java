@@ -14,15 +14,11 @@ import io.agora.ng_api.databinding.FragmentJoinChannelVideoBinding;
 import io.agora.ng_api.util.ExampleUtil;
 import io.agora.ng_api.view.DynamicView;
 import io.agora.rte.AgoraRteSDK;
-import io.agora.rte.media.AgoraRteMediaType;
-import io.agora.rte.media.audio.AgoraRteAudioVolumeInfo;
-import io.agora.rte.media.camera.AgoraRteCameraState;
 import io.agora.rte.media.stream.*;
 import io.agora.rte.media.video.AgoraRteVideoCanvas;
 import io.agora.rte.media.video.AgoraRteVideoSubscribeOptions;
 import io.agora.rte.scene.AgoraRteSceneConnState;
 import io.agora.rte.scene.AgoraRteSceneEventHandler;
-import io.agora.rte.statistics.*;
 import io.agora.rte.user.AgoraRteUserInfo;
 
 import java.util.List;
@@ -63,7 +59,7 @@ public class JoinChannelVideoFragment extends BaseDemoFragment<FragmentJoinChann
     }
 
     private void initListener() {
-        agoraListener = new AgoraRteSceneEventHandler() {
+        mAgoraHandler = new AgoraRteSceneEventHandler() {
 
             /**
              * 场景网络状态回调
@@ -77,19 +73,19 @@ public class JoinChannelVideoFragment extends BaseDemoFragment<FragmentJoinChann
                 // 连接建立完成
                 if (state1 == AgoraRteSceneConnState.CONN_STATE_CONNECTED) {
                     // RTC stream prepare
-                    sid = "local_" + scene.getLocalUserInfo().getUserId();
+                    sid = "local_" + mScene.getLocalUserInfo().getUserId();
                     AgoraRtcStreamOptions option = new AgoraRtcStreamOptions();
-                    scene.createOrUpdateRTCStream(sid, option);
+                    mScene.createOrUpdateRTCStream(sid, option);
                     // 准备视频采集
-                    localVideoTrack = AgoraRteSDK.getRteMediaFactory().createCameraVideoTrack();
+                    mLocalVideoTrack = AgoraRteSDK.getRteMediaFactory().createCameraVideoTrack();
                     // 必须先添加setPreviewCanvas，然后才能 startCapture
                     addLocalView();
-                    localVideoTrack.startCapture(null);
-                    scene.publishLocalVideoTrack(sid, localVideoTrack);
+                    mLocalVideoTrack.startCapture(null);
+                    mScene.publishLocalVideoTrack(sid, mLocalVideoTrack);
                     // 准备音频采集
-                    localAudioTrack = AgoraRteSDK.getRteMediaFactory().createMicrophoneAudioTrack();
-                    localAudioTrack.startRecording();
-                    scene.publishLocalAudioTrack(sid, localAudioTrack);
+                    mLocalAudioTrack = AgoraRteSDK.getRteMediaFactory().createMicrophoneAudioTrack();
+                    mLocalAudioTrack.startRecording();
+                    mScene.publishLocalAudioTrack(sid, mLocalAudioTrack);
                 } else if (state1 == AgoraRteSceneConnState.CONN_STATE_DISCONNECTED) {
                     ExampleUtil.utilLog("onConnectionStateChanged: CONN_STATE_DISCONNECTED");
                 }
@@ -154,7 +150,7 @@ public class JoinChannelVideoFragment extends BaseDemoFragment<FragmentJoinChann
         SurfaceView view = mBinding.containerJoinChannelVideo.createDemoLayout(SurfaceView.class);
         mBinding.containerJoinChannelVideo.demoAddView(view);
         AgoraRteVideoCanvas canvas = new AgoraRteVideoCanvas(view);
-        localVideoTrack.setPreviewCanvas(canvas);
+        mLocalVideoTrack.setPreviewCanvas(canvas);
     }
 
     private void addRemoteView(String streamId) {
@@ -162,10 +158,10 @@ public class JoinChannelVideoFragment extends BaseDemoFragment<FragmentJoinChann
         view.setTag(streamId);
         mBinding.containerJoinChannelVideo.demoAddView(view);
         AgoraRteVideoCanvas canvas = new AgoraRteVideoCanvas(view);
-        scene.setRemoteVideoCanvas(streamId, canvas);
+        mScene.setRemoteVideoCanvas(streamId, canvas);
 
-        scene.subscribeRemoteVideo(streamId, new AgoraRteVideoSubscribeOptions());
-        scene.subscribeRemoteAudio(streamId);
+        mScene.subscribeRemoteVideo(streamId, new AgoraRteVideoSubscribeOptions());
+        mScene.subscribeRemoteAudio(streamId);
     }
 
     @Override

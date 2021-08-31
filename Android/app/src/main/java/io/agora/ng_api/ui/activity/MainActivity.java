@@ -1,7 +1,6 @@
 package io.agora.ng_api.ui.activity;
 
 import android.content.res.ColorStateList;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import androidx.annotation.NonNull;
@@ -26,6 +25,7 @@ import io.agora.ng_api.base.BaseActivity;
 import io.agora.ng_api.base.BaseDemoFragment;
 import io.agora.ng_api.bean.DemoInfo;
 import io.agora.ng_api.databinding.ActivityMainBinding;
+import io.agora.ng_api.ui.fragment.DescriptionFragment;
 import io.agora.ng_api.util.ExampleUtil;
 
 import java.util.ArrayList;
@@ -147,6 +147,14 @@ public final class MainActivity extends BaseActivity {
                 if (destination.getLabel() != null)
                     title = destination.getLabel().toString();
 
+
+                if(destination.getId() != R.id.listFragment) {
+                    if(arguments != null) {
+                        String channelName = arguments.getString(DescriptionFragment.channelName);
+                        if(channelName!=null)
+                        title += "【"+ channelName+"】";
+                    }
+                }
                 mBinding.tFabMain.show();
             }
             mBinding.textTitleMain.setText(title);
@@ -192,9 +200,9 @@ public final class MainActivity extends BaseActivity {
         mBinding.sectionAudioMain.muteBtnSectionAudio.addOnCheckedChangeListener((v, isChecked) -> {
             if (!v.isPressed()) return;
             BaseDemoFragment<?> f = checkDemoAvailable();
-            if (f != null && f.scene != null && f.localAudioTrack != null) {
-                if (isChecked) f.scene.unpublishLocalAudioTrack(f.localAudioTrack);
-                else f.scene.publishLocalAudioTrack(f.sid, f.localAudioTrack);
+            if (f != null && f.mScene != null && f.mLocalAudioTrack != null) {
+                if (isChecked) f.mScene.unpublishLocalAudioTrack(f.mLocalAudioTrack);
+                else f.mScene.publishLocalAudioTrack(f.sid, f.mLocalAudioTrack);
             }
         });
 
@@ -227,7 +235,7 @@ public final class MainActivity extends BaseActivity {
         });
         mBinding.sectionAudioMain.sliderVolumeSectionAudio.addOnChangeListener((slider, value, fromUser) -> {
             BaseDemoFragment<?> f = checkDemoAvailable();
-            if (f != null && f.localAudioTrack != null) f.localAudioTrack.adjustPublishVolume((int) value);
+            if (f != null && f.mLocalAudioTrack != null) f.mLocalAudioTrack.adjustPublishVolume((int) value);
         });
     }
 
@@ -276,7 +284,7 @@ public final class MainActivity extends BaseActivity {
             Integer descInt;
             NavArgument descArgument = destination.getArguments().get(argsDesc);
             if (descArgument == null)
-                throw new IllegalArgumentException("fragment argument " + argsPerm + " required.");
+                throw new IllegalArgumentException("fragment argument " + argsDesc + " required.");
             descInt = (Integer) descArgument.getDefaultValue();
             if (null == descInt || descInt <= 0)
                 throw new IllegalArgumentException("fragment argument " + argsDesc + " illegal.");

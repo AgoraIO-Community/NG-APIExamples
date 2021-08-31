@@ -11,18 +11,13 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import io.agora.ng_api.MyApp;
-import io.agora.ng_api.R;
 import io.agora.ng_api.base.BaseDemoFragment;
 import io.agora.ng_api.databinding.FragmentJoinChannelAudioBinding;
 import io.agora.ng_api.util.ExampleUtil;
 import io.agora.rte.AgoraRteSDK;
-import io.agora.rte.media.AgoraRteMediaType;
-import io.agora.rte.media.audio.AgoraRteAudioVolumeInfo;
-import io.agora.rte.media.media_player.AgoraRteMediaPlayer;
 import io.agora.rte.media.stream.*;
 import io.agora.rte.scene.AgoraRteSceneConnState;
 import io.agora.rte.scene.AgoraRteSceneEventHandler;
-import io.agora.rte.statistics.*;
 import io.agora.rte.user.AgoraRteUserInfo;
 
 import java.util.List;
@@ -49,7 +44,7 @@ public class JoinChannelAudioFragment extends BaseDemoFragment<FragmentJoinChann
     }
 
     private void initListener() {
-        agoraListener = new AgoraRteSceneEventHandler() {
+        mAgoraHandler = new AgoraRteSceneEventHandler() {
 
             /**
              * 场景网络状态回调
@@ -63,17 +58,17 @@ public class JoinChannelAudioFragment extends BaseDemoFragment<FragmentJoinChann
                 if (mBinding == null) return;
                 // 连接建立完成
                 if (state1 == AgoraRteSceneConnState.CONN_STATE_CONNECTED) {
-                    sid = "local_" + scene.getLocalUserInfo().getUserId();
+                    sid = "local_" + mScene.getLocalUserInfo().getUserId();
                     AgoraRtcStreamOptions option = new AgoraRtcStreamOptions();
-                    scene.createOrUpdateRTCStream(sid, option);
+                    mScene.createOrUpdateRTCStream(sid, option);
                     // 必须先添加setPreviewCanvas，然后才能 startCapture
                     addVoiceView();
 
                     // 准备音频采集
-                    localAudioTrack = AgoraRteSDK.getRteMediaFactory().createMicrophoneAudioTrack();
-                    localAudioTrack.adjustPublishVolume(100);
-                    localAudioTrack.startRecording();
-                    scene.publishLocalAudioTrack(sid, localAudioTrack);
+                    mLocalAudioTrack = AgoraRteSDK.getRteMediaFactory().createMicrophoneAudioTrack();
+                    mLocalAudioTrack.adjustPublishVolume(100);
+                    mLocalAudioTrack.startRecording();
+                    mScene.publishLocalAudioTrack(sid, mLocalAudioTrack);
                 } else if (state1 == AgoraRteSceneConnState.CONN_STATE_DISCONNECTED) {
                     ExampleUtil.utilLog("onConnectionStateChanged: CONN_STATE_DISCONNECTED");
                 }
@@ -162,7 +157,7 @@ public class JoinChannelAudioFragment extends BaseDemoFragment<FragmentJoinChann
         view.addView(title);
 
         mBinding.containerJoinChannelAudio.demoAddView(view);
-        scene.subscribeRemoteAudio(info.getStreamId());
+        mScene.subscribeRemoteAudio(info.getStreamId());
     }
 
     private void joinChannel() {

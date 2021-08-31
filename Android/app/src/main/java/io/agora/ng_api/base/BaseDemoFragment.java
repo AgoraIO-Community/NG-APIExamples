@@ -2,9 +2,7 @@ package io.agora.ng_api.base;
 
 import android.media.AudioManager;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Toast;
-import androidx.annotation.NonNull;
+
 import androidx.annotation.Nullable;
 import androidx.viewbinding.ViewBinding;
 import io.agora.ng_api.MyApp;
@@ -14,7 +12,6 @@ import io.agora.ng_api.util.ExampleUtil;
 import io.agora.rte.AgoraRteSDK;
 import io.agora.rte.AgoraRteSdkConfig;
 import io.agora.rte.base.AgoraRteLogConfig;
-import io.agora.rte.media.camera.AgoraRteCameraCaptureObserver;
 import io.agora.rte.media.stream.AgoraRteMediaStreamInfo;
 import io.agora.rte.media.track.AgoraRteCameraVideoTrack;
 import io.agora.rte.media.track.AgoraRteMicrophoneAudioTrack;
@@ -38,10 +35,10 @@ public abstract class BaseDemoFragment<B extends ViewBinding> extends BaseFragme
     public String sid;
     public String channelName;
     public AudioManager audioManager;
-    public AgoraRteScene scene;
-    public AgoraRteSceneEventHandler agoraListener;
-    public AgoraRteCameraVideoTrack localVideoTrack;
-    public AgoraRteMicrophoneAudioTrack localAudioTrack;
+    public AgoraRteScene mScene;
+    public AgoraRteSceneEventHandler mAgoraHandler;
+    public AgoraRteCameraVideoTrack mLocalVideoTrack;
+    public AgoraRteMicrophoneAudioTrack mLocalAudioTrack;
 
 
     public List<AgoraRteMediaStreamInfo> streamInfoList = new ArrayList<>();
@@ -94,15 +91,15 @@ public abstract class BaseDemoFragment<B extends ViewBinding> extends BaseFragme
      */
     public void doJoinChannel(String channelName, String userId, String token) {
         AgoraRteSceneConfig config = new AgoraRteSceneConfig();
-        scene = AgoraRteSDK.createRteScene(channelName, config);
-        scene.registerSceneEventHandler(agoraListener);
-        scene.join(userId, token, new AgoraRteSceneJoinOptions());
+        mScene = AgoraRteSDK.createRteScene(channelName, config);
+        mScene.registerSceneEventHandler(mAgoraHandler);
+        mScene.join(userId, token, new AgoraRteSceneJoinOptions());
     }
 
     public void doExitChannel() {
-        if (scene != null) {
-            scene.leave();
-            scene.destroy();
+        if (mScene != null) {
+            mScene.leave();
+            mScene.destroy();
         }
         AgoraRteSDK.deInit();
     }
