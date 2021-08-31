@@ -73,19 +73,18 @@ public class JoinChannelVideoFragment extends BaseDemoFragment<FragmentJoinChann
                 // 连接建立完成
                 if (state1 == AgoraRteSceneConnState.CONN_STATE_CONNECTED) {
                     // RTC stream prepare
-                    sid = "local_" + mScene.getLocalUserInfo().getUserId();
                     AgoraRtcStreamOptions option = new AgoraRtcStreamOptions();
-                    mScene.createOrUpdateRTCStream(sid, option);
+                    mScene.createOrUpdateRTCStream(mLocalUserId, option);
                     // 准备视频采集
                     mLocalVideoTrack = AgoraRteSDK.getRteMediaFactory().createCameraVideoTrack();
                     // 必须先添加setPreviewCanvas，然后才能 startCapture
                     addLocalView();
                     mLocalVideoTrack.startCapture(null);
-                    mScene.publishLocalVideoTrack(sid, mLocalVideoTrack);
+                    mScene.publishLocalVideoTrack(mLocalUserId, mLocalVideoTrack);
                     // 准备音频采集
                     mLocalAudioTrack = AgoraRteSDK.getRteMediaFactory().createMicrophoneAudioTrack();
                     mLocalAudioTrack.startRecording();
-                    mScene.publishLocalAudioTrack(sid, mLocalAudioTrack);
+                    mScene.publishLocalAudioTrack(mLocalUserId, mLocalAudioTrack);
                 } else if (state1 == AgoraRteSceneConnState.CONN_STATE_DISCONNECTED) {
                     ExampleUtil.utilLog("onConnectionStateChanged: CONN_STATE_DISCONNECTED");
                 }
@@ -132,10 +131,7 @@ public class JoinChannelVideoFragment extends BaseDemoFragment<FragmentJoinChann
                 if (mBinding == null) return;
                 streamInfoList.removeAll(list);
                 for (AgoraRteMediaStreamInfo info : list) {
-                    View viewToRemoved = mBinding.containerJoinChannelVideo.findViewWithTag(info.getStreamId());
-                    if (viewToRemoved != null) {
-                        mBinding.containerJoinChannelVideo.demoRemoveView(viewToRemoved);
-                    }
+                    mBinding.containerJoinChannelVideo.dynamicRemoveViewWithTag(info.getStreamId());
                 }
             }
         };

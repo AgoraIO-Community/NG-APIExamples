@@ -10,7 +10,10 @@ import android.util.TypedValue;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.*;
+import android.widget.FrameLayout;
+import android.widget.HorizontalScrollView;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
 
 import androidx.annotation.IntRange;
 import androidx.annotation.NonNull;
@@ -20,14 +23,11 @@ import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
 
-import com.google.android.material.card.MaterialCardView;
+import java.util.ArrayList;
+import java.util.List;
 
 import io.agora.ng_api.R;
 import io.agora.ng_api.util.ExampleUtil;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
 
 /**
  * @author liuqiang
@@ -110,6 +110,42 @@ public class DynamicView extends ConstraintLayout {
         super.onConfigurationChanged(newConfig);
         if (this.scrollContainer != null)
             this.scrollContainer.setBackgroundColor(ExampleUtil.getColorInt(getContext(), R.attr.colorSurface));
+    }
+
+
+    public void switchView(View thumbView) {
+        switchView(getChildAt(0), thumbView);
+    }
+
+    public void switchView(View mainView, View thumbView) {
+        if (mainView.getParent() != this)
+            throw new IllegalStateException("mainView should be the one which is directly inside this DynamicView.");
+        if (thumbView.getParent() != innerContainer)
+            throw new IllegalStateException("thumbView should be a child of innerContainer.");
+        if (this.enableDefaultClickListener) {
+            thumbView.setOnClickListener(null);
+            mainView.setOnClickListener(this::switchView);
+        }
+        configViewIfIsSurfaceView(mainView, true);
+        configViewIfIsSurfaceView(thumbView, false);
+
+        // enable custom Animation
+        if (enableInsideAnimation) {
+            helper.switchView(mainView, thumbView);
+        } else {
+            doSwitchView(mainView, thumbView);
+        }
+    }
+
+    protected void doSwitchView(View mainView, View thumbView) {
+        int indexOfMain = this.indexOfChild(mainView);
+        this.removeView(mainView);
+
+        int indexOfThumb = innerContainer.indexOfChild(thumbView);
+        innerContainer.removeView(thumbView);
+
+        this.addView(thumbView, indexOfMain, getLpForMainView());
+        innerContainer.addView(mainView, indexOfThumb, getLpForThumbView());
     }
 
     /**
@@ -230,7 +266,6 @@ public class DynamicView extends ConstraintLayout {
         return linearLayout;
     }
 
-
     private FrameLayout initScrollContainer() {
         if (layoutStyle == STYLE_LAYOUT_FLEX_GRID) return null;
         FrameLayout scrollView;
@@ -275,7 +310,6 @@ public class DynamicView extends ConstraintLayout {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
             scrollView.setElevation(dp2px(2));
 
-
         return scrollView;
     }
 
@@ -295,30 +329,25 @@ public class DynamicView extends ConstraintLayout {
             }
         } else if (insideInnerContainer == null) {
             if (this.getChildAt(0) == scrollContainer) {
-                addView(child);
+                addView(child, 0);
             } else {
-                scrollContainer.addView(child);
+                innerContainer.addView(child);
             }
         } else if (insideInnerContainer) {
             if (enableDefaultClickListener)
                 throw new IllegalStateException("DynamicView cannot handle this situation.");
             else innerContainer.addView(child);
         } else {
-            innerContainer.addView(child);
+            addView(child);
         }
     }
 
-    public void demoAddView() {
-        if (layoutStyle == DynamicView.STYLE_LAYOUT_FLEX_GRID) {
-            if (enableInsideAnimation)
-                helper.addChildInFlexLayout(createDefaultVideoView());
-            else {
-                addView(createDefaultVideoView());
-                regroupChildren();
-            }
-        } else if (getChildCount() == 1)
-            addView(createDefaultVideoView(), 0);
-        else innerContainer.addView(createDefaultVideoView());
+    public void dynamicRemoveViewWithTag(Object tag){
+        View view = findViewWithTag(tag);
+        if(view != null){
+            if(view.getParent() == this) this.demoRemoveView(view);
+            else if(view.getParent() == innerContainer) innerContainer.removeView(view);
+        }
     }
 
     public void demoRemoveView(View view) {
@@ -331,54 +360,6 @@ public class DynamicView extends ConstraintLayout {
             }
         } else removeView(view);
     }
-
-    public void switchView(View thumbView) {
-        switchView(getChildAt(0), thumbView);
-    }
-
-    public void switchView(View mainView, View thumbView) {
-        if (mainView.getParent() != this)
-            throw new IllegalStateException("mainView should be the one which is directly inside this DynamicView.");
-        if (thumbView.getParent() != innerContainer)
-            throw new IllegalStateException("thumbView should be a child of innerContainer.");
-        if (this.enableDefaultClickListener) {
-            thumbView.setOnClickListener(null);
-            mainView.setOnClickListener(this::switchView);
-        }
-        configViewIfIsSurfaceView(mainView, true);
-        configViewIfIsSurfaceView(thumbView, false);
-
-        // enable custom Animation
-        if (enableInsideAnimation) {
-            helper.switchView(mainView, thumbView);
-        } else {
-            doSwitchView(mainView, thumbView);
-        }
-    }
-
-    protected void doSwitchView(View mainView, View thumbView) {
-        int indexOfMain = this.indexOfChild(mainView);
-        this.removeView(mainView);
-
-        int indexOfThumb = innerContainer.indexOfChild(thumbView);
-        innerContainer.removeView(thumbView);
-
-        this.addView(thumbView, indexOfMain, getLpForMainView());
-        innerContainer.addView(mainView, indexOfThumb, getLpForThumbView());
-    }
-
-    public View createDefaultVideoView() {
-        ImageView iv = createDemoLayout(ImageView.class);
-        iv.setBackgroundColor(Color.rgb(new Random().nextInt(255), new Random().nextInt(255), new Random().nextInt(255)));
-        return iv;
-    }
-
-    public View createDefaultAudioView() {
-        ImageView iv = createDemoLayout(ImageView.class);
-        iv.setImageResource(R.mipmap.ic_launcher);
-        return iv;
-    }
-
 
     public <T extends View> T createDemoLayout(Class<T> tClass) {
         boolean forContainer = getChildCount() > 1 && layoutStyle != DynamicView.STYLE_LAYOUT_FLEX_GRID;

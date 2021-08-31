@@ -11,6 +11,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import io.agora.ng_api.MyApp;
+import io.agora.ng_api.R;
 import io.agora.ng_api.base.BaseDemoFragment;
 import io.agora.ng_api.databinding.FragmentJoinChannelAudioBinding;
 import io.agora.ng_api.util.ExampleUtil;
@@ -58,9 +59,8 @@ public class JoinChannelAudioFragment extends BaseDemoFragment<FragmentJoinChann
                 if (mBinding == null) return;
                 // 连接建立完成
                 if (state1 == AgoraRteSceneConnState.CONN_STATE_CONNECTED) {
-                    sid = "local_" + mScene.getLocalUserInfo().getUserId();
                     AgoraRtcStreamOptions option = new AgoraRtcStreamOptions();
-                    mScene.createOrUpdateRTCStream(sid, option);
+                    mScene.createOrUpdateRTCStream(mLocalUserId, option);
                     // 必须先添加setPreviewCanvas，然后才能 startCapture
                     addVoiceView();
 
@@ -68,7 +68,7 @@ public class JoinChannelAudioFragment extends BaseDemoFragment<FragmentJoinChann
                     mLocalAudioTrack = AgoraRteSDK.getRteMediaFactory().createMicrophoneAudioTrack();
                     mLocalAudioTrack.adjustPublishVolume(100);
                     mLocalAudioTrack.startRecording();
-                    mScene.publishLocalAudioTrack(sid, mLocalAudioTrack);
+                    mScene.publishLocalAudioTrack(mLocalUserId, mLocalAudioTrack);
                 } else if (state1 == AgoraRteSceneConnState.CONN_STATE_DISCONNECTED) {
                     ExampleUtil.utilLog("onConnectionStateChanged: CONN_STATE_DISCONNECTED");
                 }
@@ -116,10 +116,7 @@ public class JoinChannelAudioFragment extends BaseDemoFragment<FragmentJoinChann
                 if (mBinding == null) return;
                 streamInfoList.removeAll(list);
                 for (AgoraRteMediaStreamInfo info : list) {
-                    View viewToRemoved = mBinding.containerJoinChannelAudio.findViewWithTag(info.getStreamId());
-                    if (viewToRemoved != null) {
-                         mBinding.containerJoinChannelAudio.demoRemoveView(viewToRemoved);
-                    }
+                    mBinding.containerJoinChannelAudio.dynamicRemoveViewWithTag(info.getStreamId());
                 }
             }
 
@@ -135,7 +132,7 @@ public class JoinChannelAudioFragment extends BaseDemoFragment<FragmentJoinChann
 
         TextView title = new TextView(requireContext());
         title.setLayoutParams(lp);
-        title.setText(sid);
+        title.setText(getString(R.string.local_user_id_format,mLocalUserId));
 
         view.setBackgroundColor(Color.rgb(new Random().nextInt(255), new Random().nextInt(255), new Random().nextInt(255)));
         view.addView(title);
@@ -161,7 +158,7 @@ public class JoinChannelAudioFragment extends BaseDemoFragment<FragmentJoinChann
     }
 
     private void joinChannel() {
-        doJoinChannel(channelName, String.valueOf(new Random().nextInt(1024)), "");
+        doJoinChannel(channelName, mLocalUserId, "");
     }
 
     @Override

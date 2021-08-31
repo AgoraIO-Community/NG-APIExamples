@@ -28,6 +28,9 @@
     <string name="permission_refused">运行此功能需要的必要权限未被授予。</string>
 
 
+    <string name="local_user_id_format">local_%s</string>
+
+
 <!--    页面相关-->
 
 <!--    媒体播放器-->

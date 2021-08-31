@@ -23,6 +23,7 @@ import io.agora.rte.user.AgoraRteUserInfo;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 /**
  * On Jetpack navigation
@@ -32,7 +33,7 @@ import java.util.List;
 public abstract class BaseDemoFragment<B extends ViewBinding> extends BaseFragment<B> {
 
     // COMMON FILED
-    public String sid;
+    public String mLocalUserId = String.valueOf(new Random().nextInt(1024));
     public String channelName;
     public AudioManager audioManager;
     public AgoraRteScene mScene;

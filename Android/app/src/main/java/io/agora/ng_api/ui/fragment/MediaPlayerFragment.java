@@ -138,19 +138,18 @@ public class MediaPlayerFragment extends BaseDemoFragment<FragmentMediaPlayerBin
                 if (newState == AgoraRteSceneConnState.CONN_STATE_CONNECTED) {
                     ExampleUtil.utilLog("onConnectionStateChanged,Thread:"+Thread.currentThread().getName());
                     // RTC stream prepare
-                    sid = "local_" + mScene.getLocalUserInfo().getUserId();
                     AgoraRtcStreamOptions option = new AgoraRtcStreamOptions();
-                    mScene.createOrUpdateRTCStream(sid, option);
+                    mScene.createOrUpdateRTCStream(mLocalUserId, option);
                     // 准备视频采集
                     mLocalVideoTrack = AgoraRteSDK.getRteMediaFactory().createCameraVideoTrack();
                     // 必须先添加setPreviewCanvas，然后才能 startCapture
                     addCameraView();
                     mLocalVideoTrack.startCapture(null);
-                    mScene.publishLocalVideoTrack(sid, mLocalVideoTrack);
+                    mScene.publishLocalVideoTrack(mLocalUserId, mLocalVideoTrack);
                     // 准备音频采集
                     mLocalAudioTrack = AgoraRteSDK.getRteMediaFactory().createMicrophoneAudioTrack();
                     mLocalAudioTrack.startRecording();
-                    mScene.publishLocalAudioTrack(sid, mLocalAudioTrack);
+                    mScene.publishLocalAudioTrack(mLocalUserId, mLocalAudioTrack);
 
                     // MediaPlayer initiate
                     mPlayer = AgoraRteSDK.getRteMediaFactory().createMediaPlayer();
@@ -170,9 +169,7 @@ public class MediaPlayerFragment extends BaseDemoFragment<FragmentMediaPlayerBin
             @Override
             public void onRemoteStreamRemoved(List<AgoraRteMediaStreamInfo> streams) {
                 for (AgoraRteMediaStreamInfo stream : streams) {
-                    View child = mBinding.containerFgPlayer.findViewWithTag(stream.getStreamId());
-                    if (child != null)
-                        mBinding.containerFgPlayer.demoRemoveView(child);
+                    mBinding.containerFgPlayer.dynamicRemoveViewWithTag(stream.getStreamId());
                 }
             }
         };
