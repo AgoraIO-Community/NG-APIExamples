@@ -310,8 +310,7 @@ public final class MainActivity extends BaseActivity {
         return demoInfoList;
     }
 
-    private @Nullable
-    BaseDemoFragment<?> checkDemoAvailable() {
+    private @Nullable BaseDemoFragment<?> checkDemoAvailable() {
         Fragment fragment = getSupportFragmentManager().getPrimaryNavigationFragment();
         if (fragment != null)
             fragment = fragment.getChildFragmentManager().getPrimaryNavigationFragment();

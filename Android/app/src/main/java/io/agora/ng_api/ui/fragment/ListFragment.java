@@ -61,9 +61,9 @@ public class ListFragment extends BaseFragment<FragmentListBinding> {
 
     @Override
     public void doChangeView() {
+        if(mDecoration!=null) mDecoration.updatePaintColor(requireContext());
         RecyclerView.Adapter<?> adapter = mBinding.recyclerViewFgList.getAdapter();
         if(adapter!=null) adapter.notifyDataSetChanged();
-        if(mDecoration!=null) mDecoration.updatePaintColor(requireContext());
 
     }
 }

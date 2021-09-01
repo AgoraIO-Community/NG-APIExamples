@@ -33,12 +33,16 @@ import java.util.Random;
 public abstract class BaseDemoFragment<B extends ViewBinding> extends BaseFragment<B> {
 
     // COMMON FILED
-    public String mLocalUserId = String.valueOf(new Random().nextInt(1024));
+    public final String mLocalUserId = String.valueOf(new Random().nextInt(1024));
+    public final String mLocalMediaStreamId = "media-" + new Random().nextInt(1024) + 1024;
     public String channelName;
+    @Nullable
     public AudioManager audioManager;
     public AgoraRteScene mScene;
     public AgoraRteSceneEventHandler mAgoraHandler;
+    @Nullable
     public AgoraRteCameraVideoTrack mLocalVideoTrack;
+    @Nullable
     public AgoraRteMicrophoneAudioTrack mLocalAudioTrack;
 
 

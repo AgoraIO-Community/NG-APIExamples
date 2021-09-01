@@ -4,6 +4,7 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="../../../../../layout/custom_preview.xml" value="0.43020833333333336" />
+        <entry key="app/src/main/res/drawable/ic_launcher_foreground.xml" value="0.4197916666666667" />
         <entry key="app/src/main/res/layout/fragment_join_channel_audio.xml" value="0.4036458333333333" />
         <entry key="app/src/main/res/layout/fragment_screen_share.xml" value="0.375" />
       </map>

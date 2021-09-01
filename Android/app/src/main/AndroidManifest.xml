@@ -9,6 +9,8 @@
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/>
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+<!--    ScreenShare required-->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application
             android:name="io.agora.ng_api.MyApp"
@@ -30,6 +32,10 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <service android:name=".service.MediaProjectFgService"
+                android:enabled="true"
+                android:exported="false"
+                android:foregroundServiceType="mediaProjection"/>
     </application>
 
 </manifest>

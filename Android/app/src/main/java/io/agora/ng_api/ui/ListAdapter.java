@@ -27,7 +27,6 @@ public class ListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        Context context = parent.getContext();
         TextView textView = new TextView(parent.getContext());
         textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f);
         textView.setGravity(Gravity.CENTER_VERTICAL | Gravity.START);
