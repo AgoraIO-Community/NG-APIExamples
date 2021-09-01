@@ -79,7 +79,9 @@ public class JoinChannelVideoFragment extends BaseDemoFragment<FragmentJoinChann
                     mLocalVideoTrack = AgoraRteSDK.getRteMediaFactory().createCameraVideoTrack();
                     // 必须先添加setPreviewCanvas，然后才能 startCapture
                     addLocalView();
-                    mLocalVideoTrack.startCapture(null);
+                    if (mLocalVideoTrack != null) {
+                        mLocalVideoTrack.startCapture(null);
+                    }
                     mScene.publishLocalVideoTrack(mLocalUserId, mLocalVideoTrack);
                     // 准备音频采集
                     mLocalAudioTrack = AgoraRteSDK.getRteMediaFactory().createMicrophoneAudioTrack();
@@ -146,7 +148,9 @@ public class JoinChannelVideoFragment extends BaseDemoFragment<FragmentJoinChann
         SurfaceView view = mBinding.containerJoinChannelVideo.createDemoLayout(SurfaceView.class);
         mBinding.containerJoinChannelVideo.demoAddView(view);
         AgoraRteVideoCanvas canvas = new AgoraRteVideoCanvas(view);
-        mLocalVideoTrack.setPreviewCanvas(canvas);
+        if (mLocalVideoTrack != null) {
+            mLocalVideoTrack.setPreviewCanvas(canvas);
+        }
     }
 
     private void addRemoteView(String streamId) {

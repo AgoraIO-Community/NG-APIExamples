@@ -130,6 +130,8 @@ public final class MainActivity extends BaseActivity {
         });
 
 
+        // For avoiding overlap with Back Icon
+        mBinding.textTitleMain.setSelected(true);
         // Nav back listener
         mBinding.navIconMain.setOnClickListener((v) -> getNavController().popBackStack());
 
@@ -152,7 +154,7 @@ public final class MainActivity extends BaseActivity {
                     if(arguments != null) {
                         String channelName = arguments.getString(DescriptionFragment.channelName);
                         if(channelName!=null)
-                        title += "【"+ channelName+"】";
+                            title += getString(R.string.show_channel_name,channelName);
                     }
                 }
                 mBinding.tFabMain.show();
@@ -168,29 +170,15 @@ public final class MainActivity extends BaseActivity {
         };
 
         // For the ime & navigationBar
-        ViewCompat.setOnApplyWindowInsetsListener(getWindow().getDecorView(), (v, insets) -> {
-            final int statusBarT = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top;
-            Insets navInset = insets.getInsets(WindowInsetsCompat.Type.navigationBars());
-            final int navBottom = Math.max(navInset.bottom, insets.getInsets(WindowInsetsCompat.Type.ime()).bottom);
-            final int navLeft = navInset.left;
-            final int navRight = navInset.right;
+        ViewCompat.setOnApplyWindowInsetsListener(mBinding.getRoot(), (v, insets) -> {
+            Insets inset = insets.getInsets(WindowInsetsCompat.Type.systemBars());
 
-            mBinding.getRoot().setPadding(navLeft, statusBarT, navRight, navBottom);
+            int desiredBottom = Math.max(insets.getInsets(WindowInsetsCompat.Type.ime()).bottom,inset.bottom);
+
+            v.setPadding(inset.left,inset.top,inset.right,desiredBottom);
             // TODO find a better way to achieve this.
-            ((ConstraintLayout.LayoutParams)mBinding.scrimMain.getLayoutParams()).setMargins(-navLeft, -statusBarT, -navRight, -navBottom);
-            // status bar height
-//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-//                mBinding.toolBarMain.setPaddingRelative(0, statusBarT, 0, 0);
-//                mBinding.containerNpApi.setPaddingRelative(0, 0, 0, bot);
-//            } else {
-//                mBinding.toolBarMain.setPadding(0, statusBarT, 0, 0);
-//                mBinding.containerNpApi.setPadding(0, 0, 0, bot);
-//            }
-//            // ime height
-//            int spaceMedium = (int) getResources().getDimension(R.dimen.space_medium);
-//            ((ConstraintLayout.LayoutParams) mBinding.cardView.getLayoutParams()).bottomMargin = bot + spaceMedium;
-//            ((ConstraintLayout.LayoutParams) mBinding.tFabMain.getLayoutParams()).bottomMargin = bot + spaceMedium;
-            return insets;
+            ((ConstraintLayout.LayoutParams)mBinding.scrimMain.getLayoutParams()).setMargins(-inset.left,-inset.top - 1,-inset.right,-desiredBottom);
+            return WindowInsetsCompat.CONSUMED;
         });
     }
 

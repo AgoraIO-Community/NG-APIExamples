@@ -19,6 +19,8 @@
     <string name="audio_profile_default">default</string>
     <string name="audio_profile_game_streaming">game_streaming</string>
     <string name="audio_profile_high_definition">high_definition</string>
+    <string name="channel_name_required">channelName required</string>
+    <string name="show_channel_name">(%s)</string>
 
     <string name="app_id_title">APPID 设置</string>
     <string name="app_id_alert">【agora_app_id】未配置\n此为演示功能所必须\n请至官网注册获取，若已有可👇手动输入</string>
@@ -41,6 +43,11 @@
     <string name="pause">暂停</string>
 
     <!--    屏幕共享-->
+    <string name="screen_share_request_denied">Screen share cancelled</string>
+    <string name="screen_share_version_unsupported">Screen Share do not support on this Android version</string>
+    <string name="notify_recording_screen">正在录制屏幕内容…</string>
+    <string name="notify_service_desc">Notice that we are trying to capture the screen!!</string>
+    <string name="notify_channel_id">agora_media_project</string>
 
     <!-- 数据相关-->
     <string name="demo_string_basic">基本</string>
@@ -60,8 +67,8 @@
     <string name="desc_join_channel_video">加入视频通话agora加入视频通话agora\n加入视频通话agora加入视频通话agora</string>
     <string name="title_join_channel_audio">加入音频通话</string>
     <string name="desc_join_channel_audio">加入音频通话agora加入音频通话agora\n加入音频通话agora加入音频通话agora</string>
-    <string name="title_media_player">媒体播放器</string>
-    <string name="desc_media_player">媒体播放器agora媒体播放器agora\n媒体播放器agora媒体播放器agora</string>
+    <string name="title_media_player">媒体播放</string>
+    <string name="desc_media_player">媒体播放agora媒体播放agora\n媒体播放agora媒体播放agora</string>
     <string name="title_screen_share">屏幕共享</string>
     <string name="desc_screen_share">屏幕共享agora屏幕共享agora\n屏幕共享agora屏幕共享agora</string>
 

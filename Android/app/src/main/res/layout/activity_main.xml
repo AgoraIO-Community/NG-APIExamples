@@ -12,7 +12,7 @@
             android:id="@+id/tool_bar_main"
             android:animateLayoutChanges="true"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="?android:attr/actionBarSize">
 
         <ImageButton
                 android:id="@+id/nav_icon_main"
@@ -30,12 +30,15 @@
         <TextView
                 android:id="@+id/text_title_main"
                 android:layout_gravity="center"
+                android:layout_marginHorizontal="48dp"
                 tools:text="@string/app_name"
-                android:gravity="center_vertical"
+                android:ellipsize="marquee"
+                android:singleLine="true"
+                android:gravity="center"
                 android:textColor="?android:attr/textColorPrimary"
                 style="@style/TextAppearance.AppCompat.Title"
-                android:layout_width="wrap_content"
-                android:layout_height="?android:attr/actionBarSize"/>
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
     </FrameLayout>
 
     <androidx.fragment.app.FragmentContainerView

@@ -6,7 +6,7 @@
         xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <io.agora.ng_api.view.DynamicView
-            app:layoutStyle_dynamic="collaborate"
+            app:layoutStyle_dynamic="flex"
             android:id="@+id/container_join_channel_audio"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>

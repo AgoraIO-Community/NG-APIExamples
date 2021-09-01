@@ -50,7 +50,7 @@ public class DynamicView extends ConstraintLayout {
 
     ///////////////////////////////////// ANIMATION /////////////////////////////////////////////////////////////////
     // TODO try my best to finish the animation part
-    private boolean enableInsideAnimation = false;
+    private boolean enableInsideAnimation = true;
     public boolean enableDefaultClickListener = true;
     private DynamicViewAnimationHelper helper;
 

@@ -32,7 +32,6 @@ import java.util.Random;
 
 public class MediaPlayerFragment extends BaseDemoFragment<FragmentMediaPlayerBinding> {
     private AgoraRteMediaPlayer mPlayer;
-    private String localMediaStreamId = "media";
     private AgoraRteMediaPlayerObserver mPlayerObserver;
     private VideoView mVideoView;
 
@@ -53,7 +52,7 @@ public class MediaPlayerFragment extends BaseDemoFragment<FragmentMediaPlayerBin
     @Override
     public void onDestroyView() {
         if (mPlayer != null) {
-            mPlayer.stop();
+            mPlayer.unregisterMediaPlayerObserver(mPlayerObserver);
             mPlayer.destroy();
         }
         super.onDestroyView();
@@ -61,9 +60,7 @@ public class MediaPlayerFragment extends BaseDemoFragment<FragmentMediaPlayerBin
 
     private void initView() {
         mBinding.containerFgPlayer.enableDefaultClickListener = false;
-        mBinding.btnOpenFgPlayer.setOnClickListener(v -> {
-            openURL();
-        });
+        mBinding.btnOpenFgPlayer.setOnClickListener(v -> openURL());
         mVideoView = mBinding.containerFgPlayer.createDemoLayout(VideoView.class, false);
         mVideoView.mPlayBtn.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (!buttonView.isPressed()) return;
@@ -144,7 +141,9 @@ public class MediaPlayerFragment extends BaseDemoFragment<FragmentMediaPlayerBin
                     mLocalVideoTrack = AgoraRteSDK.getRteMediaFactory().createCameraVideoTrack();
                     // 必须先添加setPreviewCanvas，然后才能 startCapture
                     addCameraView();
-                    mLocalVideoTrack.startCapture(null);
+                    if (mLocalVideoTrack != null) {
+                        mLocalVideoTrack.startCapture(null);
+                    }
                     mScene.publishLocalVideoTrack(mLocalUserId, mLocalVideoTrack);
                     // 准备音频采集
                     mLocalAudioTrack = AgoraRteSDK.getRteMediaFactory().createMicrophoneAudioTrack();
@@ -180,8 +179,8 @@ public class MediaPlayerFragment extends BaseDemoFragment<FragmentMediaPlayerBin
         addMediaView();
         mPlayer.open(url, 0);
 
-        mScene.createOrUpdateRTCStream(localMediaStreamId, new AgoraRtcStreamOptions());
-        mScene.publishMediaPlayer(localMediaStreamId, mPlayer);
+        mScene.createOrUpdateRTCStream(mLocalMediaStreamId, new AgoraRtcStreamOptions());
+        mScene.publishMediaPlayer(mLocalMediaStreamId, mPlayer);
     }
 
     public void joinChannel() {
@@ -198,7 +197,9 @@ public class MediaPlayerFragment extends BaseDemoFragment<FragmentMediaPlayerBin
         view.setZOrderMediaOverlay(true);
         mBinding.containerFgPlayer.demoAddView(view, true);
         AgoraRteVideoCanvas canvas = new AgoraRteVideoCanvas(view);
-        mLocalVideoTrack.setPreviewCanvas(canvas);
+        if (mLocalVideoTrack != null) {
+            mLocalVideoTrack.setPreviewCanvas(canvas);
+        }
     }
 
     private void addRemoteView(String streamId) {

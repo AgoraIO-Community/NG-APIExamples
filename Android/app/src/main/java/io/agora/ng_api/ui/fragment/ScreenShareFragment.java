@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Random;
 
 import io.agora.ng_api.MyApp;
+import io.agora.ng_api.R;
 import io.agora.ng_api.base.BaseDemoFragment;
 import io.agora.ng_api.databinding.FragmentScreenShareBinding;
 import io.agora.ng_api.service.MediaProjectFgService;
@@ -54,7 +55,7 @@ public class ScreenShareFragment extends BaseDemoFragment<FragmentScreenShareBin
                 joinChannel();
             }
         }else{
-            MyApp.getInstance().shortToast("Screen Share do not support on this Android version.");
+            MyApp.getInstance().shortToast(R.string.screen_share_version_unsupported);
             getNavController().popBackStack();
         }
     }
@@ -82,7 +83,7 @@ public class ScreenShareFragment extends BaseDemoFragment<FragmentScreenShareBin
                 screenCaptureOperation(true);
             } else {
                 mBinding.btnOpenFgScreenShare.toggle();
-                MyApp.getInstance().shortToast("User Refused");
+                MyApp.getInstance().shortToast(R.string.screen_share_request_denied);
             }
         });
         mAgoraHandler = new AgoraRteSceneEventHandler() {

@@ -54,7 +54,7 @@ public abstract class BaseDemoFragment<B extends ViewBinding> extends BaseFragme
         super.onCreate(savedInstanceState);
         // ensure channelName
         if (getArguments() == null || getArguments().get(DescriptionFragment.channelName) == null) {
-            MyApp.getInstance().shortToast("channelName required");
+            MyApp.getInstance().shortToast(R.string.channel_name_required);
             getNavController().popBackStack();
             return;
         }
