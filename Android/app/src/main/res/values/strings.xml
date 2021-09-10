@@ -2,8 +2,8 @@
 
     <!-- 通用 -->
     <string name="app_name">Agora-API</string>
-    <string name="agora_app_id" translatable="false"/>
-    <string name="agora_access_token" translatable="false"/>
+    <string name="agora_app_id" translatable="false" />
+    <string name="agora_access_token" translatable="false" />
 
     <string name="custom_app_id">自定义APPID（或者清除自定义APPID）</string>
 
@@ -33,9 +33,9 @@
     <string name="local_user_id_format">local_%s</string>
 
 
-<!--    页面相关-->
+    <!--    页面相关-->
 
-<!--    媒体播放器-->
+    <!--    媒体播放器-->
     <string name="demo_video_url">https://vfx.mtime.cn/Video/2021/05/03/mp4/210503222942653184.mp4</string>
     <string name="file_url">媒体文件地址</string>
     <string name="open">打开</string>
@@ -58,7 +58,6 @@
     <string name="args_nav_permission">perm</string>
 
 
-
     <!-- 分页面管理 -->
 
 
@@ -71,6 +70,7 @@
     <string name="desc_media_player">媒体播放agora媒体播放agora\n媒体播放agora媒体播放agora</string>
     <string name="title_screen_share">屏幕共享</string>
     <string name="desc_screen_share">屏幕共享agora屏幕共享agora\n屏幕共享agora屏幕共享agora</string>
+    <string name="title_activity_main">MainActivity</string>
 
 
 </resources>
