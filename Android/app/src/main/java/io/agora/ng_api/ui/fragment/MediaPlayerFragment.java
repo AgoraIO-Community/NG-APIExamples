@@ -10,6 +10,8 @@ import android.webkit.URLUtil;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.google.android.material.slider.Slider;
+
 import io.agora.ng_api.MyApp;
 import io.agora.ng_api.base.BaseDemoFragment;
 import io.agora.ng_api.databinding.FragmentMediaPlayerBinding;
@@ -69,10 +71,13 @@ public class MediaPlayerFragment extends BaseDemoFragment<FragmentMediaPlayerBin
             else mPlayer.pause();
         });
 
-        mVideoView.mProgressSlider.addOnChangeListener((slider, value, fromUser) -> {
-            if (fromUser && mPlayer != null) {
-                mVideoView.showOverlay();
-                mPlayer.seek((long) value);
+        mVideoView.mProgressSlider.addOnSliderTouchListener(new Slider.OnSliderTouchListener() {
+            @Override
+            public void onStartTrackingTouch(@NonNull Slider slider) { }
+
+            @Override
+            public void onStopTrackingTouch(@NonNull Slider slider) {
+                mPlayer.seek((long) slider.getValue());
             }
         });
     }
@@ -112,9 +117,13 @@ public class MediaPlayerFragment extends BaseDemoFragment<FragmentMediaPlayerBin
                 super.onPlayerStateChanged(fileInfo, state, error);
                 ExampleUtil.utilLog(fileInfo.beginTime + "/" + fileInfo.duration + "state: " + state + ", error: " + error);
                 if (state == AgoraRteMediaPlayerState.PLAYER_STATE_OPEN_COMPLETED) {
-                    mPlayer.play();
-                    mVideoView.mLoadingView.setVisibility(View.GONE);
+                    // set duration
                     mVideoView.mProgressSlider.setValueTo(mPlayer.getDuration());
+                    // start play
+                    mPlayer.play();
+                    // hide loading
+                    mVideoView.mLoadingView.setVisibility(View.GONE);
+                    // show indicator on the first frame
                     mVideoView.performClick();
                 } else if (state == AgoraRteMediaPlayerState.PLAYER_STATE_PLAYBACK_COMPLETED) {
                     mVideoView.mPlayBtn.setChecked(false);
@@ -124,7 +133,7 @@ public class MediaPlayerFragment extends BaseDemoFragment<FragmentMediaPlayerBin
             @Override
             public void onPositionChanged(AgoraRteFileInfo fileInfo, long position) {
                 super.onPositionChanged(fileInfo, position);
-                if(!mVideoView.mProgressSlider.isHovered())
+                if(!mVideoView.mProgressSlider.isPressed())
                     mVideoView.mProgressSlider.setValue(position);
             }
 

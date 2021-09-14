@@ -2,6 +2,7 @@ package io.agora.ng_api.view;
 
 import android.animation.Animator;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
@@ -145,7 +146,9 @@ public class VideoView extends FrameLayout implements ScaleGestureDetector.OnSca
         lp4Slider.gravity = Gravity.BOTTOM;
         lp4Slider.bottomMargin = (int) ExampleUtil.dp2px(120);
         mProgressSlider.setLayoutParams(lp4Slider);
-        mProgressSlider.setLabelBehavior(LabelFormatter.LABEL_GONE);
+        mProgressSlider.setHaloRadius(0);
+        mProgressSlider.setLabelBehavior(LabelFormatter.LABEL_FLOATING);
+        mProgressSlider.setLabelFormatter(value -> ExampleUtil.durationFormat(getContext(), (long) value));
         mProgressSlider.setVisibility(GONE);
 
         LayoutParams lp4LoadingView = new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
@@ -167,6 +170,21 @@ public class VideoView extends FrameLayout implements ScaleGestureDetector.OnSca
         this.addView(mPlayBtn);
         this.addView(mProgressSlider);
 
+        // default view operation
+        mProgressSlider.addOnSliderTouchListener(new Slider.OnSliderTouchListener() {
+            @Override
+            public void onStartTrackingTouch(@NonNull Slider slider) {
+                mHandler.removeCallbacksAndMessages(null);
+                mHandler.post(showOverlayRunnable);
+            }
+
+            @Override
+            public void onStopTrackingTouch(@NonNull Slider slider) {
+                // if we trigger hideOverlay() it cause Overlay INVISIBLE immediately
+                showOverlay();
+            }
+        });
+
         this.setOnClickListener(v -> {
             if (mPlayBtn.getVisibility() == VISIBLE)
                 hideOverlay();
@@ -174,6 +192,11 @@ public class VideoView extends FrameLayout implements ScaleGestureDetector.OnSca
         });
     }
 
+
+    @Override
+    protected void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+    }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {

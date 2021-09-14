@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.media.projection.MediaProjectionManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.view.SurfaceView;
 import android.view.TextureView;
 import android.view.View;
 
@@ -61,10 +60,18 @@ public class ScreenShareFragment extends BaseDemoFragment<FragmentScreenShareBin
         }
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        requireActivity().stopService(mediaProjectionIntent);
+    }
+
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private void initView() {
         mediaProjectionIntent = new Intent(requireActivity(), MediaProjectFgService.class);
         mBinding.containerFgScreenShare.enableDefaultClickListener = false;
+
+        // checked the button to record screen
         mBinding.btnOpenFgScreenShare.addOnCheckedChangeListener((button, isChecked) -> {
             if (!button.isPressed()) return;
             if (isChecked) {
@@ -78,6 +85,8 @@ public class ScreenShareFragment extends BaseDemoFragment<FragmentScreenShareBin
 
     private void initListener() {
 
+        // handle request screen record callback
+        // since onActivityResult() is deprecated
         activityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
             if (result.getResultCode() == RESULT_OK) {
                 createOrUpdateScreenVideoTrack(result.getData());
@@ -139,6 +148,7 @@ public class ScreenShareFragment extends BaseDemoFragment<FragmentScreenShareBin
         } else {
             // stop screen capture and update options
             if (screenVideoTrack != null) {
+                mScene.unpublishLocalVideoTrack(screenVideoTrack);
                 screenVideoTrack.stopCapture();
                 requireActivity().stopService(mediaProjectionIntent);
             }
@@ -152,21 +162,23 @@ public class ScreenShareFragment extends BaseDemoFragment<FragmentScreenShareBin
      * 3: startCaptureScreen
      * 4: publishLocalVideoTrack
      */
+    private TextureView textureView;
+    private AgoraRteVideoCanvas canvas;
     private void createOrUpdateScreenVideoTrack(Intent intent) {
         if (screenVideoTrack == null) {
             // Add View
-            TextureView textureView = mBinding.containerFgScreenShare.createDemoLayout(TextureView.class);
+            textureView = mBinding.containerFgScreenShare.createDemoLayout(TextureView.class);
             mBinding.containerFgScreenShare.demoAddView(textureView);
-
-            AgoraRteVideoCanvas canvas = new AgoraRteVideoCanvas(textureView);
-
+            // Create preview canvas
+            canvas = new AgoraRteVideoCanvas(textureView);
             // Create screenVideoTrack
             screenVideoTrack = AgoraRteSDK.getRteMediaFactory().createScreenVideoTrack();
-            screenVideoTrack.setPreviewCanvas(canvas);
+            // Set preview
         }
+        screenVideoTrack.setPreviewCanvas(canvas);
+        mScene.createOrUpdateRTCStream(mLocalMediaStreamId, new AgoraRtcStreamOptions());
         screenVideoTrack.startCaptureScreen(intent, new AgoraRteVideoEncoderConfiguration.VideoDimensions());
         // Publish screenVideoTrack
-        mScene.createOrUpdateRTCStream(mLocalMediaStreamId, new AgoraRtcStreamOptions());
         mScene.publishLocalVideoTrack(mLocalMediaStreamId, screenVideoTrack);
     }
 

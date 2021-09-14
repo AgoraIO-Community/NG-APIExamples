@@ -31,6 +31,7 @@ import io.agora.ng_api.R;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class ExampleUtil {
     public static String APPID = "APPID";
@@ -158,4 +159,13 @@ public class ExampleUtil {
         return (configuration.uiMode & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES;
     }
 
+
+    public static String durationFormat(Context context, Long duration) {
+        return context.getString(
+                R.string.duration_format,
+                TimeUnit.MILLISECONDS.toHours(duration)%60,
+                TimeUnit.MILLISECONDS.toMinutes(duration)%60,
+                TimeUnit.MILLISECONDS.toSeconds(duration)%60
+        );
+    }
 }

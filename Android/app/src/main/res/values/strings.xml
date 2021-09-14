@@ -31,6 +31,7 @@
 
 
     <string name="local_user_id_format">local_%s</string>
+    <string name="duration_format">%02d:%02d:%02d</string>
 
 
 <!--    页面相关-->
