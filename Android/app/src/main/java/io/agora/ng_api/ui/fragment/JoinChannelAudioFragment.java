@@ -10,11 +10,14 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.cardview.widget.CardView;
+
 import io.agora.ng_api.MyApp;
 import io.agora.ng_api.R;
 import io.agora.ng_api.base.BaseDemoFragment;
 import io.agora.ng_api.databinding.FragmentJoinChannelAudioBinding;
 import io.agora.ng_api.util.ExampleUtil;
+import io.agora.ng_api.view.ScrollableLinearLayout;
 import io.agora.rte.AgoraRteSDK;
 import io.agora.rte.media.stream.*;
 import io.agora.rte.scene.AgoraRteSceneConnState;
@@ -58,15 +61,14 @@ public class JoinChannelAudioFragment extends BaseDemoFragment<FragmentJoinChann
                 ExampleUtil.utilLog("onConnectionStateChanged: " + state.getValue() + ", " + state1.getValue() + ",reason: " + reason.getValue() + "，\nThread:" + Thread.currentThread().getName());
                 if (mBinding == null) return;
                 // 连接建立完成
-                if (state1 == AgoraRteSceneConnState.CONN_STATE_CONNECTED) {
+                if (state1 == AgoraRteSceneConnState.CONN_STATE_CONNECTED && mLocalAudioTrack == null) {
                     AgoraRtcStreamOptions option = new AgoraRtcStreamOptions();
                     mScene.createOrUpdateRTCStream(mLocalUserId, option);
                     // 必须先添加setPreviewCanvas，然后才能 startCapture
-                    addVoiceView();
+                    addVoiceView(null);
 
                     // 准备音频采集
                     mLocalAudioTrack = AgoraRteSDK.getRteMediaFactory().createMicrophoneAudioTrack();
-                    mLocalAudioTrack.adjustPublishVolume(100);
                     mLocalAudioTrack.startRecording();
                     mScene.publishLocalAudioTrack(mLocalUserId, mLocalAudioTrack);
                 } else if (state1 == AgoraRteSceneConnState.CONN_STATE_DISCONNECTED) {
@@ -124,37 +126,16 @@ public class JoinChannelAudioFragment extends BaseDemoFragment<FragmentJoinChann
 
     }
 
-    private void addVoiceView() {
-        FrameLayout view = mBinding.containerJoinChannelAudio.createDemoLayout(FrameLayout.class);
-        // config title
-        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT);
-        lp.gravity = Gravity.CENTER;
 
-        TextView title = new TextView(requireContext());
-        title.setLayoutParams(lp);
-        title.setText(getString(R.string.local_user_id_format,mLocalUserId));
+    private void addVoiceView(@Nullable AgoraRteMediaStreamInfo info) {
+        String tag = info == null ? null : info.getStreamId();
+        String title = info == null ? getString(R.string.local_user_id_format,mLocalUserId) : info.getUserId();
+        CardView cardView = ScrollableLinearLayout.getChildAudioCardView(requireContext(),tag,title);
 
-        view.setBackgroundColor(Color.rgb(new Random().nextInt(255), new Random().nextInt(255), new Random().nextInt(255)));
-        view.addView(title);
-        mBinding.containerJoinChannelAudio.demoAddView(view);
-    }
+        mBinding.containerJoinChannelAudio.demoAddView(cardView);
 
-    private void addVoiceView(AgoraRteMediaStreamInfo info) {
-        FrameLayout view = mBinding.containerJoinChannelAudio.createDemoLayout(FrameLayout.class);
-        view.setTag(info.getStreamId());
-        view.setBackgroundColor(Color.rgb(new Random().nextInt(255), new Random().nextInt(255), new Random().nextInt(255)));
-
-        // config title
-        TextView title = new TextView(requireContext());
-        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT);
-        lp.gravity = Gravity.CENTER;
-        title.setLayoutParams(lp);
-        title.setText(info.getUserId());
-
-        view.addView(title);
-
-        mBinding.containerJoinChannelAudio.demoAddView(view);
-        mScene.subscribeRemoteAudio(info.getStreamId());
+        if(tag!=null)
+            mScene.subscribeRemoteAudio(tag);
     }
 
     private void joinChannel() {

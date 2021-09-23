@@ -3,8 +3,8 @@
     <declare-styleable name="DynamicView">
         <attr name="layoutStyle_dynamic" format="flags">
             <flag name="flex" value="0"/>
-            <flag name="collaborate" value="1"/>
-            <flag name="fixed" value="2"/>
+            <flag name="scroll" value="1"/>
         </attr>
+        <attr name="fitEnd_dynamic" format="boolean"/>
     </declare-styleable>
 </resources>

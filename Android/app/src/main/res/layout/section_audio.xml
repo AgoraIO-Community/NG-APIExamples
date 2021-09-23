@@ -44,43 +44,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
     </com.google.android.material.button.MaterialButtonToggleGroup>
-    <com.google.android.material.button.MaterialButtonToggleGroup
-            android:id="@+id/type_switch_group_section_audio"
-            app:singleSelection="true"
-            app:selectionRequired="true"
-            android:layout_marginTop="@dimen/space_medium"
-            app:layout_constraintTop_toBottomOf="@id/voice_switch_group_section_audio"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-        <com.google.android.material.button.MaterialButton
-                android:id="@+id/default_btn_section_audio"
-                android:text="@string/audio_profile_default"
-                android:textSize="12sp"
-                android:padding="6dp"
-                android:minWidth="0dp"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-        <com.google.android.material.button.MaterialButton
-                android:id="@+id/gs_btn_section_audio"
-                android:text="@string/audio_profile_game_streaming"
-                android:textSize="12sp"
-                android:padding="6dp"
-                android:minWidth="0dp"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-        <com.google.android.material.button.MaterialButton
-                android:id="@+id/hd_btn_section_audio"
-                android:text="@string/audio_profile_high_definition"
-                android:layout_weight="1"
-                android:textSize="12sp"
-                android:padding="6dp"
-                android:minWidth="0dp"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
-    </com.google.android.material.button.MaterialButtonToggleGroup>
 
     <ImageButton
             android:id="@+id/volume_down_btn_section_audio"
@@ -99,7 +62,7 @@
             app:layout_constraintStart_toEndOf="@id/volume_down_btn_section_audio"
             app:layout_constraintEnd_toStartOf="@id/volume_up_btn_section_audio"
             android:id="@+id/slider_volume_section_audio"
-            app:layout_constraintTop_toBottomOf="@id/type_switch_group_section_audio"
+            app:layout_constraintTop_toBottomOf="@id/mute_btn_section_audio"
             android:layout_marginTop="@dimen/space_medium"
             app:haloColor="@android:color/transparent"
             app:tickVisible="false"

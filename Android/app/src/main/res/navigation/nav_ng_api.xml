@@ -39,6 +39,9 @@
         <action
                 android:id="@+id/action_descriptionFragment_to_screenShareFragment"
                 app:destination="@id/order_d_screenShareFragment" />
+        <action
+                android:id="@+id/action_descriptionFragment_to_simpleExtensionFragment"
+                app:destination="@id/order_e_simpleExtensionFragment" />
     </fragment>
 
     <fragment
@@ -112,5 +115,23 @@
                 android:name="@string/args_nav_desc"
                 app:argType="reference"
                 android:defaultValue="@string/desc_screen_share"/>
+    </fragment>
+    <fragment
+            android:id="@+id/order_e_simpleExtensionFragment"
+            tools:layout="@layout/fragment_simple_extension"
+            android:name="io.agora.ng_api.ui.fragment.SimpleExtensionFragment"
+            android:label="@string/title_simple_extension" >
+        <argument
+                android:name="@string/args_nav_type"
+                app:argType="integer"
+                android:defaultValue="1"/>
+        <argument
+                android:name="@string/args_nav_permission"
+                app:argType="integer"
+                android:defaultValue="0x03"/>
+        <argument
+                android:name="@string/args_nav_desc"
+                app:argType="reference"
+                android:defaultValue="@string/desc_simple_extension"/>
     </fragment>
 </navigation>

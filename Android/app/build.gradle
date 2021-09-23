@@ -16,8 +16,7 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         ndk {
-            abiFilters 'armeabi-v7a'
-            //, 'arm64-v8a'
+            abiFilters 'armeabi-v7a', 'arm64-v8a'
         }
     }
     buildTypes {
@@ -38,6 +37,7 @@ android {
 }
 
 dependencies {
+    implementation project(path: ':agora-simple-filter')
     def nav_version = "2.3.5"
 
     // Java language implementation

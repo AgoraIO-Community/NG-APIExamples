@@ -21,3 +21,4 @@ local.properties
 app/**/*.so
 app/**/*.jar
 *.apk
+/.idea

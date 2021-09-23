@@ -4,13 +4,16 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.Editable;
-import android.view.SurfaceView;
+import android.view.TextureView;
 import android.view.View;
 import android.webkit.URLUtil;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.google.android.material.slider.Slider;
+
+import java.util.List;
 
 import io.agora.ng_api.MyApp;
 import io.agora.ng_api.base.BaseDemoFragment;
@@ -20,7 +23,10 @@ import io.agora.ng_api.view.VideoView;
 import io.agora.rte.AgoraRteSDK;
 import io.agora.rte.media.data.AgoraRteMediaPlayerObserver;
 import io.agora.rte.media.data.AgoraRteVideoFrame;
-import io.agora.rte.media.media_player.*;
+import io.agora.rte.media.media_player.AgoraRteFileInfo;
+import io.agora.rte.media.media_player.AgoraRteMediaPlayer;
+import io.agora.rte.media.media_player.AgoraRteMediaPlayerError;
+import io.agora.rte.media.media_player.AgoraRteMediaPlayerState;
 import io.agora.rte.media.stream.AgoraRtcStreamOptions;
 import io.agora.rte.media.stream.AgoraRteMediaStreamInfo;
 import io.agora.rte.media.video.AgoraRteVideoCanvas;
@@ -28,9 +34,6 @@ import io.agora.rte.media.video.AgoraRteVideoSubscribeOptions;
 import io.agora.rte.scene.AgoraRteConnectionChangedReason;
 import io.agora.rte.scene.AgoraRteSceneConnState;
 import io.agora.rte.scene.AgoraRteSceneEventHandler;
-
-import java.util.List;
-import java.util.Random;
 
 public class MediaPlayerFragment extends BaseDemoFragment<FragmentMediaPlayerBinding> {
     private AgoraRteMediaPlayer mPlayer;
@@ -61,9 +64,8 @@ public class MediaPlayerFragment extends BaseDemoFragment<FragmentMediaPlayerBin
     }
 
     private void initView() {
-        mBinding.containerFgPlayer.enableDefaultClickListener = false;
         mBinding.btnOpenFgPlayer.setOnClickListener(v -> openURL());
-        mVideoView = mBinding.containerFgPlayer.createDemoLayout(VideoView.class, false);
+        mVideoView = new VideoView(requireContext());
         mVideoView.mPlayBtn.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (!buttonView.isPressed()) return;
             mVideoView.showOverlay();
@@ -103,6 +105,8 @@ public class MediaPlayerFragment extends BaseDemoFragment<FragmentMediaPlayerBin
             @Override
             public void onVideoFrame(AgoraRteFileInfo fileInfo, AgoraRteVideoFrame videoFrame) {
                 super.onVideoFrame(fileInfo, videoFrame);
+                // We want the playerView's size matches the video frame's size, So when the frame
+                // shows at the first time, wo adjust view's size immediately
                 if(!initVideoView){
                     initVideoView = true;
                     new Handler(Looper.getMainLooper()).postAtFrontOfQueue(() -> {
@@ -141,7 +145,7 @@ public class MediaPlayerFragment extends BaseDemoFragment<FragmentMediaPlayerBin
         mAgoraHandler = new AgoraRteSceneEventHandler() {
             @Override
             public void onConnectionStateChanged(AgoraRteSceneConnState oldState, AgoraRteSceneConnState newState, AgoraRteConnectionChangedReason reason) {
-                if (newState == AgoraRteSceneConnState.CONN_STATE_CONNECTED) {
+                if (newState == AgoraRteSceneConnState.CONN_STATE_CONNECTED && mLocalVideoTrack == null) {
                     ExampleUtil.utilLog("onConnectionStateChanged,Thread:"+Thread.currentThread().getName());
                     // RTC stream prepare
                     AgoraRtcStreamOptions option = new AgoraRtcStreamOptions();
@@ -193,18 +197,17 @@ public class MediaPlayerFragment extends BaseDemoFragment<FragmentMediaPlayerBin
     }
 
     public void joinChannel() {
-        doJoinChannel(channelName, String.valueOf(new Random().nextInt(1024)), "");
+        doJoinChannel(channelName, mLocalUserId, "");
     }
 
     private void addMediaView() {
-        mBinding.containerFgPlayer.demoAddView(mVideoView, false);
+        mBinding.containerFgPlayer.demoAddView(mVideoView);
         mPlayer.setView(mVideoView.mTextureView);
     }
 
     private void addCameraView() {
-        SurfaceView view = mBinding.containerFgPlayer.createDemoLayout(SurfaceView.class, true);
-        view.setZOrderMediaOverlay(true);
-        mBinding.containerFgPlayer.demoAddView(view, true);
+        TextureView view = new TextureView(requireContext());
+        mBinding.containerFgPlayer.demoAddView(view);
         AgoraRteVideoCanvas canvas = new AgoraRteVideoCanvas(view);
         if (mLocalVideoTrack != null) {
             mLocalVideoTrack.setPreviewCanvas(canvas);
@@ -212,10 +215,9 @@ public class MediaPlayerFragment extends BaseDemoFragment<FragmentMediaPlayerBin
     }
 
     private void addRemoteView(String streamId) {
-        SurfaceView view = mBinding.containerFgPlayer.createDemoLayout(SurfaceView.class, true);
-        view.setZOrderMediaOverlay(true);
+        TextureView view = new TextureView(requireContext());
         view.setTag(streamId);
-        mBinding.containerFgPlayer.demoAddView(view, true);
+        mBinding.containerFgPlayer.demoAddView(view);
         AgoraRteVideoCanvas canvas = new AgoraRteVideoCanvas(view);
         mScene.setRemoteVideoCanvas(streamId, canvas);
 

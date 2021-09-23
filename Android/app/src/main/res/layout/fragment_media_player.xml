@@ -7,7 +7,8 @@
 
     <io.agora.ng_api.view.DynamicView
             android:id="@+id/container_fg_player"
-            app:layoutStyle_dynamic="collaborate"
+            app:layoutStyle_dynamic="scroll"
+            app:fitEnd_dynamic="false"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
 

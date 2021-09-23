@@ -3,10 +3,14 @@ package io.agora.ng_api.ui.fragment;
 import android.content.Context;
 import android.media.AudioManager;
 import android.os.Bundle;
-import android.view.SurfaceView;
+import android.view.TextureView;
 import android.view.View;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
+import java.util.List;
+
 import io.agora.ng_api.MyApp;
 import io.agora.ng_api.R;
 import io.agora.ng_api.base.BaseDemoFragment;
@@ -14,15 +18,13 @@ import io.agora.ng_api.databinding.FragmentJoinChannelVideoBinding;
 import io.agora.ng_api.util.ExampleUtil;
 import io.agora.ng_api.view.DynamicView;
 import io.agora.rte.AgoraRteSDK;
-import io.agora.rte.media.stream.*;
+import io.agora.rte.media.stream.AgoraRtcStreamOptions;
+import io.agora.rte.media.stream.AgoraRteMediaStreamInfo;
 import io.agora.rte.media.video.AgoraRteVideoCanvas;
 import io.agora.rte.media.video.AgoraRteVideoSubscribeOptions;
 import io.agora.rte.scene.AgoraRteSceneConnState;
 import io.agora.rte.scene.AgoraRteSceneEventHandler;
 import io.agora.rte.user.AgoraRteUserInfo;
-
-import java.util.List;
-import java.util.Random;
 
 /**
  * This demo demonstrates how to make a one-to-one video call version 2
@@ -48,11 +50,9 @@ public class JoinChannelVideoFragment extends BaseDemoFragment<FragmentJoinChann
         mBinding.toggleGroupFgVideo.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
             if (!isChecked) return;
             if (checkedId == R.id.toggle_btn_flex_fg_video) {
-                mBinding.containerJoinChannelVideo.setLayoutStyle(DynamicView.STYLE_LAYOUT_FLEX_GRID);
-            } else if (checkedId == R.id.toggle_btn_collaborate_fg_video) {
-                mBinding.containerJoinChannelVideo.setLayoutStyle(DynamicView.STYLE_LAYOUT_COLLABORATE);
+                mBinding.containerJoinChannelVideo.setLayoutStyle(DynamicView.STYLE_FLEX);
             } else {
-                mBinding.containerJoinChannelVideo.setLayoutStyle(DynamicView.STYLE_LAYOUT_FIXED_GRID);
+                mBinding.containerJoinChannelVideo.setLayoutStyle(DynamicView.STYLE_SCROLL);
             }
         });
         mBinding.toggleGroupFgVideo.check(R.id.toggle_btn_flex_fg_video);
@@ -71,7 +71,7 @@ public class JoinChannelVideoFragment extends BaseDemoFragment<FragmentJoinChann
             public void onConnectionStateChanged(AgoraRteSceneConnState state, AgoraRteSceneConnState state1, io.agora.rte.scene.AgoraRteConnectionChangedReason reason) {
                 ExampleUtil.utilLog("onConnectionStateChanged: " + state.getValue() + ", " + state1.getValue() + ",reason: " + reason.getValue() + "，\nThread:" + Thread.currentThread().getName());
                 // 连接建立完成
-                if (state1 == AgoraRteSceneConnState.CONN_STATE_CONNECTED) {
+                if (state1 == AgoraRteSceneConnState.CONN_STATE_CONNECTED && mLocalVideoTrack == null && mLocalAudioTrack == null) {
                     // RTC stream prepare
                     AgoraRtcStreamOptions option = new AgoraRtcStreamOptions();
                     mScene.createOrUpdateRTCStream(mLocalUserId, option);
@@ -140,21 +140,22 @@ public class JoinChannelVideoFragment extends BaseDemoFragment<FragmentJoinChann
     }
 
     private void joinChannel() {
-        doJoinChannel(channelName, String.valueOf(new Random().nextInt(1024)), "");
+        doJoinChannel(channelName, mLocalUserId, "");
     }
 
 
     private void addLocalView() {
-        SurfaceView view = mBinding.containerJoinChannelVideo.createDemoLayout(SurfaceView.class);
+        TextureView view = new TextureView(requireContext());
         mBinding.containerJoinChannelVideo.demoAddView(view);
         AgoraRteVideoCanvas canvas = new AgoraRteVideoCanvas(view);
+        canvas.renderMode = AgoraRteVideoCanvas.RENDER_MODE_FIT;
         if (mLocalVideoTrack != null) {
             mLocalVideoTrack.setPreviewCanvas(canvas);
         }
     }
 
     private void addRemoteView(String streamId) {
-        SurfaceView view = mBinding.containerJoinChannelVideo.createDemoLayout(SurfaceView.class);
+        TextureView view = new TextureView(requireContext());
         view.setTag(streamId);
         mBinding.containerJoinChannelVideo.demoAddView(view);
         AgoraRteVideoCanvas canvas = new AgoraRteVideoCanvas(view);

@@ -19,13 +19,7 @@
                 android:layout_height="wrap_content"/>
         <com.google.android.material.button.MaterialButton
                 android:id="@+id/toggle_btn_collaborate_fg_video"
-                android:text="COLLABORATE"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-        <com.google.android.material.button.MaterialButton
-                android:id="@+id/toggle_btn_fixed_fg_video"
-                android:text="FIXED"
+                android:text="SCROLL"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>

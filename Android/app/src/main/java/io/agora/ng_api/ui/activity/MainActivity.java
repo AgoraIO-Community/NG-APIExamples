@@ -3,12 +3,14 @@ package io.agora.ng_api.ui.activity;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.view.View;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.graphics.ColorUtils;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.widget.ImageViewCompat;
 import androidx.fragment.app.Fragment;
@@ -18,8 +20,13 @@ import androidx.navigation.NavDestination;
 import androidx.navigation.Navigation;
 import androidx.transition.Transition;
 import androidx.transition.TransitionManager;
+
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.transition.MaterialContainerTransform;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import io.agora.ng_api.R;
 import io.agora.ng_api.base.BaseActivity;
 import io.agora.ng_api.base.BaseDemoFragment;
@@ -27,9 +34,6 @@ import io.agora.ng_api.bean.DemoInfo;
 import io.agora.ng_api.databinding.ActivityMainBinding;
 import io.agora.ng_api.ui.fragment.DescriptionFragment;
 import io.agora.ng_api.util.ExampleUtil;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public final class MainActivity extends BaseActivity {
     private final List<DemoInfo> demoInfoList = new ArrayList<>();
@@ -42,6 +46,21 @@ public final class MainActivity extends BaseActivity {
         setContentView(mBinding.getRoot());
         initView();
         initControlView();
+
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+
+        // Basically this is equivalent to last line, but I want to change something
+        // like scrimMain's size and show FAB shadow when hover, works perfect
+        ViewCompat.setOnApplyWindowInsetsListener(mBinding.getRoot(), (v, insets) -> {
+            Insets inset = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+
+            int desiredBottom = Math.max(insets.getInsets(WindowInsetsCompat.Type.ime()).bottom,inset.bottom);
+
+            v.setPadding(inset.left,inset.top,inset.right,desiredBottom);
+            // TODO find a better way to achieve this.
+            ((ConstraintLayout.LayoutParams)mBinding.scrimMain.getLayoutParams()).setMargins(-inset.left,-inset.top - 1,-inset.right,-desiredBottom);
+            return WindowInsetsCompat.CONSUMED;
+        });
     }
 
     /**
@@ -129,7 +148,6 @@ public final class MainActivity extends BaseActivity {
             mBinding.cardView.setVisibility(View.GONE);
         });
 
-
         // For avoiding overlap with Back Icon
         mBinding.textTitleMain.setSelected(true);
         // Nav back listener
@@ -169,17 +187,6 @@ public final class MainActivity extends BaseActivity {
             }
         };
 
-        // For the ime & navigationBar
-        ViewCompat.setOnApplyWindowInsetsListener(mBinding.getRoot(), (v, insets) -> {
-            Insets inset = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-
-            int desiredBottom = Math.max(insets.getInsets(WindowInsetsCompat.Type.ime()).bottom,inset.bottom);
-
-            v.setPadding(inset.left,inset.top,inset.right,desiredBottom);
-            // TODO find a better way to achieve this.
-            ((ConstraintLayout.LayoutParams)mBinding.scrimMain.getLayoutParams()).setMargins(-inset.left,-inset.top - 1,-inset.right,-desiredBottom);
-            return WindowInsetsCompat.CONSUMED;
-        });
     }
 
     private void initControlView() {
@@ -191,21 +198,6 @@ public final class MainActivity extends BaseActivity {
             if (f != null && f.mScene != null && f.mLocalAudioTrack != null) {
                 if (isChecked) f.mScene.unpublishLocalAudioTrack(f.mLocalAudioTrack);
                 else f.mScene.publishLocalAudioTrack(f.mLocalUserId, f.mLocalAudioTrack);
-            }
-        });
-
-        // profile change
-        // 音频 profile 改变
-        mBinding.sectionAudioMain.typeSwitchGroupSectionAudio.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
-            if (!isChecked) return;
-            BaseDemoFragment<?> f = checkDemoAvailable();
-
-            if (checkedId == R.id.default_btn_section_audio) {
-                ExampleUtil.utilLog("0");
-            } else if (checkedId == R.id.gs_btn_section_audio) {
-                ExampleUtil.utilLog("1");
-            } else {
-                ExampleUtil.utilLog("2");
             }
         });
 
@@ -351,8 +343,6 @@ public final class MainActivity extends BaseActivity {
 
         ExampleUtil.updateMaterialButtonTint(mBinding.sectionAudioMain.muteBtnSectionAudio, primaryStateList, surfaceStateList);
 
-        for (int i = 0; i < mBinding.sectionAudioMain.typeSwitchGroupSectionAudio.getChildCount(); i++)
-            ExampleUtil.updateMaterialButtonTint((MaterialButton) mBinding.sectionAudioMain.typeSwitchGroupSectionAudio.getChildAt(i), primaryStateList, surfaceStateList);
         for (int i = 0; i < mBinding.sectionAudioMain.voiceSwitchGroupSectionAudio.getChildCount(); i++)
             ExampleUtil.updateMaterialButtonTint((MaterialButton) mBinding.sectionAudioMain.voiceSwitchGroupSectionAudio.getChildAt(i), primaryStateList, surfaceStateList);
     }

@@ -7,21 +7,24 @@ import android.graphics.Color;
 import android.os.Build;
 import android.util.AttributeSet;
 import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.HorizontalScrollView;
-import android.widget.LinearLayout;
 import android.widget.ScrollView;
 
 import androidx.annotation.IntRange;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
-import androidx.core.content.ContextCompat;
 import androidx.core.view.ViewCompat;
+import androidx.transition.AutoTransition;
+import androidx.transition.Transition;
+import androidx.transition.TransitionManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,27 +38,27 @@ import io.agora.ng_api.util.ExampleUtil;
  * 默认Flex模式
  * 所有子View宽高1：1
  * 需要定制可重写 {@link this#getStepByChildCount(int)}
+ * <p>
+ * For STYLE_FLEX children will be in a ConstraintLayout.
+ * For STYLE_SCROLL children will be in this view and a ScrollableLinearLayout with a IndicatorView.
  */
 public class DynamicView extends ConstraintLayout {
-    public static final int STYLE_LAYOUT_FLEX_GRID = 0;
-    public static final int STYLE_LAYOUT_COLLABORATE = 1;
-    public static final int STYLE_LAYOUT_FIXED_GRID = 2;
+    public static final int STYLE_FLEX = 0;
+    public static final int STYLE_SCROLL = 1;
 
 
-    public FrameLayout scrollContainer;
-    public LinearLayout innerContainer;
+    public ScrollView flexContainerScrollView;
+    public ConstraintLayout flexContainer;
+    public ScrollableLinearLayout scrollContainer;
+    public IndicatorView indicatorView;
 
     public int defaultCardSize;
     private int layoutStyle;
+    public boolean needCustomClick = false;
+    public boolean fitEnd = true;
 
     ///////////////////////////////////// ANIMATION /////////////////////////////////////////////////////////////////
-    // TODO try my best to finish the animation part
-    private boolean enableInsideAnimation = true;
-    public boolean enableDefaultClickListener = true;
-    private DynamicViewAnimationHelper helper;
-
-    private final int defStyleAttr;
-    private final int defStyleRes;
+    public final Transition flexTransition = new AutoTransition();
 
     public DynamicView(@NonNull Context context) {
         this(context, null);
@@ -66,140 +69,176 @@ public class DynamicView extends ConstraintLayout {
     }
 
     public DynamicView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
-        this(context, attrs, defStyleAttr, 0);
+        super(context, attrs, defStyleAttr);
+        init(context, attrs, defStyleAttr, 0);
     }
 
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public DynamicView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
-        this.defStyleAttr = defStyleAttr;
-        this.defStyleRes = defStyleRes;
+        init(context, attrs, defStyleAttr, defStyleRes);
+    }
 
+    private void init(Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
 
-        TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.DynamicView);
-        layoutStyle = ta.getInt(R.styleable.DynamicView_layoutStyle_dynamic, DynamicView.STYLE_LAYOUT_FLEX_GRID);
+        TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.DynamicView, defStyleAttr, defStyleRes);
+        layoutStyle = ta.getInt(R.styleable.DynamicView_layoutStyle_dynamic, DynamicView.STYLE_FLEX);
+        fitEnd = ta.getBoolean(R.styleable.DynamicView_fitEnd_dynamic, true);
         ta.recycle();
 
         defaultCardSize = (int) dp2px(120);
         // init childView
         setupViewWithStyle();
 
-
-        if (isInEditMode()) enableInsideAnimation = false;
-        // default LayoutTransition do not match our needs
-        // addView/removeView will cause bound change before view start animate
-        if (enableInsideAnimation) {
-            helper = new DynamicViewAnimationHelper(this);
-            setLayoutTransition(null);
-        }
-
         // for the preview
         if (this.isInEditMode()) {
             int[] colors = new int[]{Color.RED, Color.GREEN, Color.BLUE};
             View view;
             for (int i = 0; i < 3; i++) {
-                view = createDemoLayout(FrameLayout.class);
+                view = new FrameLayout(getContext());
                 view.setBackgroundColor(colors[i]);
                 demoAddView(view);
             }
         }
     }
 
-
     @Override
     protected void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        if (this.scrollContainer != null)
-            this.scrollContainer.setBackgroundColor(ExampleUtil.getColorInt(getContext(), R.attr.colorSurface));
+        configChangeForContainer(newConfig);
     }
 
+
+    private void configChangeForContainer(Configuration newConfig) {
+
+        if(scrollContainer != null) {
+            scrollContainer.fitEnd = this.fitEnd;
+
+            ViewCompat.setElevation(scrollContainer, dp2px(2));
+            ViewCompat.setElevation(indicatorView, dp2px(2));
+
+            ConstraintLayout.LayoutParams lp4Indicator;
+            ConstraintLayout.LayoutParams lp4Container;
+
+            if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+                scrollContainer.setOrientation(LinearLayoutCompat.HORIZONTAL);
+
+                lp4Container = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+                lp4Indicator = new LayoutParams(LayoutParams.MATCH_PARENT, (int) dp2px(24));
+
+                if(fitEnd){
+                    lp4Container.bottomToBottom = ConstraintSet.PARENT_ID;
+                    lp4Indicator.bottomToTop = scrollContainer.getId();
+                    indicatorView.gravity = Gravity.BOTTOM;
+                }else{
+                    lp4Container.topToTop = ConstraintSet.PARENT_ID;
+                    lp4Indicator.topToBottom = scrollContainer.getId();
+                    indicatorView.gravity = Gravity.TOP;
+                }
+
+
+            } else {
+                scrollContainer.setOrientation(LinearLayoutCompat.VERTICAL);
+                lp4Container = new LayoutParams(ConstraintLayout.LayoutParams.WRAP_CONTENT, ConstraintLayout.LayoutParams.MATCH_PARENT);
+                lp4Indicator = new LayoutParams((int) dp2px(24), LayoutParams.MATCH_PARENT);
+
+                if(fitEnd){
+                    lp4Container.endToEnd = ConstraintSet.PARENT_ID;
+                    lp4Indicator.endToStart = scrollContainer.getId();
+                    indicatorView.gravity = Gravity.END;
+                }else{
+                    lp4Container.startToStart = ConstraintSet.PARENT_ID;
+                    lp4Indicator.startToEnd = scrollContainer.getId();
+                    indicatorView.gravity = Gravity.START;
+                }
+            }
+
+            indicatorView.setLayoutParams(lp4Indicator);
+            scrollContainer.setLayoutParams(lp4Container);
+
+            scrollContainer.attachToIndicator(indicatorView);
+            scrollContainer.forceLayout();
+            scrollContainer.invalidate();
+        }
+    }
 
     public void switchView(View thumbView) {
-        switchView(getChildAt(0), thumbView);
+        if(layoutStyle == STYLE_SCROLL) {
+            View mainView = this.getChildAt(0);
+            if (mainView != scrollContainer && mainView != indicatorView)
+                switchView(mainView, thumbView);
+            else switchView(null, thumbView);
+        }
     }
 
-    public void switchView(View mainView, View thumbView) {
-        if (mainView.getParent() != this)
-            throw new IllegalStateException("mainView should be the one which is directly inside this DynamicView.");
-        if (thumbView.getParent() != innerContainer)
-            throw new IllegalStateException("thumbView should be a child of innerContainer.");
-        if (this.enableDefaultClickListener) {
+    public void switchView(@Nullable View mainView,@NonNull View thumbView) {
+
+        if (thumbView.getParent() != scrollContainer)
+            throw new IllegalStateException("thumbView should be a child of scrollContainer.");
+
+        if (!needCustomClick) {
             thumbView.setOnClickListener(null);
-            mainView.setOnClickListener(this::switchView);
+            if(mainView != null)
+                mainView.setOnClickListener(this::switchView);
         }
-        configViewIfIsSurfaceView(mainView, true);
+        if(mainView!=null)
+             configViewIfIsSurfaceView(mainView, true);
+
         configViewIfIsSurfaceView(thumbView, false);
 
-        // enable custom Animation
-        if (enableInsideAnimation) {
-            helper.switchView(mainView, thumbView);
-        } else {
-            doSwitchView(mainView, thumbView);
-        }
+        doSwitchView(mainView, thumbView);
     }
 
-    protected void doSwitchView(View mainView, View thumbView) {
+    private void doSwitchView(@Nullable View mainView,@NonNull View thumbView) {
         int indexOfMain = this.indexOfChild(mainView);
-        this.removeView(mainView);
+        if(indexOfMain>=0)
+            this.removeView(mainView);
+        else indexOfMain = 0;
 
-        int indexOfThumb = innerContainer.indexOfChild(thumbView);
-        innerContainer.removeView(thumbView);
+        int indexOfThumb = scrollContainer.indexOfChild(thumbView);
+        if(indexOfThumb >= 0)
+            scrollContainer.removeView(thumbView);
 
         this.addView(thumbView, indexOfMain, getLpForMainView());
-        innerContainer.addView(mainView, indexOfThumb, getLpForThumbView());
+
+        if(mainView != null)
+        scrollContainer.addView(mainView, indexOfThumb);
     }
 
     /**
      * Handle stuff each time layoutStyle changed.
-     * 1. Gather all childView added to this.
-     * 2. Recreate all container based on current layoutStyle
+     * 1. Gather previousChildren then detach all of it.
+     * 2. Recreate container based on current configuration and current layoutStyle.
      * 3. Restore all view.
      */
     private void setupViewWithStyle() {
-        // Step 1
-        List<View> children = resetView();
+        List<View> oldChildren = resetView();
 
-        // Step 2
-        innerContainer = initInnerContainer();
-        scrollContainer = initScrollContainer();
-
-        // FLEX situation ==> Step 3
-        if (layoutStyle == DynamicView.STYLE_LAYOUT_FLEX_GRID) {
-            for (View child : children) {
+        if (layoutStyle == DynamicView.STYLE_FLEX) {
+            initFlexContainer();
+            for (View child : oldChildren) {
                 configViewIfIsSurfaceView(child, false);
-                if (enableDefaultClickListener)
+                if (!needCustomClick)
                     child.setOnClickListener(null);
-                this.addView(child, getLpForMainView());
+                demoAddView(child);
             }
-            regroupChildren();
-            children.clear();
-            return;
-        }
-        // other situation ==> Step 3
-
-        // For the first View we add it to 'this'
-        if (children.size() > 0) {
-            View v = children.get(0);
-            configViewIfIsSurfaceView(v, false);
-            if (enableDefaultClickListener)
-                v.setOnClickListener(null);
-            this.addView(v, getLpForMainView());
-            children.remove(v);
-        }
-
-        // For the rest View we try to add it to innerContainer
-        if (innerContainer != null) {
-            if (scrollContainer != null) {
-                scrollContainer.addView(innerContainer);
-                addView(scrollContainer);
-                for (View child : children) {
+            regroupFlexChildren();
+        } else {
+            initScrollContainer();
+            for (int i = 0; i < oldChildren.size(); i++) {
+                View child = oldChildren.get(i);
+                if (i == 0) {
+                    configViewIfIsSurfaceView(child, false);
+                    if (!needCustomClick) child.setOnClickListener(null);
+                } else {
                     configViewIfIsSurfaceView(child, true);
-                    if (enableDefaultClickListener)
-                        child.setOnClickListener(this::switchView);
-                    innerContainer.addView(child, getLpForThumbView());
+                    if (!needCustomClick) child.setOnClickListener(this::switchView);
                 }
+                demoAddView(child);
             }
         }
-        children.clear();
+        oldChildren.clear();
     }
 
     /**
@@ -226,246 +265,168 @@ public class DynamicView extends ConstraintLayout {
             surfaceView.setZOrderMediaOverlay(zOrderMediaOverlay);
     }
 
+    /**
+     * gather all view then detach all of it
+     *
+     * @return previousChildren
+     */
     private List<View> resetView() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2)
-            getOverlay().clear();
-        List<View> children = new ArrayList<>();
-        if (innerContainer == null) {
-            for (int i = 0; i < getChildCount(); i++)
-                children.add(this.getChildAt(i));
-        } else {
-            children.add(this.getChildAt(0));
-            for (int i = 0; i < innerContainer.getChildCount(); i++)
-                children.add(innerContainer.getChildAt(i));
-            innerContainer.removeAllViews();
-        }
-        removeAllViews();
-        return children;
-    }
+        List<View> previousChildren = new ArrayList<>();
 
-    private LinearLayout initInnerContainer() {
-        if (layoutStyle == STYLE_LAYOUT_FLEX_GRID) return null;
-        LinearLayout linearLayout;
-        // setup linearLayout
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-            linearLayout = new LinearLayout(getContext(), null, defStyleAttr, defStyleRes);
-        else linearLayout = new LinearLayout(getContext(), null, defStyleAttr);
+        if (getChildCount() != 0) {
 
-        FrameLayout.LayoutParams lp;
-        if (layoutStyle == STYLE_LAYOUT_COLLABORATE) {
-            linearLayout.setOrientation(LinearLayout.HORIZONTAL);
-            lp = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        } else if (layoutStyle == STYLE_LAYOUT_FIXED_GRID) {
-            linearLayout.setOrientation(LinearLayout.VERTICAL);
-            lp = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        } else {
-            lp = null;
-        }
-
-        linearLayout.setLayoutParams(lp);
-        return linearLayout;
-    }
-
-    private FrameLayout initScrollContainer() {
-        if (layoutStyle == STYLE_LAYOUT_FLEX_GRID) return null;
-        FrameLayout scrollView;
-        LayoutParams lp;
-        if (layoutStyle == DynamicView.STYLE_LAYOUT_COLLABORATE) {
-            // config lp
-            lp = new LayoutParams(LayoutParams.MATCH_PARENT, defaultCardSize);
-            lp.topToTop = ConstraintSet.PARENT_ID;
-            // new scrollView
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-                scrollView = new HorizontalScrollView(getContext(), null, defStyleAttr, defStyleRes);
-            } else {
-                scrollView = new HorizontalScrollView(getContext(), null, defStyleAttr);
+            // there will be a view in this on STYLE_SCROLL.
+            for (int i = 0; i < getChildCount(); i++) {
+                View view = getChildAt(i);
+                if(view != indicatorView && view != flexContainerScrollView && view != scrollContainer)
+                    previousChildren.add(view);
             }
-            lp.setMargins((int) dp2px(16), (int) dp2px(12), (int) dp2px(16), 0);
-            ((HorizontalScrollView) scrollView).setFillViewport(true);
-        } else if (layoutStyle == DynamicView.STYLE_LAYOUT_FIXED_GRID) {
-            // config lp
-            lp = new LayoutParams(defaultCardSize, LayoutParams.MATCH_PARENT);
-            lp.topToTop = ConstraintSet.PARENT_ID;
-            lp.endToEnd = ConstraintSet.PARENT_ID;
-            lp.rightToRight = ConstraintSet.PARENT_ID;
 
-            // new scrollView
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-                scrollView = new ScrollView(getContext(), null, defStyleAttr, defStyleRes);
-            } else {
-                scrollView = new ScrollView(getContext(), null, defStyleAttr);
+            ViewGroup container = null;
+            if (flexContainer != null)
+                container = flexContainer;
+            else if (scrollContainer != null)
+                container = scrollContainer;
+
+            if (container != null) {
+                for (int i = 0; i < container.getChildCount(); i++)
+                    previousChildren.add(container.getChildAt(i));
+                container.removeAllViews();
             }
-            ((ScrollView) scrollView).setFillViewport(true);
-        } else return null;
-
-        scrollView.setLayoutParams(lp);
-        scrollView.setId(ViewCompat.generateViewId());
-
-        TypedValue typedValue = new TypedValue();
-        getContext().getTheme().resolveAttribute(R.attr.colorSurface, typedValue, true);
-        int surface = ContextCompat.getColor(getContext(), typedValue.resourceId);
-
-        scrollView.setBackgroundColor(surface);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-            scrollView.setElevation(dp2px(2));
-
-        return scrollView;
+            removeAllViews();
+            flexContainerScrollView = null;
+            flexContainer = null;
+            scrollContainer = null;
+            indicatorView = null;
+        }
+        return previousChildren;
     }
 
+    private void initFlexContainer() {
+        flexContainerScrollView = new ScrollView(getContext());
+        flexContainerScrollView.setId(ViewCompat.generateViewId());
+        flexContainerScrollView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,LayoutParams.MATCH_PARENT));
+        flexContainerScrollView.setFillViewport(true);
+
+        flexContainer = new ConstraintLayout(getContext());
+        flexContainer.setId(ViewCompat.generateViewId());
+        flexContainer.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,FrameLayout.LayoutParams.WRAP_CONTENT));
+        flexContainer.setLayoutTransition(null);
+
+        flexContainerScrollView.addView(flexContainer);
+        this.addView(flexContainerScrollView);
+    }
+
+    private void initScrollContainer() {
+        scrollContainer = new ScrollableLinearLayout(getContext());
+        scrollContainer.setId(ViewCompat.generateViewId());
+
+        indicatorView = new IndicatorView(getContext());
+        indicatorView.setId(ViewCompat.generateViewId());
+
+        configChangeForContainer(getResources().getConfiguration());
+
+        this.addView(scrollContainer);
+        this.addView(indicatorView);
+    }
+
+    /**
+     * For a better control we override child's LayoutParams
+     */
     public void demoAddView(View child) {
-        demoAddView(child, null);
-    }
+        if (child.getId() == View.NO_ID)
+            child.setId(ViewCompat.generateViewId());
 
-    public void demoAddView(View child, Boolean insideInnerContainer) {
-        if (layoutStyle == DynamicView.STYLE_LAYOUT_FLEX_GRID) {
-            if (Boolean.TRUE == insideInnerContainer)
-                throw new IllegalStateException("layoutStyle STYLE_LAYOUT_FLEX_GRID do not allow the ScrollContainer exist.");
-            if (enableInsideAnimation)
-                helper.addChildInFlexLayout(child);
-            else {
-                addView(child);
-                regroupChildren();
-            }
-        } else if (insideInnerContainer == null) {
-            if (this.getChildAt(0) == scrollContainer) {
-                addView(child, 0);
-            } else {
-                innerContainer.addView(child);
-            }
-        } else if (insideInnerContainer) {
-            if (enableDefaultClickListener)
-                throw new IllegalStateException("DynamicView cannot handle this situation.");
-            else innerContainer.addView(child);
+        if (layoutStyle == DynamicView.STYLE_FLEX) {
+            child.setLayoutParams(getLpForMainView());
+            addChildInFlexLayout(child);
+        } else if (this.getChildAt(0) == scrollContainer || this.getChildAt(0) == indicatorView) {
+            child.setLayoutParams(getLpForMainView());
+            addView(child, 0);
         } else {
-            addView(child);
-        }
-    }
-
-    public void dynamicRemoveViewWithTag(Object tag){
-        View view = findViewWithTag(tag);
-        if(view != null){
-            if(view.getParent() == this) this.demoRemoveView(view);
-            else if(view.getParent() == innerContainer) innerContainer.removeView(view);
+            if(!needCustomClick)
+                child.setOnClickListener(this::switchView);
+            scrollContainer.addView(child);
         }
     }
 
     public void demoRemoveView(View view) {
-        if (layoutStyle == DynamicView.STYLE_LAYOUT_FLEX_GRID) {
-            if (enableInsideAnimation)
-                helper.removeChildInFlexLayout(view);
-            else {
-                removeView(view);
-                regroupChildren();
-            }
-        } else removeView(view);
-    }
-
-    public <T extends View> T createDemoLayout(Class<T> tClass) {
-        boolean forContainer = getChildCount() > 1 && layoutStyle != DynamicView.STYLE_LAYOUT_FLEX_GRID;
-        return createDemoLayout(tClass, forContainer);
-    }
-
-    /**
-     * base lp config
-     * <p>
-     *
-     * @param tClass class of view
-     * @return the view going to be ADDED
-     */
-    public <T extends View> T createDemoLayout(Class<T> tClass, boolean forContainer) {
-        T view;
-        try {
-            view = tClass.getConstructor(Context.class).newInstance(getContext());
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-        view.setId(ViewCompat.generateViewId());
-        view.setSaveEnabled(true);
-
-        if (this.enableDefaultClickListener) {
-            if (forContainer) view.setOnClickListener(this::switchView);
-        }
-
-        if (forContainer) {
-            view.setLayoutParams(getLpForThumbView());
+        if (layoutStyle == DynamicView.STYLE_FLEX) {
+            removeChildInFlexLayout(view);
         } else {
-            view.setLayoutParams(getLpForMainView());
-        }
-
-        return view;
+            scrollContainer.removeView(view);
+        };
     }
 
-    public LinearLayout.LayoutParams getLpForThumbView() {
-        LinearLayout.LayoutParams lp;
-        switch (this.layoutStyle) {
-            case DynamicView.STYLE_LAYOUT_COLLABORATE:
-                lp = new LinearLayout.LayoutParams(defaultCardSize, LinearLayout.LayoutParams.MATCH_PARENT);
-                break;
-            case DynamicView.STYLE_LAYOUT_FIXED_GRID:
-                lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, defaultCardSize);
-                break;
-            default:
-                lp = null;
-        }
-        return lp;
+    public void addChildInFlexLayout(View view) {
+        TransitionManager.beginDelayedTransition(flexContainer, flexTransition);
+        flexContainer.addView(view);
+        regroupFlexChildren();
     }
 
-    public LayoutParams getLpForMainView() {
-        ConstraintLayout.LayoutParams lp = new ConstraintLayout.LayoutParams(0, 0);
-        switch (this.layoutStyle) {
-            case DynamicView.STYLE_LAYOUT_FLEX_GRID:
-                lp.dimensionRatio = "1:1";
-                break;
-            case DynamicView.STYLE_LAYOUT_COLLABORATE:
-                lp.leftToLeft = ConstraintSet.PARENT_ID;
-                lp.startToStart = ConstraintSet.PARENT_ID;
-
-                lp.topToTop = ConstraintSet.PARENT_ID;
-
-                lp.rightToRight = ConstraintSet.PARENT_ID;
-                lp.endToEnd = ConstraintSet.PARENT_ID;
-
-                lp.bottomToBottom = ConstraintSet.PARENT_ID;
-                break;
-            default:
-                lp.leftToLeft = ConstraintSet.PARENT_ID;
-                lp.startToStart = ConstraintSet.PARENT_ID;
-
-                lp.topToTop = ConstraintSet.PARENT_ID;
-
-                lp.rightToLeft = scrollContainer.getId();
-                lp.endToStart = scrollContainer.getId();
-
-                lp.bottomToBottom = ConstraintSet.PARENT_ID;
+    public void dynamicRemoveViewWithTag(Object tag) {
+        View view = findViewWithTag(tag);
+        if (view != null) {
+            if (view.getParent() == this) this.removeView(view);
+            else if (view.getParent() == scrollContainer) scrollContainer.removeView(view);
+            else if (view.getParent() == flexContainer) removeChildInFlexLayout(view);
         }
-        return lp;
+    }
+
+    public void removeChildInFlexLayout(int index) {
+        removeChildInFlexLayout(flexContainer.getChildAt(index));
+    }
+
+    public void removeChildInFlexLayout(View view) {
+        TransitionManager.beginDelayedTransition(flexContainer, flexTransition);
+        flexContainer.removeView(view);
+        regroupFlexChildren();
     }
 
     /**
      * 重新组织子 View 的关联
      */
-    protected void regroupChildren() {
-        int childCount = this.getChildCount();
-        if (childCount == 0) return;
-
-        View currentView;
-        int step = getStepByChildCount(childCount);
-        for (int i = 0; i < childCount; i++) {
-            currentView = this.getChildAt(i);
-            configViewForFlexStyle(i, step, currentView);
+    protected void regroupFlexChildren() {
+        if(flexContainer!=null) {
+            int childCount = flexContainer.getChildCount();
+            if (childCount != 0) {
+                View currentView;
+                int step = getStepByChildCount(childCount);
+                for (int i = 0; i < childCount; i++) {
+                    currentView = flexContainer.getChildAt(i);
+                    configViewForFlexStyle(i, step, currentView);
+                }
+            }
         }
+    }
+
+    public ConstraintLayout.LayoutParams getLpForMainView() {
+        ConstraintLayout.LayoutParams lp = new ConstraintLayout.LayoutParams(0, 0);
+        if (this.layoutStyle == DynamicView.STYLE_FLEX) {
+            lp.dimensionRatio = "1:1";
+        } else {
+            lp.leftToLeft = ConstraintSet.PARENT_ID;
+            lp.startToStart = ConstraintSet.PARENT_ID;
+
+            lp.topToTop = ConstraintSet.PARENT_ID;
+
+            lp.rightToRight = ConstraintSet.PARENT_ID;
+            lp.endToEnd = ConstraintSet.PARENT_ID;
+
+            lp.bottomToBottom = ConstraintSet.PARENT_ID;
+        }
+        return lp;
     }
 
     /**
      * step = 2
-     * 0 == 1
-     * 2 == 3
+     * 0 , 1
+     * 2 , 3
      * <p>
      * step = 3
-     * 0 == 1 == 2
-     * 3 == 4 == 5
+     * 0 , 1 , 2
+     * 3 , 4 , 5
+     * 6 , 7 , 8
      *
      * @param index view 在父View中的下标
      * @param step  步长
@@ -482,32 +443,32 @@ public class DynamicView extends ConstraintLayout {
             } else {
                 lp.rightToRight = ConstraintSet.UNSET;
 //                其他情况有可能此View为最后一个，需要判断
-                if (index + 1 == this.getChildCount()) {
-                    lp.rightToLeft = this.getChildAt(index + 1 - step).getId();
+                if (index + 1 == this.flexContainer.getChildCount()) {
+                    lp.rightToLeft = this.flexContainer.getChildAt(index + 1 - step).getId();
                 } else {
-                    lp.rightToLeft = this.getChildAt(index + 1).getId();
+                    lp.rightToLeft = this.flexContainer.getChildAt(index + 1).getId();
                 }
             }
         } else if (index % step == step - 1) { // 最后一个
             lp.leftToLeft = ConstraintSet.UNSET;
-            lp.leftToRight = this.getChildAt(index - 1).getId();
+            lp.leftToRight = this.flexContainer.getChildAt(index - 1).getId();
             lp.rightToLeft = ConstraintSet.UNSET;
             lp.rightToRight = ConstraintSet.PARENT_ID;
         } else { // 中间
             lp.leftToLeft = ConstraintSet.UNSET;
-            lp.leftToRight = this.getChildAt(index - 1).getId();
+            lp.leftToRight = this.flexContainer.getChildAt(index - 1).getId();
             lp.rightToRight = ConstraintSet.UNSET;
 
 //          其他情况有可能此View为最后一个，需要判断
-            if (index + 1 == this.getChildCount()) {
-                lp.rightToLeft = this.getChildAt(index + 1 - step).getId();
+            if (index + 1 == this.flexContainer.getChildCount()) {
+                lp.rightToLeft = this.flexContainer.getChildAt(index + 1 - step).getId();
             } else {
-                lp.rightToLeft = this.getChildAt(index + 1).getId();
+                lp.rightToLeft = this.flexContainer.getChildAt(index + 1).getId();
             }
         }
         // TOP 修正
         if (index - step >= 0) {
-            lp.topToBottom = this.getChildAt(index - step).getId();
+            lp.topToBottom = this.flexContainer.getChildAt(index - step).getId();
             lp.topToTop = ConstraintSet.UNSET;
         } else {
             lp.topToTop = ConstraintSet.PARENT_ID;
@@ -526,7 +487,7 @@ public class DynamicView extends ConstraintLayout {
         return layoutStyle;
     }
 
-    public void setLayoutStyle(@IntRange(from = DynamicView.STYLE_LAYOUT_FLEX_GRID, to = DynamicView.STYLE_LAYOUT_FIXED_GRID) int newLayoutStyle) {
+    public void setLayoutStyle(@IntRange(from = DynamicView.STYLE_FLEX, to = DynamicView.STYLE_SCROLL) int newLayoutStyle) {
         this.layoutStyle = newLayoutStyle;
         setupViewWithStyle();
     }

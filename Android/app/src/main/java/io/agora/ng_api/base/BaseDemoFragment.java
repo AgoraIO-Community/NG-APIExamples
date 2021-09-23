@@ -5,6 +5,12 @@ import android.os.Bundle;
 
 import androidx.annotation.Nullable;
 import androidx.viewbinding.ViewBinding;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+import io.agora.extension.ExtensionManager;
 import io.agora.ng_api.MyApp;
 import io.agora.ng_api.R;
 import io.agora.ng_api.ui.fragment.DescriptionFragment;
@@ -21,10 +27,6 @@ import io.agora.rte.scene.AgoraRteSceneEventHandler;
 import io.agora.rte.scene.AgoraRteSceneJoinOptions;
 import io.agora.rte.user.AgoraRteUserInfo;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-
 /**
  * On Jetpack navigation
  * Fragments enter/exit represent onCreateView/onDestroyView
@@ -33,8 +35,8 @@ import java.util.Random;
 public abstract class BaseDemoFragment<B extends ViewBinding> extends BaseFragment<B> {
 
     // COMMON FILED
-    public final String mLocalUserId = String.valueOf(new Random().nextInt(1024));
-    public final String mLocalMediaStreamId = "media-" + new Random().nextInt(1024) + 1024;
+    public final String mLocalUserId = String.valueOf(new Random().nextInt(Integer.MAX_VALUE/2));
+    public final String mLocalMediaStreamId = "media-" + new Random().nextInt(Integer.MAX_VALUE/2) + Integer.MAX_VALUE/2;
     public String channelName;
     @Nullable
     public AudioManager audioManager;
@@ -86,6 +88,7 @@ public abstract class BaseDemoFragment<B extends ViewBinding> extends BaseFragme
         profile.context = requireContext();
         profile.logConfig = new AgoraRteLogConfig(requireContext().getFilesDir().getAbsolutePath());
         AgoraRteSDK.init(profile);
+
 //        if (res != 0) Toast.makeText(requireContext(), "AGORA SDK init error, code: " + res, Toast.LENGTH_SHORT).show();
     }
 
@@ -95,7 +98,10 @@ public abstract class BaseDemoFragment<B extends ViewBinding> extends BaseFragme
      * @param token       access token
      */
     public void doJoinChannel(String channelName, String userId, String token) {
-        AgoraRteSceneConfig config = new AgoraRteSceneConfig();
+        doJoinChannel(channelName, userId, token, new AgoraRteSceneConfig());
+    }
+
+    public void doJoinChannel(String channelName, String userId, String token, AgoraRteSceneConfig config) {
         mScene = AgoraRteSDK.createRteScene(channelName, config);
         mScene.registerSceneEventHandler(mAgoraHandler);
         mScene.join(userId, token, new AgoraRteSceneJoinOptions());

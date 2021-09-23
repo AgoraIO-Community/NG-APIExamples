@@ -69,7 +69,6 @@ public class ScreenShareFragment extends BaseDemoFragment<FragmentScreenShareBin
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private void initView() {
         mediaProjectionIntent = new Intent(requireActivity(), MediaProjectFgService.class);
-        mBinding.containerFgScreenShare.enableDefaultClickListener = false;
 
         // checked the button to record screen
         mBinding.btnOpenFgScreenShare.addOnCheckedChangeListener((button, isChecked) -> {
@@ -167,7 +166,7 @@ public class ScreenShareFragment extends BaseDemoFragment<FragmentScreenShareBin
     private void createOrUpdateScreenVideoTrack(Intent intent) {
         if (screenVideoTrack == null) {
             // Add View
-            textureView = mBinding.containerFgScreenShare.createDemoLayout(TextureView.class);
+            textureView = new TextureView(requireContext());
             mBinding.containerFgScreenShare.demoAddView(textureView);
             // Create preview canvas
             canvas = new AgoraRteVideoCanvas(textureView);
@@ -183,7 +182,7 @@ public class ScreenShareFragment extends BaseDemoFragment<FragmentScreenShareBin
     }
 
     private void addLocalView() {
-        TextureView view = mBinding.containerFgScreenShare.createDemoLayout(TextureView.class);
+        TextureView view = new TextureView(requireContext());
         mBinding.containerFgScreenShare.demoAddView(view);
         AgoraRteVideoCanvas canvas = new AgoraRteVideoCanvas(view);
         if (mLocalVideoTrack != null) {
@@ -197,7 +196,7 @@ public class ScreenShareFragment extends BaseDemoFragment<FragmentScreenShareBin
      * @param streamId related remote streamID
      */
     private void addRemoteView(String streamId) {
-        TextureView view = mBinding.containerFgScreenShare.createDemoLayout(TextureView.class);
+        TextureView view = new TextureView(requireContext());
         view.setTag(streamId);
         mBinding.containerFgScreenShare.demoAddView(view);
         AgoraRteVideoCanvas canvas = new AgoraRteVideoCanvas(view);
@@ -208,7 +207,7 @@ public class ScreenShareFragment extends BaseDemoFragment<FragmentScreenShareBin
     }
 
     private void joinChannel() {
-        doJoinChannel(channelName, String.valueOf(new Random().nextInt(1024)), "");
+        doJoinChannel(channelName, mLocalUserId, "");
     }
 
     @Override

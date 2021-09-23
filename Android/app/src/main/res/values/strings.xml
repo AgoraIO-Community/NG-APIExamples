@@ -16,9 +16,6 @@
     <string name="earpiece">听筒</string>
     <string name="adjust_volume_down">调低音量</string>
     <string name="adjust_volume_up">调高音量</string>
-    <string name="audio_profile_default">default</string>
-    <string name="audio_profile_game_streaming">game_streaming</string>
-    <string name="audio_profile_high_definition">high_definition</string>
     <string name="channel_name_required">channelName required</string>
     <string name="show_channel_name">(%s)</string>
 
@@ -72,6 +69,8 @@
     <string name="desc_media_player">媒体播放agora媒体播放agora\n媒体播放agora媒体播放agora</string>
     <string name="title_screen_share">屏幕共享</string>
     <string name="desc_screen_share">屏幕共享agora屏幕共享agora\n屏幕共享agora屏幕共享agora</string>
+    <string name="title_simple_extension">插件演示</string>
+    <string name="desc_simple_extension">插件演示agora插件演示agora\n插件演示agora插件演示agora</string>
 
 
 </resources>
