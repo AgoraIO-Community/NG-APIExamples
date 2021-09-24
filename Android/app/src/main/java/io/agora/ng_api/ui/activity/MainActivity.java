@@ -2,10 +2,13 @@ package io.agora.ng_api.ui.activity;
 
 import android.content.res.ColorStateList;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.graphics.ColorUtils;
 import androidx.core.graphics.Insets;
@@ -50,17 +53,19 @@ public final class MainActivity extends BaseActivity {
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
 
         // Basically this is equivalent to last line, but I want to change something
-        // like scrimMain's size and show FAB shadow when hover, works perfect
+        // like change scrimMain's size and show FAB shadow when hover, works perfect
         ViewCompat.setOnApplyWindowInsetsListener(mBinding.getRoot(), (v, insets) -> {
             Insets inset = insets.getInsets(WindowInsetsCompat.Type.systemBars());
 
             int desiredBottom = Math.max(insets.getInsets(WindowInsetsCompat.Type.ime()).bottom,inset.bottom);
 
             v.setPadding(inset.left,inset.top,inset.right,desiredBottom);
-            // TODO find a better way to achieve this.
+            // FIXME find a better way to achieve this.
             ((ConstraintLayout.LayoutParams)mBinding.scrimMain.getLayoutParams()).setMargins(-inset.left,-inset.top - 1,-inset.right,-desiredBottom);
             return WindowInsetsCompat.CONSUMED;
         });
+        // Prevent the first run lagging
+//        new Handler(Looper.getMainLooper()).postDelayed(() -> mBinding.scrimMain.performClick(),200);
     }
 
     /**
@@ -76,7 +81,7 @@ public final class MainActivity extends BaseActivity {
 
     private void initView() {
         // FAB and CardView animation
-        MaterialContainerTransform transformExpand = ExampleUtil.getTransform(mBinding.tFabMain, mBinding.cardView);
+        MaterialContainerTransform transformExpand = ExampleUtil.getTransform(mBinding.tFabMain, mBinding.sectionAudioMain.getRoot());
         transformExpand.addListener(new Transition.TransitionListener() {
             @Override
             public void onTransitionStart(@NonNull Transition transition) {
@@ -105,7 +110,7 @@ public final class MainActivity extends BaseActivity {
 
             }
         });
-        MaterialContainerTransform transformClose = ExampleUtil.getTransform(mBinding.cardView, mBinding.tFabMain);
+        MaterialContainerTransform transformClose = ExampleUtil.getTransform(mBinding.sectionAudioMain.getRoot(), mBinding.tFabMain);
         transformClose.addListener(new Transition.TransitionListener() {
             @Override
             public void onTransitionStart(@NonNull Transition transition) {
@@ -140,12 +145,12 @@ public final class MainActivity extends BaseActivity {
         mBinding.tFabMain.setOnClickListener(v -> {
             TransitionManager.beginDelayedTransition(mBinding.getRoot(), transformExpand);
             mBinding.tFabMain.setVisibility(View.GONE);
-            mBinding.cardView.setVisibility(View.VISIBLE);
+            mBinding.sectionAudioMain.getRoot().setVisibility(View.VISIBLE);
         });
         mBinding.scrimMain.setOnClickListener(v -> {
             TransitionManager.beginDelayedTransition(mBinding.getRoot(), transformClose);
             mBinding.tFabMain.setVisibility(View.VISIBLE);
-            mBinding.cardView.setVisibility(View.GONE);
+            mBinding.sectionAudioMain.getRoot().setVisibility(View.GONE);
         });
 
         // For avoiding overlap with Back Icon
@@ -300,10 +305,11 @@ public final class MainActivity extends BaseActivity {
 
     /**
      * 当 FAB 是展开的《==》返回键收起
+     * Block back this time when FAB is not showing or animation is in progress.
      */
     @Override
     public void onBackPressed() {
-        if (mBinding.cardView.getVisibility() == View.VISIBLE) {
+        if (mBinding.sectionAudioMain.getRoot().getVisibility() == View.VISIBLE) {
             // 动画结束，调用点击事件；动画过程中，直接忽略这次操作。
             if (mBinding.scrimMain.isEnabled())
                 mBinding.scrimMain.performClick();
@@ -337,7 +343,7 @@ public final class MainActivity extends BaseActivity {
         mBinding.tFabMain.setSupportImageTintList(ColorStateList.valueOf(colorOnPrimary));
 
         // Config ControlView's color
-        mBinding.cardView.setCardBackgroundColor(colorSurface);
+        ((CardView)mBinding.sectionAudioMain.getRoot()).setCardBackgroundColor(colorSurface);
         ColorStateList primaryStateList = new ColorStateList(new int[][]{new int[]{android.R.attr.state_checked, android.R.attr.state_enabled}, new int[]{android.R.attr.state_enabled}, new int[]{}}, new int[]{colorPrimary, colorTextSecondary, colorTextDisabled});
         ColorStateList surfaceStateList = new ColorStateList(new int[][]{new int[]{android.R.attr.state_checked}, new int[]{}}, new int[]{colorPrimary, colorStroke});
 
