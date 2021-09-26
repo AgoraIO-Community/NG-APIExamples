@@ -143,19 +143,6 @@ public class ScrollableLinearLayout extends LinearLayoutCompat {
 
     //<editor-fold desc="Override function">
 
-
-//    @Override
-//    public boolean dispatchTouchEvent(MotionEvent ev) {
-//        ExampleUtil.utilLog("dispatchTouchEvent:"+ev.getActionMasked());
-//        switch (ev.getActionMasked()){
-//            case MotionEvent.ACTION_DOWN:{
-//                onInterceptTouchEvent(ev);
-//                return true;
-//            }
-//            default:return super.dispatchTouchEvent(ev);
-//        }
-//    }
-
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
         int action = ev.getActionMasked();

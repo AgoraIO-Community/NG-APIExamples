@@ -49,7 +49,7 @@ public class SimpleExtensionFragment extends BaseDemoFragment<FragmentSimpleExte
             @Override
             public void onConnectionStateChanged(AgoraRteSceneConnState oldState, AgoraRteSceneConnState newState, AgoraRteConnectionChangedReason reason) {
 
-                if(newState == AgoraRteSceneConnState.CONN_STATE_CONNECTED && mLocalAudioTrack == null && mLocalVideoTrack == null){
+                if(newState == AgoraRteSceneConnState.CONN_STATE_CONNECTED && mLocalAudioTrack == null){
                     // RTC stream prepare
                     mScene.createOrUpdateRTCStream(mLocalUserId, new AgoraRtcStreamOptions());
 

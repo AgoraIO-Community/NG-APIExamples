@@ -113,10 +113,8 @@ public class DynamicView extends ConstraintLayout {
     private void configChangeForContainer(Configuration newConfig) {
 
         if(scrollContainer != null) {
-            scrollContainer.fitEnd = this.fitEnd;
-
-            ViewCompat.setElevation(scrollContainer, dp2px(2));
-            ViewCompat.setElevation(indicatorView, dp2px(2));
+            scrollContainer.setTranslationX(0f);
+            scrollContainer.setTranslationY(0f);
 
             ConstraintLayout.LayoutParams lp4Indicator;
             ConstraintLayout.LayoutParams lp4Container;
@@ -320,9 +318,12 @@ public class DynamicView extends ConstraintLayout {
     private void initScrollContainer() {
         scrollContainer = new ScrollableLinearLayout(getContext());
         scrollContainer.setId(ViewCompat.generateViewId());
+        scrollContainer.fitEnd = this.fitEnd;
+        ViewCompat.setElevation(scrollContainer, dp2px(2));
 
         indicatorView = new IndicatorView(getContext());
         indicatorView.setId(ViewCompat.generateViewId());
+        ViewCompat.setElevation(indicatorView, dp2px(2));
 
         configChangeForContainer(getResources().getConfiguration());
 

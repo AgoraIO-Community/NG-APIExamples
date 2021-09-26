@@ -185,11 +185,6 @@ public class VideoView extends FrameLayout implements ScaleGestureDetector.OnSca
             }
         });
 
-        this.setOnClickListener(v -> {
-            if (mPlayBtn.getVisibility() == VISIBLE)
-                hideOverlay();
-            else showOverlay();
-        });
     }
 
 
@@ -205,7 +200,12 @@ public class VideoView extends FrameLayout implements ScaleGestureDetector.OnSca
         }else if(event.getActionMasked() == MotionEvent.ACTION_POINTER_DOWN){
             wantClick = false;
         }else if(event.getActionMasked() == MotionEvent.ACTION_UP){
-            if(wantClick) performClick();
+            if(wantClick) {
+                if(getLayoutParams().width == 0)
+                    toggleOverlay();
+                else
+                    performClick();
+            }
         }
         detector.onTouchEvent(event);
         return true;
@@ -213,12 +213,13 @@ public class VideoView extends FrameLayout implements ScaleGestureDetector.OnSca
 
     @Override
     public boolean performClick() {
-        super.performClick();
-        if(!wantClick) return true;
-        if (mPlayBtn.getVisibility() == VISIBLE)
+        return super.performClick();
+    }
+
+    public void toggleOverlay(){
+        if(mPlayBtn.getVisibility() == VISIBLE)
             hideOverlay();
         else showOverlay();
-        return true;
     }
 
     public void hideOverlay(){

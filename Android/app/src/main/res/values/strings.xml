@@ -20,8 +20,8 @@
     <string name="show_channel_name">(%s)</string>
 
     <string name="app_id_title">APPID 设置</string>
-    <string name="app_id_alert">【agora_app_id】未配置\n此为演示功能所必须\n请至官网注册获取，若已有可👇手动输入</string>
-    <string name="app_id_alert_user">您可手动指定APPID\n配置文件中【agora_app_id】：\n【%s】</string>
+    <string name="app_id_alert">[agora_app_id]未配置\n此为演示功能所必须\n请至官网注册获取，若已有可👇手动输入</string>
+    <string name="app_id_alert_user">您可手动指定APPID\n配置文件中[agora_app_id]：[%s]</string>
     <string name="app_id_error">请输入正确的 agora APP ID</string>
     <string name="permission_alert">缺少运行所需的必要权限，是否确认申请？</string>
     <string name="permission_refused">运行此功能需要的必要权限未被授予。</string>

@@ -96,7 +96,6 @@ public class DescriptionFragment extends BaseFragment<FragmentDescriptionBinding
             // Button pressed
             // 按下按钮的判断标志
             if (action == EditorInfo.IME_ACTION_DONE || (keyEvent != null && keyEvent.getKeyCode() == KeyEvent.KEYCODE_ENTER)) {
-                ExampleUtil.hideKeyboard(requireActivity().getWindow(), v);
                 mBinding.btnJoinFgDesc.callOnClick();
                 return true;
             }
@@ -116,6 +115,8 @@ public class DescriptionFragment extends BaseFragment<FragmentDescriptionBinding
             if (tempName.isEmpty()) {
                 ExampleUtil.shakeViewAndVibrateToAlert(mBinding.layoutInputChannelFgDesc);
             } else {
+                ExampleUtil.hideKeyboard(requireActivity().getWindow(), v);
+
                 String appIdInStrings = requireContext().getString(R.string.agora_app_id);
                 String appIdInSP = ExampleUtil.getSp(requireContext()).getString(ExampleUtil.APPID, "");
                 if (appIdInStrings.isEmpty() && appIdInSP.isEmpty())

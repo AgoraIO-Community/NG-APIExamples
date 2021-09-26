@@ -71,7 +71,7 @@ public class JoinChannelVideoFragment extends BaseDemoFragment<FragmentJoinChann
             public void onConnectionStateChanged(AgoraRteSceneConnState state, AgoraRteSceneConnState state1, io.agora.rte.scene.AgoraRteConnectionChangedReason reason) {
                 ExampleUtil.utilLog("onConnectionStateChanged: " + state.getValue() + ", " + state1.getValue() + ",reason: " + reason.getValue() + "，\nThread:" + Thread.currentThread().getName());
                 // 连接建立完成
-                if (state1 == AgoraRteSceneConnState.CONN_STATE_CONNECTED && mLocalVideoTrack == null && mLocalAudioTrack == null) {
+                if (state1 == AgoraRteSceneConnState.CONN_STATE_CONNECTED && mLocalAudioTrack == null) {
                     // RTC stream prepare
                     AgoraRtcStreamOptions option = new AgoraRtcStreamOptions();
                     mScene.createOrUpdateRTCStream(mLocalUserId, option);

@@ -99,7 +99,7 @@ public class ScreenShareFragment extends BaseDemoFragment<FragmentScreenShareBin
             @Override
             public void onConnectionStateChanged(AgoraRteSceneConnState oldState, AgoraRteSceneConnState newState, AgoraRteConnectionChangedReason reason) {
                 super.onConnectionStateChanged(oldState, newState, reason);
-                if (newState == AgoraRteSceneConnState.CONN_STATE_CONNECTED) {
+                if (newState == AgoraRteSceneConnState.CONN_STATE_CONNECTED && mLocalAudioTrack == null) {
                     mBinding.btnOpenFgScreenShare.setEnabled(true);
 
                     // RTC stream prepare

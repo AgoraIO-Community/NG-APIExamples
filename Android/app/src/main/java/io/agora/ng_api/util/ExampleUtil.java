@@ -91,6 +91,7 @@ public class ExampleUtil {
     public static void hideKeyboard(Window window, View view) {
         WindowInsetsControllerCompat con = WindowCompat.getInsetsController(window, view);
         if (con != null) con.hide(WindowInsetsCompat.Type.ime());
+        view.clearFocus();
     }
 
     public static void showKeyboard(Window window, View view) {
