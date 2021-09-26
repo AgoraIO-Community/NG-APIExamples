@@ -12,6 +12,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.core.view.*
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
@@ -72,6 +73,7 @@ fun NGApiApp() {
 //        })
 
         Scaffold(
+                backgroundColor = Color.Transparent,
             topBar = {
                 NGApiAppBar(
                     title = currentScreen.pageDesc.title,
