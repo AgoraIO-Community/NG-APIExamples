@@ -23,7 +23,6 @@
             tools:ignore="AllowBackup">
 
         <activity
-                android:windowSoftInputMode="adjustResize"
                 android:configChanges="keyboardHidden|orientation|screenSize|uiMode"
                 android:name="io.agora.ng_api.ui.activity.MainActivity"
                 android:exported="true">
@@ -36,8 +35,7 @@
 
         <service android:name=".service.MediaProjectFgService"
                 android:enabled="true"
-                android:exported="false"
-                android:foregroundServiceType="mediaProjection"/>
+                android:exported="false"/>
     </application>
 
 </manifest>

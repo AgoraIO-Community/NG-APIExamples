@@ -40,6 +40,8 @@ dependencies {
     implementation project(path: ':agora-simple-filter')
     def nav_version = "2.3.5"
 
+    //Leak Canary
+//    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.7'
     // Java language implementation
     implementation "androidx.navigation:navigation-fragment:$nav_version"
 

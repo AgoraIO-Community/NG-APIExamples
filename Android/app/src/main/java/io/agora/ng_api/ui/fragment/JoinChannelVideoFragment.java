@@ -3,11 +3,11 @@ package io.agora.ng_api.ui.fragment;
 import android.content.Context;
 import android.media.AudioManager;
 import android.os.Bundle;
-import android.view.TextureView;
 import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.cardview.widget.CardView;
 
 import java.util.List;
 
@@ -17,6 +17,7 @@ import io.agora.ng_api.base.BaseDemoFragment;
 import io.agora.ng_api.databinding.FragmentJoinChannelVideoBinding;
 import io.agora.ng_api.util.ExampleUtil;
 import io.agora.ng_api.view.DynamicView;
+import io.agora.ng_api.view.ScrollableLinearLayout;
 import io.agora.rte.AgoraRteSDK;
 import io.agora.rte.media.stream.AgoraRtcStreamOptions;
 import io.agora.rte.media.stream.AgoraRteMediaStreamInfo;
@@ -24,7 +25,6 @@ import io.agora.rte.media.video.AgoraRteVideoCanvas;
 import io.agora.rte.media.video.AgoraRteVideoSubscribeOptions;
 import io.agora.rte.scene.AgoraRteSceneConnState;
 import io.agora.rte.scene.AgoraRteSceneEventHandler;
-import io.agora.rte.user.AgoraRteUserInfo;
 
 /**
  * This demo demonstrates how to make a one-to-one video call version 2
@@ -61,15 +61,8 @@ public class JoinChannelVideoFragment extends BaseDemoFragment<FragmentJoinChann
     private void initListener() {
         mAgoraHandler = new AgoraRteSceneEventHandler() {
 
-            /**
-             * 场景网络状态回调
-             * @param state from state
-             * @param state1 to state
-             * @param reason 状态改变的原因
-             */
-            @Override
             public void onConnectionStateChanged(AgoraRteSceneConnState state, AgoraRteSceneConnState state1, io.agora.rte.scene.AgoraRteConnectionChangedReason reason) {
-                ExampleUtil.utilLog("onConnectionStateChanged: " + state.getValue() + ", " + state1.getValue() + ",reason: " + reason.getValue() + "，\nThread:" + Thread.currentThread().getName());
+                ExampleUtil.utilLog("onConnectionStateChanged: " + state.getValue() + ", " + state1.getValue() + ",reason: " + reason.getValue());
                 // 连接建立完成
                 if (state1 == AgoraRteSceneConnState.CONN_STATE_CONNECTED && mLocalAudioTrack == null) {
                     // RTC stream prepare
@@ -78,7 +71,7 @@ public class JoinChannelVideoFragment extends BaseDemoFragment<FragmentJoinChann
                     // 准备视频采集
                     mLocalVideoTrack = AgoraRteSDK.getRteMediaFactory().createCameraVideoTrack();
                     // 必须先添加setPreviewCanvas，然后才能 startCapture
-                    addLocalView();
+                    addUserPreview(null);
                     if (mLocalVideoTrack != null) {
                         mLocalVideoTrack.startCapture(null);
                     }
@@ -93,45 +86,17 @@ public class JoinChannelVideoFragment extends BaseDemoFragment<FragmentJoinChann
 
             }
 
-            /**
-             * 远端用户进入场景
-             * @param list 所有用户
-             */
-            @Override
-            public void onRemoteUserJoined(List<AgoraRteUserInfo> list) {
-                ExampleUtil.utilLog("onRemoteUserJoined: " + list.toString());
-                userInfoList.addAll(list);
-            }
-
-            /**
-             * 远端用户离开场景
-             */
-            @Override
-            public void onRemoteUserLeft(List<AgoraRteUserInfo> list) {
-                ExampleUtil.utilLog("onRemoteUserLeft: " + list.toString());
-                userInfoList.removeAll(list);
-            }
-
-            /**
-             * 场景内远端用户开始推流
-             */
             @Override
             public void onRemoteStreamAdded(List<AgoraRteMediaStreamInfo> list) {
                 if (mBinding == null) return;
-                streamInfoList.addAll(list);
                 for (AgoraRteMediaStreamInfo info : list) {
-                    addRemoteView(info.getStreamId());
+                    addUserPreview(info.getStreamId());
                 }
             }
 
-            /**
-             * OnRemoteStreamRemoved
-             */
             @Override
             public void onRemoteStreamRemoved(List<AgoraRteMediaStreamInfo> list) {
-                ExampleUtil.utilLog("onRemoteStreamRemoved: " + Thread.currentThread().getName());
                 if (mBinding == null) return;
-                streamInfoList.removeAll(list);
                 for (AgoraRteMediaStreamInfo info : list) {
                     mBinding.containerJoinChannelVideo.dynamicRemoveViewWithTag(info.getStreamId());
                 }
@@ -143,26 +108,37 @@ public class JoinChannelVideoFragment extends BaseDemoFragment<FragmentJoinChann
         doJoinChannel(channelName, mLocalUserId, "");
     }
 
+    /**
+     * @param remoteStreamIdOrNull null => localView, else => remoteView
+     */
+    private void addUserPreview(@Nullable String remoteStreamIdOrNull) {
+        // Create CardView which contains a TextureView
+        CardView cardView = ScrollableLinearLayout.getChildVideoCardView(requireContext(), remoteStreamIdOrNull);
 
-    private void addLocalView() {
-        TextureView view = new TextureView(requireContext());
-        mBinding.containerJoinChannelVideo.demoAddView(view);
-        AgoraRteVideoCanvas canvas = new AgoraRteVideoCanvas(view);
-        canvas.renderMode = AgoraRteVideoCanvas.RENDER_MODE_FIT;
-        if (mLocalVideoTrack != null) {
+        // Add CardView
+        mBinding.containerJoinChannelVideo.demoAddView(cardView);
+        // Create AgoraRteVideoCanvas
+        AgoraRteVideoCanvas canvas = new AgoraRteVideoCanvas(cardView.getChildAt(0));
+
+        // Enhanced
+//        cardView.setOnLongClickListener(v -> {
+//            int desiredMode = AgoraRteVideoCanvas.RENDER_MODE_FIT;
+//            if(canvas.renderMode == desiredMode) desiredMode = AgoraRteVideoCanvas.RENDER_MODE_HIDDEN ;
+//            canvas.renderMode = desiredMode;
+//            return true;
+//        });
+
+        // Set RenderMode
+        canvas.renderMode = AgoraRteVideoCanvas.RENDER_MODE_HIDDEN;
+        // Remote related stuff
+        if(remoteStreamIdOrNull != null){
+            mScene.setRemoteVideoCanvas(remoteStreamIdOrNull, canvas);
+            mScene.subscribeRemoteVideo(remoteStreamIdOrNull, new AgoraRteVideoSubscribeOptions());
+            mScene.subscribeRemoteAudio(remoteStreamIdOrNull);
+        }else if(mLocalVideoTrack != null){
+            // Local preview
             mLocalVideoTrack.setPreviewCanvas(canvas);
         }
-    }
-
-    private void addRemoteView(String streamId) {
-        TextureView view = new TextureView(requireContext());
-        view.setTag(streamId);
-        mBinding.containerJoinChannelVideo.demoAddView(view);
-        AgoraRteVideoCanvas canvas = new AgoraRteVideoCanvas(view);
-        mScene.setRemoteVideoCanvas(streamId, canvas);
-
-        mScene.subscribeRemoteVideo(streamId, new AgoraRteVideoSubscribeOptions());
-        mScene.subscribeRemoteAudio(streamId);
     }
 
     @Override

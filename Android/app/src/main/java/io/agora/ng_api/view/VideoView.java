@@ -235,6 +235,12 @@ public class VideoView extends FrameLayout implements ScaleGestureDetector.OnSca
 
 
     @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        mHandler.removeCallbacksAndMessages(null);
+    }
+
+    @Override
     public boolean onScale(ScaleGestureDetector detector) {
         float desireScale = getDesiredScale(detector.getScaleFactor());
 

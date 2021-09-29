@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import io.agora.base.internal.ContextUtils;
 import io.agora.extension.ExtensionManager;
 import io.agora.ng_api.MyApp;
 import io.agora.ng_api.R;
@@ -47,10 +48,6 @@ public abstract class BaseDemoFragment<B extends ViewBinding> extends BaseFragme
     @Nullable
     public AgoraRteMicrophoneAudioTrack mLocalAudioTrack;
 
-
-    public List<AgoraRteMediaStreamInfo> streamInfoList = new ArrayList<>();
-    public List<AgoraRteUserInfo> userInfoList = new ArrayList<>();
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,9 +63,6 @@ public abstract class BaseDemoFragment<B extends ViewBinding> extends BaseFragme
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        // view is gone, these data represent nothing.
-        streamInfoList.clear();
-        userInfoList.clear();
         if (!MyApp.debugMine) {
             doExitChannel();
         }
@@ -108,6 +102,10 @@ public abstract class BaseDemoFragment<B extends ViewBinding> extends BaseFragme
     }
 
     public void doExitChannel() {
+        if(mLocalAudioTrack != null)
+            mLocalAudioTrack.destroy();
+        if(mLocalVideoTrack != null)
+            mLocalVideoTrack.destroy();
         if (mScene != null) {
             mScene.leave();
             mScene.destroy();

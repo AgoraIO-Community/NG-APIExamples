@@ -65,7 +65,6 @@
             app:tint="?attr/colorOnPrimary"
             android:src="@drawable/ic_setting_white"
             android:contentDescription="@string/mute"
-            app:rippleColor="@android:color/transparent"
             app:backgroundTint="?attr/colorPrimary"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"

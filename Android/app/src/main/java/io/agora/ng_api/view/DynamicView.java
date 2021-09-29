@@ -52,10 +52,10 @@ public class DynamicView extends ConstraintLayout {
     public ScrollableLinearLayout scrollContainer;
     public IndicatorView indicatorView;
 
-    public int defaultCardSize;
     private int layoutStyle;
     public boolean needCustomClick = false;
     public boolean fitEnd = true;
+    public int gapInFlex = 0;
 
     ///////////////////////////////////// ANIMATION /////////////////////////////////////////////////////////////////
     public final Transition flexTransition = new AutoTransition();
@@ -83,22 +83,20 @@ public class DynamicView extends ConstraintLayout {
     private void init(Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
 
         TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.DynamicView, defStyleAttr, defStyleRes);
-        layoutStyle = ta.getInt(R.styleable.DynamicView_layoutStyle_dynamic, DynamicView.STYLE_FLEX);
-        fitEnd = ta.getBoolean(R.styleable.DynamicView_fitEnd_dynamic, true);
+        layoutStyle = ta.getInt(R.styleable.DynamicView_dynamic_layoutStyle, DynamicView.STYLE_FLEX);
+        fitEnd = ta.getBoolean(R.styleable.DynamicView_dynamic_fitEnd, true);
+        gapInFlex = ta.getDimensionPixelSize(R.styleable.DynamicView_dynamic_gapInFlex, 0);
+
+        int previewViewCount = ta.getInt(R.styleable.DynamicView_dynamic_previewViewCount, 3);
         ta.recycle();
 
-        defaultCardSize = (int) dp2px(120);
         // init childView
         setupViewWithStyle();
 
         // for the preview
         if (this.isInEditMode()) {
-            int[] colors = new int[]{Color.RED, Color.GREEN, Color.BLUE};
-            View view;
-            for (int i = 0; i < 3; i++) {
-                view = new FrameLayout(getContext());
-                view.setBackgroundColor(colors[i]);
-                demoAddView(view);
+            for (int i = 0; i < previewViewCount; i++) {
+                demoAddView(ScrollableLinearLayout.getChildAudioCardView(getContext(), null, "V"+(i+1)));
             }
         }
     }
@@ -356,7 +354,7 @@ public class DynamicView extends ConstraintLayout {
             removeChildInFlexLayout(view);
         } else {
             scrollContainer.removeView(view);
-        };
+        }
     }
 
     public void addChildInFlexLayout(View view) {
@@ -433,33 +431,33 @@ public class DynamicView extends ConstraintLayout {
      * @param step  步长
      */
     private void configViewForFlexStyle(int index, int step, View v) {
-        ConstraintLayout.LayoutParams lp = (ConstraintLayout.LayoutParams) v.getLayoutParams();
+        ConstraintLayout.LayoutParams lp = new ConstraintLayout.LayoutParams(0,0);
+        lp.dimensionRatio = "1:1";
+        lp.topMargin = gapInFlex;
         // 第一个
         if (index % step == 0) {
             lp.leftToLeft = ConstraintSet.PARENT_ID;
-            lp.leftToRight = ConstraintSet.UNSET;
+            lp.leftMargin = gapInFlex;
+            // 最后一个
             if (step == 1) {
-                lp.rightToLeft = ConstraintSet.UNSET;
                 lp.rightToRight = ConstraintSet.PARENT_ID;
+                lp.rightMargin = gapInFlex;
             } else {
-                lp.rightToRight = ConstraintSet.UNSET;
-//                其他情况有可能此View为最后一个，需要判断
+//                其他情况有可能此View为最后一个，需要判断。 0,1,2 \n 3,_,_
                 if (index + 1 == this.flexContainer.getChildCount()) {
-                    lp.rightToLeft = this.flexContainer.getChildAt(index + 1 - step).getId();
+                    lp.rightToRight = this.flexContainer.getChildAt(index - step).getId();
                 } else {
                     lp.rightToLeft = this.flexContainer.getChildAt(index + 1).getId();
                 }
             }
         } else if (index % step == step - 1) { // 最后一个
-            lp.leftToLeft = ConstraintSet.UNSET;
             lp.leftToRight = this.flexContainer.getChildAt(index - 1).getId();
-            lp.rightToLeft = ConstraintSet.UNSET;
             lp.rightToRight = ConstraintSet.PARENT_ID;
+            lp.leftMargin = gapInFlex;
+            lp.rightMargin = gapInFlex;
         } else { // 中间
-            lp.leftToLeft = ConstraintSet.UNSET;
             lp.leftToRight = this.flexContainer.getChildAt(index - 1).getId();
-            lp.rightToRight = ConstraintSet.UNSET;
-
+            lp.leftMargin = gapInFlex;
 //          其他情况有可能此View为最后一个，需要判断
             if (index + 1 == this.flexContainer.getChildCount()) {
                 lp.rightToLeft = this.flexContainer.getChildAt(index + 1 - step).getId();
@@ -468,18 +466,11 @@ public class DynamicView extends ConstraintLayout {
             }
         }
         // TOP 修正
-        if (index - step >= 0) {
-            lp.topToBottom = this.flexContainer.getChildAt(index - step).getId();
-            lp.topToTop = ConstraintSet.UNSET;
-        } else {
+        if (index - step < 0) {
             lp.topToTop = ConstraintSet.PARENT_ID;
-            lp.topToBottom = ConstraintSet.UNSET;
+        } else {
+            lp.topToBottom = this.flexContainer.getChildAt(index - step).getId();
         }
-        // Android 版本兼容
-        lp.startToEnd = lp.leftToRight;
-        lp.startToStart = lp.leftToLeft;
-        lp.endToStart = lp.rightToLeft;
-        lp.endToEnd = lp.rightToRight;
         // 赋值
         v.setLayoutParams(lp);
     }
@@ -489,6 +480,8 @@ public class DynamicView extends ConstraintLayout {
     }
 
     public void setLayoutStyle(@IntRange(from = DynamicView.STYLE_FLEX, to = DynamicView.STYLE_SCROLL) int newLayoutStyle) {
+        // this is important
+        clearAnimation();
         this.layoutStyle = newLayoutStyle;
         setupViewWithStyle();
     }

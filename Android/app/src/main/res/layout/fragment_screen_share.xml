@@ -6,7 +6,7 @@
 
     <io.agora.ng_api.view.DynamicView
             android:id="@+id/container_fg_screen_share"
-            app:layoutStyle_dynamic="flex"
+            app:dynamic_layoutStyle="flex"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 

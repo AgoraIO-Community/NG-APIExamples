@@ -5,12 +5,14 @@ import static android.view.Gravity.CENTER;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.PointF;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.MotionEvent;
+import android.view.TextureView;
 import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewConfiguration;
@@ -22,6 +24,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.cardview.widget.CardView;
+import androidx.core.view.ViewCompat;
 import androidx.dynamicanimation.animation.DynamicAnimation;
 import androidx.dynamicanimation.animation.FlingAnimation;
 import androidx.dynamicanimation.animation.FloatPropertyCompat;
@@ -500,6 +503,7 @@ public class ScrollableLinearLayout extends LinearLayoutCompat {
 
     @SuppressLint("WrongConstant")
     private void onFling(float xScrollVelocity, float yScrollVelocity) {
+        ExampleUtil.utilLog("xScrollVelocity:"+xScrollVelocity+",yScrollVelocity:"+yScrollVelocity);
         if (currentDirection == -1) return;
 
         ExampleUtil.utilLog("x:"+xScrollVelocity+",y:"+yScrollVelocity);
@@ -761,9 +765,32 @@ public class ScrollableLinearLayout extends LinearLayoutCompat {
         titleText.setText(title);
 
         cardView.setTag(tag);
-        cardView.setRadius(16);
+        cardView.setRadius(dp2pxSystem(16));
         cardView.setCardBackgroundColor(Color.rgb(new Random().nextInt(255), new Random().nextInt(255), new Random().nextInt(255)));
         cardView.addView(titleText);
         return cardView;
+    }
+    /**
+     * Help function
+     *
+     * @return a CardView contains a Texture
+     */
+    public static CardView getChildVideoCardView(@NonNull Context context, @Nullable Object tag) {
+        CardView cardView = new CardView(context);
+
+        TextureView textureView = new TextureView(context);
+        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
+        textureView.setLayoutParams(lp);
+
+        cardView.setRadius(dp2pxSystem(16));
+        cardView.setCardBackgroundColor(Color.WHITE);
+        cardView.addView(textureView);
+        if(tag != null)
+            cardView.setTag(tag);
+        return cardView;
+    }
+
+    public static float dp2pxSystem(int dp){
+        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, Resources.getSystem().getDisplayMetrics());
     }
 }

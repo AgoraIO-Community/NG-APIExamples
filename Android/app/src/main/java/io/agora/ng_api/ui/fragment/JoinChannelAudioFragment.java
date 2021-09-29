@@ -1,16 +1,15 @@
 package io.agora.ng_api.ui.fragment;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.media.AudioManager;
 import android.os.Bundle;
-import android.view.Gravity;
 import android.view.View;
-import android.widget.FrameLayout;
-import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
+
+import java.util.List;
 
 import io.agora.ng_api.MyApp;
 import io.agora.ng_api.R;
@@ -19,13 +18,10 @@ import io.agora.ng_api.databinding.FragmentJoinChannelAudioBinding;
 import io.agora.ng_api.util.ExampleUtil;
 import io.agora.ng_api.view.ScrollableLinearLayout;
 import io.agora.rte.AgoraRteSDK;
-import io.agora.rte.media.stream.*;
+import io.agora.rte.media.stream.AgoraRtcStreamOptions;
+import io.agora.rte.media.stream.AgoraRteMediaStreamInfo;
 import io.agora.rte.scene.AgoraRteSceneConnState;
 import io.agora.rte.scene.AgoraRteSceneEventHandler;
-import io.agora.rte.user.AgoraRteUserInfo;
-
-import java.util.List;
-import java.util.Random;
 
 /**
  * This demo demonstrates how to make a one-to-one video call version 2
@@ -50,12 +46,6 @@ public class JoinChannelAudioFragment extends BaseDemoFragment<FragmentJoinChann
     private void initListener() {
         mAgoraHandler = new AgoraRteSceneEventHandler() {
 
-            /**
-             * 场景网络状态回调
-             * @param state from state
-             * @param state1 to state
-             * @param reason 状态改变的原因
-             */
             @Override
             public void onConnectionStateChanged(AgoraRteSceneConnState state, AgoraRteSceneConnState state1, io.agora.rte.scene.AgoraRteConnectionChangedReason reason) {
                 ExampleUtil.utilLog("onConnectionStateChanged: " + state.getValue() + ", " + state1.getValue() + ",reason: " + reason.getValue() + "，\nThread:" + Thread.currentThread().getName());
@@ -77,46 +67,17 @@ public class JoinChannelAudioFragment extends BaseDemoFragment<FragmentJoinChann
 
             }
 
-            /**
-             * 远端用户进入场景
-             * @param list 所有用户
-             */
-            @Override
-            public void onRemoteUserJoined(List<AgoraRteUserInfo> list) {
-                ExampleUtil.utilLog("onRemoteUserJoined: " + list.toString());
-                if (mBinding == null) return;
-                userInfoList.addAll(list);
-            }
-
-            /**
-             * 远端用户离开场景
-             */
-            @Override
-            public void onRemoteUserLeft(List<AgoraRteUserInfo> list) {
-                ExampleUtil.utilLog("onRemoteUserLeft: " + list.toString());
-                if(mBinding == null) return;
-                userInfoList.removeAll(list);
-            }
-
-            /**
-             * 场景内远端用户开始推流
-             */
             @Override
             public void onRemoteStreamAdded(List<AgoraRteMediaStreamInfo> list) {
                 if (mBinding == null) return;
-                streamInfoList.addAll(list);
                 for (AgoraRteMediaStreamInfo info : list)
                     addVoiceView(info);
             }
 
-            /**
-             * OnRemoteStreamRemoved
-             */
             @Override
             public void onRemoteStreamRemoved(List<AgoraRteMediaStreamInfo> list) {
                 ExampleUtil.utilLog("onRemoteStreamRemoved: " + Thread.currentThread().getName());
                 if (mBinding == null) return;
-                streamInfoList.removeAll(list);
                 for (AgoraRteMediaStreamInfo info : list) {
                     mBinding.containerJoinChannelAudio.dynamicRemoveViewWithTag(info.getStreamId());
                 }
