@@ -39,8 +39,6 @@ public abstract class BaseDemoFragment<B extends ViewBinding> extends BaseFragme
     public final String mLocalUserId = String.valueOf(new Random().nextInt(Integer.MAX_VALUE/2));
     public final String mLocalMediaStreamId = "media-" + new Random().nextInt(Integer.MAX_VALUE/2) + Integer.MAX_VALUE/2;
     public String channelName;
-    @Nullable
-    public AudioManager audioManager;
     public AgoraRteScene mScene;
     public AgoraRteSceneEventHandler mAgoraHandler;
     @Nullable

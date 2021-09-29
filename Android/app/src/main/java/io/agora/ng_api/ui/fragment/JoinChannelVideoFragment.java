@@ -1,7 +1,5 @@
 package io.agora.ng_api.ui.fragment;
 
-import android.content.Context;
-import android.media.AudioManager;
 import android.os.Bundle;
 import android.view.View;
 
@@ -45,7 +43,6 @@ public class JoinChannelVideoFragment extends BaseDemoFragment<FragmentJoinChann
     }
 
     private void initView() {
-        audioManager = (AudioManager) requireContext().getSystemService(Context.AUDIO_SERVICE);
         // control the layout style
         mBinding.toggleGroupFgVideo.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
             if (!isChecked) return;
