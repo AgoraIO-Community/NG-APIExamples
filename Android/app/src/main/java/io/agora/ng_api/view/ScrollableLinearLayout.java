@@ -24,7 +24,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.cardview.widget.CardView;
-import androidx.core.view.ViewCompat;
 import androidx.dynamicanimation.animation.DynamicAnimation;
 import androidx.dynamicanimation.animation.FlingAnimation;
 import androidx.dynamicanimation.animation.FloatPropertyCompat;
@@ -68,7 +67,7 @@ public class ScrollableLinearLayout extends LinearLayoutCompat {
     private int gravityFlag = Gravity.BOTTOM;
     // true for BOTTOM/END, otherwise TOP/START
     public boolean fitEnd = true;
-    private final ViewConfiguration viewConfiguration;
+    private final int mTouchSlop;
     // first touched point in float value
     private final PointF firstPointF = new PointF();
     // last touched point in float value
@@ -104,7 +103,8 @@ public class ScrollableLinearLayout extends LinearLayoutCompat {
 
     public ScrollableLinearLayout(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        viewConfiguration = ViewConfiguration.get(context);
+        ViewConfiguration viewConfiguration = ViewConfiguration.get(context);
+        mTouchSlop = viewConfiguration.getScaledTouchSlop();
         setClipToPadding(false);
 
         preferContentSize[0] = (int) dp2px(preferContentSize[0]);
@@ -148,13 +148,36 @@ public class ScrollableLinearLayout extends LinearLayoutCompat {
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
+        ExampleUtil.utilLog("intercept:" + ev.getActionMasked());
         int action = ev.getActionMasked();
-        if(action == MotionEvent.ACTION_DOWN){
-            onTouchEvent(ev);
-        }else if ((action == MotionEvent.ACTION_MOVE)) {
+
+        if ((action == MotionEvent.ACTION_MOVE) && (currentDirection != -1)) {
             return true;
         }
 
+        if (action == MotionEvent.ACTION_DOWN) {
+            firstPointF.x = ev.getRawX();
+            firstPointF.y = ev.getRawY();
+            lastPointF.x = ev.getRawX();
+            lastPointF.y = ev.getRawY();
+
+            ensureCurrentGravityFlag();
+
+            // DON'T KNOW WHY THIS ISN'T WORKING
+//            clearAnimation();
+
+            sizeAnimation.cancel();
+            scrollXAnimation.cancel();
+            scrollYAnimation.cancel();
+            transXAnimation.cancel();
+            transYAnimation.cancel();
+        } else if (action == MotionEvent.ACTION_MOVE) {
+            float distanceX = lastPointF.x - ev.getRawX();
+            float distanceY = lastPointF.y - ev.getRawY();
+            if (Math.abs(distanceX) > mTouchSlop || Math.abs(distanceY) > mTouchSlop) {
+                return true;
+            }
+        }
         return super.onInterceptTouchEvent(ev);
     }
 
@@ -178,27 +201,13 @@ public class ScrollableLinearLayout extends LinearLayoutCompat {
 
         if (velocityTracker == null)
             velocityTracker = VelocityTracker.obtain();
-        velocityTracker.addMovement(event);
+        MotionEvent testEvent = MotionEvent.obtain(event);
+        testEvent.setLocation(event.getRawX(), event.getRawY());
+        velocityTracker.addMovement(testEvent);
+        testEvent.recycle();
 
 
-        if (action == MotionEvent.ACTION_DOWN) {
-            firstPointF.x = event.getRawX();
-            firstPointF.y = event.getRawY();
-            lastPointF.x = event.getRawX();
-            lastPointF.y = event.getRawY();
-
-            ensureCurrentGravityFlag();
-
-            // DON'T KNOW WHY THIS ISN'T WORKING
-//            clearAnimation();
-
-            sizeAnimation.cancel();
-            scrollXAnimation.cancel();
-            scrollYAnimation.cancel();
-            transXAnimation.cancel();
-            transYAnimation.cancel();
-            return true;
-        } else if (action == MotionEvent.ACTION_MOVE) {
+        if (action == MotionEvent.ACTION_MOVE) {
 
             float distanceX = lastPointF.x - event.getRawX();
             float distanceY = lastPointF.y - event.getRawY();
@@ -207,7 +216,7 @@ public class ScrollableLinearLayout extends LinearLayoutCompat {
             lastPointF.y = event.getRawY();
 
             // calculate current gesture direction
-            if (currentDirection != HORIZONTAL && currentDirection != VERTICAL) {
+            if (currentDirection == -1) {
                 // control the angle at 30º
                 if (distanceX * distanceX * 3 <= distanceY * distanceY) {
                     currentDirection = VERTICAL;
@@ -218,10 +227,9 @@ public class ScrollableLinearLayout extends LinearLayoutCompat {
                 }
                 canTrans(distanceX, distanceY);
             }
-
             onScroll(distanceX, distanceY);
             return true;
-        } else if (action == MotionEvent.ACTION_UP) {
+        } else if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL) {
             velocityTracker.computeCurrentVelocity(1000);
             // We want view to its fixed status so we need fling in any condition
             onFling(velocityTracker.getXVelocity(), velocityTracker.getYVelocity());
@@ -234,12 +242,13 @@ public class ScrollableLinearLayout extends LinearLayoutCompat {
             }
 
             // Handle the warning.
-            if (Math.abs(firstPointF.x - lastPointF.x) < viewConfiguration.getScaledTouchSlop() &&
-                    Math.abs(firstPointF.y - lastPointF.y) < viewConfiguration.getScaledTouchSlop())
+            if (Math.abs(firstPointF.x - lastPointF.x) < mTouchSlop &&
+                    Math.abs(firstPointF.y - lastPointF.y) < mTouchSlop)
                 performClick();
 
             return true;
-        } else return super.onTouchEvent(event);
+        }
+        return true;
     }
 
     @Override
@@ -253,7 +262,7 @@ public class ScrollableLinearLayout extends LinearLayoutCompat {
 
         saveCurrentPreferSize();
 
-        if(getChildCount() == 0) {
+        if (getChildCount() == 0) {
             setVisibility(GONE);
             return;
         }
@@ -427,7 +436,7 @@ public class ScrollableLinearLayout extends LinearLayoutCompat {
     @Override
     public void setVisibility(int visibility) {
         super.setVisibility(visibility);
-        if(mIndicatorView!=null){
+        if (mIndicatorView != null) {
             mIndicatorView.setVisibility(visibility);
         }
     }
@@ -503,10 +512,10 @@ public class ScrollableLinearLayout extends LinearLayoutCompat {
 
     @SuppressLint("WrongConstant")
     private void onFling(float xScrollVelocity, float yScrollVelocity) {
-        ExampleUtil.utilLog("xScrollVelocity:"+xScrollVelocity+",yScrollVelocity:"+yScrollVelocity);
+        ExampleUtil.utilLog("xScrollVelocity:" + xScrollVelocity + ",yScrollVelocity:" + yScrollVelocity);
         if (currentDirection == -1) return;
 
-        ExampleUtil.utilLog("x:"+xScrollVelocity+",y:"+yScrollVelocity);
+        ExampleUtil.utilLog("x:" + xScrollVelocity + ",y:" + yScrollVelocity);
         // SIZING/TRANS ANIMATION
         if ((currentDirection != getOrientation())) {
             int currentSize = getCurrentContentSize();
@@ -770,6 +779,7 @@ public class ScrollableLinearLayout extends LinearLayoutCompat {
         cardView.addView(titleText);
         return cardView;
     }
+
     /**
      * Help function
      *
@@ -785,12 +795,12 @@ public class ScrollableLinearLayout extends LinearLayoutCompat {
         cardView.setRadius(dp2pxSystem(16));
         cardView.setCardBackgroundColor(Color.WHITE);
         cardView.addView(textureView);
-        if(tag != null)
+        if (tag != null)
             cardView.setTag(tag);
         return cardView;
     }
 
-    public static float dp2pxSystem(int dp){
+    public static float dp2pxSystem(int dp) {
         return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, Resources.getSystem().getDisplayMetrics());
     }
 }

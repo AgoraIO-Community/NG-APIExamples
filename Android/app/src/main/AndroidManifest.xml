@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          xmlns:tools="http://schemas.android.com/tools"
-          package="io.agora.ng_api">
+        xmlns:tools="http://schemas.android.com/tools"
+        package="io.agora.ng_api">
 
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.CAMERA"/>
-    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
-    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/>
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-<!--    ScreenShare required-->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!--    ScreenShare required-->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application
@@ -23,19 +23,22 @@
             tools:ignore="AllowBackup">
 
         <activity
+                android:windowSoftInputMode="adjustResize"
                 android:configChanges="keyboardHidden|orientation|screenSize|uiMode"
                 android:name="io.agora.ng_api.ui.activity.MainActivity"
+                android:launchMode="singleTask"
                 android:exported="true">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
+                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <service android:name=".service.MediaProjectFgService"
+        <service
+                android:name=".service.MediaProjectFgService"
                 android:enabled="true"
-                android:exported="false"/>
+                android:exported="false" />
     </application>
 
 </manifest>

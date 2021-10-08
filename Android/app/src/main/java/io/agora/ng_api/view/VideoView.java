@@ -233,11 +233,12 @@ public class VideoView extends FrameLayout implements ScaleGestureDetector.OnSca
         mHandler.postDelayed(hideOverlayRunnable, 2000);
     }
 
-
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         mHandler.removeCallbacksAndMessages(null);
+        mPlayBtn.setVisibility(GONE);
+        mProgressSlider.setVisibility(GONE);
     }
 
     @Override
