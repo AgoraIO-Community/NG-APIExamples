@@ -1,5 +1,5 @@
 //
-//  JoinChannelVC.swift
+//  MediaPlayer.swift
 //  APIExample
 //
 //  Created by 张乾泽 on 2020/4/17.
@@ -9,73 +9,18 @@ import UIKit
 import AGEVideoLayout
 import AgoraRTE
 
-class JoinChannelVideoEntry : UIViewController
+let LOCAL_USER_ID = String(UInt.random(in: 100...999))
+let LOCAL_STREAM_ID = String(UInt.random(in: 1000...2000))
+let PLAYER_STREAM_ID =  String(UInt.random(in: 2000...3000))
+
+class MediaPlayerEntry : UIViewController
 {
     @IBOutlet weak var joinButton: UIButton!
     @IBOutlet weak var channelTextField: UITextField!
-    let identifier = "JoinChannelVideo"
-    @IBOutlet var resolutionBtn: UIButton!
-    @IBOutlet var fpsBtn: UIButton!
-    @IBOutlet var orientationBtn: UIButton!
-    var width:Int = 640, height:Int = 360, orientation:AgoraVideoOutputOrientationMode = .adaptative, fps = 30
-    
+    let identifier = "MediaPlayer"
     
     override func viewDidLoad() {
         super.viewDidLoad()
-    }
-    
-    
-    func getResolutionAction(width:Int, height:Int) -> UIAlertAction{
-        return UIAlertAction(title: "\(width)x\(height)", style: .default, handler: {[unowned self] action in
-            self.width = width
-            self.height = height
-            self.resolutionBtn.setTitle("\(width)x\(height)", for: .normal)
-        })
-    }
-    
-    func getFpsAction(_ fps:Int) -> UIAlertAction{
-        return UIAlertAction(title: "\(fps)fps", style: .default, handler: {[unowned self] action in
-            self.fps = fps
-            self.fpsBtn.setTitle("\(fps)fps", for: .normal)
-        })
-    }
-    
-    func getOrientationAction(_ orientation:AgoraVideoOutputOrientationMode) -> UIAlertAction{
-        return UIAlertAction(title: "\(orientation.description())", style: .default, handler: {[unowned self] action in
-            self.orientation = orientation
-            self.orientationBtn.setTitle("\(orientation.description())", for: .normal)
-        })
-    }
-    
-    @IBAction func setResolution(){
-        let alert = UIAlertController(title: "Set Resolution".localized, message: nil, preferredStyle: .actionSheet)
-        alert.addAction(getResolutionAction(width: 90, height: 90))
-        alert.addAction(getResolutionAction(width: 160, height: 120))
-        alert.addAction(getResolutionAction(width: 320, height: 240))
-        alert.addAction(getResolutionAction(width: 640, height: 360))
-        alert.addAction(getResolutionAction(width: 1280, height: 720))
-        alert.addCancelAction()
-        present(alert, animated: true, completion: nil)
-    }
-    
-    @IBAction func setFps(){
-        let alert = UIAlertController(title: "Set Fps".localized, message: nil, preferredStyle: .actionSheet)
-        alert.addAction(getFpsAction(10))
-        alert.addAction(getFpsAction(15))
-        alert.addAction(getFpsAction(24))
-        alert.addAction(getFpsAction(30))
-        alert.addAction(getFpsAction(60))
-        alert.addCancelAction()
-        present(alert, animated: true, completion: nil)
-    }
-    
-    @IBAction func setOrientation(){
-        let alert = UIAlertController(title: "Set Orientation".localized, message: nil, preferredStyle: .actionSheet)
-        alert.addAction(getOrientationAction(.adaptative))
-        alert.addAction(getOrientationAction(.fixedLandscape))
-        alert.addAction(getOrientationAction(.fixedPortrait))
-        alert.addCancelAction()
-        present(alert, animated: true, completion: nil)
     }
     
     @IBAction func doJoinPressed(sender: UIButton) {
@@ -87,40 +32,97 @@ class JoinChannelVideoEntry : UIViewController
         // create new view controller every time to ensure we get a clean vc
         guard let newViewController = storyBoard.instantiateViewController(withIdentifier: identifier) as? BaseViewController else {return}
         newViewController.title = channelName
-        newViewController.configs = ["channelName":channelName, "resolution":CGSize(width: width, height: height), "fps": fps, "orientation": orientation]
+        newViewController.configs = ["channelName":channelName]
         self.navigationController?.pushViewController(newViewController, animated: true)
     }
+    
 }
 
-class JoinChannelVideoMain: BaseViewController {
-    var localVideo = Bundle.loadVideoView(type: .local, audioOnly: false)
-    var remoteVideo = Bundle.loadVideoView(type: .remote, audioOnly: false)
+class MediaPlayerMain: BaseViewController, UITextFieldDelegate {
+    var localVideo = Bundle.loadView(fromNib: "VideoView", withType: VideoView.self)
+    var remoteVideo = Bundle.loadView(fromNib: "VideoView", withType: VideoView.self)
     
     @IBOutlet weak var container: AGEVideoContainer!
+    @IBOutlet weak var mediaUrlField: UITextField!
+    @IBOutlet weak var playerControlStack: UIStackView!
+    @IBOutlet weak var playerProgressSlider: UISlider!
+    @IBOutlet weak var playoutVolume: UISlider!
+    @IBOutlet weak var publishVolume: UISlider!
+    @IBOutlet weak var playerDurationLabel: UILabel!
+    @IBAction func stop(_ sender: Any) {
+        
+        player.stop();
+    }
+    @IBAction func play(_ sender: Any) {
+        player.play()
+    }
+    
+    @IBAction func open(_ sender: Any) {
+        guard let url = mediaUrlField.text else { return }
+        player.openUrl(url, startPos: 0)
+    }
     
     var agoraKit: AgoraRteSdk!
+    var player : AgoraRteMediaPlayerProtocol!
     
     var scene: AgoraRteSceneProtocol!
     var microphoneTrack: AgoraRteMicrophoneAudioTrackProtocol!
     var cameraTrack: AgoraRteCameraVideoTrackProtocol!
-    let LOCAL_USER_ID = String(UInt.random(in: 100...999))
-    let LOCAL_STREAM_ID = String(UInt.random(in: 1000...2000))
+    private var originY: CGFloat = 0
+    
     // indicate if current instance has joined channel
     var isJoined: Bool = false
     
+    @objc func keyboardWillAppear(notification: NSNotification) {
+        let keyboardinfo = notification.userInfo![UIResponder.keyboardFrameEndUserInfoKey]
+        let keyboardheight:CGFloat = (keyboardinfo as AnyObject).cgRectValue.size.height
+   
+        if self.originY == 0 {
+//            self.originY = self.view.centerY_CS
+        }
+        let rect = self.mediaUrlField.convert(self.mediaUrlField.bounds, to: self.view)
+        let y = self.view.bounds.height - rect.origin.y - self.mediaUrlField.bounds.height - keyboardheight
+
+        if y < 0 {
+            let animator = UIViewPropertyAnimator(duration: 0.2, curve: .easeOut) {
+//                self.view.centerY_CS = y + self.originY
+            }
+            animator.startAnimation()
+        }
+    }
+    
+    @objc func keyboardWillDisappear(notification:NSNotification){
+        let animator = UIViewPropertyAnimator(duration: 0.2, curve: .easeOut) {
+//            self.view.centerY_CS = self.originY
+            self.originY = 0
+        }
+        animator.startAnimation()
+    }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        return true
+    }
+    
+    func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
+        if text == "\n" {
+            textView.resignFirstResponder()
+            return true
+        }
+        return false
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        // get channel name from configs
-        guard let channelName = configs["channelName"] as? String,
-            let resolution = configs["resolution"] as? CGSize,
-            let fps = configs["fps"] as? Int,
-            let orientation = configs["orientation"] as? AgoraVideoOutputOrientationMode else {return}
-        
+        mediaUrlField.delegate = self
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillAppear), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillDisappear), name: UIResponder.keyboardWillHideNotification, object: nil)
         // layout render view
-        localVideo.setPlaceholder(text: "Local Host".localized)
+        localVideo.setPlaceholder(text: "No Player Loaded")
         remoteVideo.setPlaceholder(text: "Remote Host".localized)
-        container.layoutStream(views: [localVideo, remoteVideo])
+        container.layoutStream1x2(views: [localVideo, remoteVideo])
+        // get channel name from configs
+        guard let channelName = configs["channelName"] as? String else {return}
         
         let profile = AgoraRteSdkProfile()
         profile.appid = KeyCenter.AppId
@@ -130,23 +132,18 @@ class JoinChannelVideoMain: BaseViewController {
         scene = agoraKit.createRteScene(withSceneId: channelName, sceneConfig: config)
         
         scene?.setSceneDelegate(self)
-        let videoConfig = AgoraVideoEncoderConfiguration(size: resolution, frameRate: AgoraVideoFrameRate(rawValue: fps) ?? .fps15, bitrate: AgoraVideoBitrateStandard, orientationMode: orientation, mirrorMode: .auto)
-        scene?.setVideoEncoderConfiguration(LOCAL_STREAM_ID, videoEncoderConfiguration: videoConfig)
         
         let mediaControl = agoraKit.rteMediaFactory()
         cameraTrack = mediaControl?.createCameraVideoTrack()
         microphoneTrack = mediaControl?.createMicrophoneAudioTrack()
+        player = mediaControl?.createMediaPlayer()
+        player.setView(localVideo.videoView)
+        player.setAgoraRtePlayerDelegate(self)
         let joinOption = AgoraRteJoinOptions()
         joinOption.isUserVisibleToRemote = true
         
         scene.joinScene(withUserId: LOCAL_USER_ID, token: "", joinOptions: joinOption)
         microphoneTrack?.startRecording()
-        
-        let videoCanvas = AgoraRtcVideoCanvas()
-        videoCanvas.uid = 0
-        videoCanvas.view = localVideo.videoView
-        videoCanvas.renderMode = .hidden
-        cameraTrack?.setPreviewCanvas(videoCanvas)
         
         let streamOption = AgoraRteRtcStreamOptions()
         streamOption.token = ""
@@ -155,20 +152,38 @@ class JoinChannelVideoMain: BaseViewController {
         scene?.publishLocalAudioTrack(LOCAL_STREAM_ID, rteAudioTrack: microphoneTrack!)
         scene.publishLocalVideoTrack(LOCAL_STREAM_ID, rteVideoTrack: cameraTrack!)
         scene?.createOrUpdateRTCStream(PLAYER_STREAM_ID, rtcStreamOptions: streamOption)
+        scene.publishMediaPlayer(PLAYER_STREAM_ID, mediaPlayer: player)
+        
+    }
+    
+    @IBAction func doPlay(sender: UIButton) {
+        player.play()
+    }
+    
+    @IBAction func doStop(sender: UIButton) {
+        player.stop()
+    }
+    
+    @IBAction func doPause(sender: UIButton) {
+        player.pause()
+    }
+    
+    @IBAction func doAdjustPlayoutVolume(sender: UISlider) {
+        player.adjustPlayoutVolume(Int(sender.value))
     }
     
     override func willMove(toParent parent: UIViewController?) {
         if parent == nil {
             // leave channel when exiting the view
             if isJoined {
+                player.stop()
                 scene.leave()
             }
         }
     }
 }
 
-var users:Int = 0
-extension JoinChannelVideoMain: AgoraRteSceneDelegate {
+extension MediaPlayerMain: AgoraRteSceneDelegate {
     //
     func agoraRteScene(_ rteScene: AgoraRteSceneProtocol, remoteUserDidJoin userInfos: [AgoraRteUserInfo]?) {
         print("didRemoteUserDidJoin")
@@ -216,5 +231,31 @@ extension JoinChannelVideoMain: AgoraRteSceneDelegate {
             return
         }
         localVideo.statsInfo?.updateChannelStats(stats!)
+    }
+}
+
+extension MediaPlayerMain:AgoraRteMediaPlayerDelegate {
+    func agoraRteMediaPlayer(_ playerKit: AgoraRteMediaPlayerProtocol, stateDidChangeTo state: AgoraMediaPlayerState, error: AgoraMediaPlayerError, rteFileInfo fileInfo: AgoraRteFileInfo?) {
+            DispatchQueue.main.async {[weak self] in
+                guard let weakself = self else { return }
+                switch state {
+                case .failed:
+                    weakself.showAlert(message: "media player error: \(error.rawValue)")
+                    break
+                case .openCompleted:
+                    let duration = weakself.player.duration()
+                    weakself.playerControlStack.isHidden = false
+                    weakself.playerDurationLabel.text = "\(String(format: "%02d", duration / 60000)) : \(String(format: "%02d", duration % 60000 / 1000))"
+                    weakself.playerProgressSlider.setValue(0, animated: true)
+                    break
+                case .stopped:
+                    weakself.playerControlStack.isHidden = true
+                    weakself.playerProgressSlider.setValue(0, animated: true)
+                    weakself.playerDurationLabel.text = "00 : 00"
+                    break
+                default: break
+                
+            }
+        }
     }
 }

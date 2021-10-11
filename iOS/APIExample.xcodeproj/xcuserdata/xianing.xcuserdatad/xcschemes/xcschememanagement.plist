@@ -7,7 +7,7 @@
 		<key>APIExample.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>5</integer>
+			<integer>8</integer>
 		</dict>
 		<key>Agora-ScreenShare-Extension(Socket).xcscheme_^#shared#^_</key>
 		<dict>
@@ -24,10 +24,20 @@
 			<key>orderHint</key>
 			<integer>9</integer>
 		</dict>
+		<key>SimpleFilter.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>9</integer>
+		</dict>
 		<key>audioFilter.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
 			<integer>10</integer>
+		</dict>
+		<key>simpleFilter.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>5</integer>
 		</dict>
 	</dict>
 </dict>

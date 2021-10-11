@@ -165,9 +165,7 @@ class JoinChannelAudioMain: BaseViewController {
         if parent == nil {
             // leave channel when exiting the view
             if isJoined {
-//                agoraKit.leaveChannel { (stats) -> Void in
-//                    LogUtils.log(message: "left channel, duration: \(stats.duration)", level: .info)
-//                }
+                scene.leave()
             }
         }
     }

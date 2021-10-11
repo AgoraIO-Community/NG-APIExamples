@@ -76,56 +76,17 @@
                                     <constraint firstAttribute="width" secondItem="bLu-sF-1q0" secondAttribute="height" multiplier="16:9" id="Inp-ZV-hqi"/>
                                 </constraints>
                             </view>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ogS-7x-sQC">
-                                <rect key="frame" x="0.0" y="314" width="414" height="233"/>
-                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="233" id="q6c-bA-ENq"/>
-                                </constraints>
-                            </view>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="LSy-ah-29O">
-                                <rect key="frame" x="192" y="595" width="30" height="30"/>
-                                <state key="normal" title="play"/>
-                                <connections>
-                                    <action selector="play:" destination="p70-sh-D1h" eventType="touchUpInside" id="BDz-Sr-6TF"/>
-                                </connections>
-                            </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Dbe-Ti-Q6G">
-                                <rect key="frame" x="356" y="595" width="31" height="30"/>
-                                <state key="normal" title="stop"/>
-                                <connections>
-                                    <action selector="stop:" destination="p70-sh-D1h" eventType="touchUpInside" id="gcL-ZW-TXG"/>
-                                </connections>
-                            </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="J3M-jH-Wat">
-                                <rect key="frame" x="26" y="595" width="35" height="30"/>
-                                <state key="normal" title="open"/>
-                                <connections>
-                                    <action selector="open:" destination="p70-sh-D1h" eventType="touchUpInside" id="ixv-ff-1Sw"/>
-                                </connections>
-                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="f4j-hu-9mE"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
-                            <constraint firstItem="Dbe-Ti-Q6G" firstAttribute="top" secondItem="ogS-7x-sQC" secondAttribute="bottom" constant="48" id="A7h-Rn-DGf"/>
                             <constraint firstItem="f4j-hu-9mE" firstAttribute="trailing" secondItem="bLu-sF-1q0" secondAttribute="trailing" id="FL8-6w-T28"/>
-                            <constraint firstItem="ogS-7x-sQC" firstAttribute="centerX" secondItem="bLu-sF-1q0" secondAttribute="centerX" id="Idq-0z-AOB"/>
-                            <constraint firstItem="J3M-jH-Wat" firstAttribute="leading" secondItem="f4j-hu-9mE" secondAttribute="leading" constant="26" id="NSm-aG-2IA"/>
-                            <constraint firstItem="LSy-ah-29O" firstAttribute="top" secondItem="ogS-7x-sQC" secondAttribute="bottom" constant="48" id="W8c-bC-2SB"/>
-                            <constraint firstItem="ogS-7x-sQC" firstAttribute="top" secondItem="bLu-sF-1q0" secondAttribute="bottom" constant="37" id="YPR-hm-t1o"/>
-                            <constraint firstItem="LSy-ah-29O" firstAttribute="centerX" secondItem="ogS-7x-sQC" secondAttribute="centerX" id="bqY-Y4-1JI"/>
-                            <constraint firstItem="f4j-hu-9mE" firstAttribute="trailing" secondItem="Dbe-Ti-Q6G" secondAttribute="trailing" constant="27" id="n15-De-ZL4"/>
-                            <constraint firstItem="f4j-hu-9mE" firstAttribute="trailing" secondItem="ogS-7x-sQC" secondAttribute="trailing" id="nFK-x4-INP"/>
-                            <constraint firstItem="ogS-7x-sQC" firstAttribute="leading" secondItem="f4j-hu-9mE" secondAttribute="leading" id="nis-7e-pPT"/>
                             <constraint firstItem="bLu-sF-1q0" firstAttribute="top" secondItem="f4j-hu-9mE" secondAttribute="top" id="qnE-dw-lXn"/>
-                            <constraint firstItem="J3M-jH-Wat" firstAttribute="top" secondItem="ogS-7x-sQC" secondAttribute="bottom" constant="48" id="srF-q3-1Mm"/>
                             <constraint firstItem="bLu-sF-1q0" firstAttribute="leading" secondItem="f4j-hu-9mE" secondAttribute="leading" id="wEO-sQ-bsY"/>
                         </constraints>
                     </view>
                     <connections>
                         <outlet property="container" destination="bLu-sF-1q0" id="ljr-4v-SFl"/>
-                        <outlet property="playerView" destination="ogS-7x-sQC" id="qHE-lM-Mz2"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="qQz-5Q-PTr" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>

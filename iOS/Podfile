@@ -8,3 +8,11 @@ target 'APIExample' do
   pod 'CocoaAsyncSocket', '7.6.5'
   pod 'AgoraNGSDK', :path => 'sdk'
 end
+
+
+target 'SimpleFilter' do
+  pod 'AgoraNGSDK', :path => 'sdk'
+  pod 'OpenCV', '~> 4.3.0'
+  use_frameworks!
+
+end
