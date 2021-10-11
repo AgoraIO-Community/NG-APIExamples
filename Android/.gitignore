@@ -1,0 +1,25 @@
+*.iml
+.gradle
+/local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml 
+/.idea/compiler.xml
+/.idea/misc.xml
+
+/.idea/assetWizardSettings.xml
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+
+#remove libs
+app/**/*.so
+app/**/*.jar
+*.apk
+/.idea
+**/agoraLibs/**

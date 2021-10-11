@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <io.agora.ng_api.view.DynamicView
+            android:id="@+id/container_fg_player"
+            app:dynamic_layoutStyle="scroll"
+            app:dynamic_fitEnd="false"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+    <LinearLayout
+            android:orientation="horizontal"
+            android:gravity="fill_vertical"
+            android:focusableInTouchMode="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_width="match_parent"
+            android:layout_height="124dp">
+
+        <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/layout_input_url_fg_player"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                app:boxBackgroundMode="filled"
+                app:errorEnabled="true"
+                app:hintEnabled="false"
+                app:boxCornerRadiusTopStart="4dp"
+                app:boxCornerRadiusTopEnd="4dp"
+                app:boxCornerRadiusBottomStart="4dp"
+                app:boxCornerRadiusBottomEnd="4dp"
+                android:paddingBottom="@dimen/space_medium"
+                android:paddingHorizontal="@dimen/space_medium"
+                app:boxStrokeWidth="0dp"
+                app:boxStrokeWidthFocused="0dp">
+
+            <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/input_url_fg_player"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@null"
+                    android:maxLines="5"
+                    android:gravity="top|start"
+                    android:text="@string/demo_video_url"
+                    android:hint="@string/file_url"
+                    android:inputType="textMultiLine|textUri"
+                    android:importantForAutofill="no"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_open_fg_player"
+                android:textAllCaps="false"
+                android:enabled="false"
+                android:text="@string/open"
+                android:minWidth="0dp"
+                android:textColor="?attr/colorOnPrimary"
+                app:backgroundTint="?attr/colorPrimary"
+                android:layout_marginRight="@dimen/space_medium"
+                android:layout_marginEnd="@dimen/space_medium"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

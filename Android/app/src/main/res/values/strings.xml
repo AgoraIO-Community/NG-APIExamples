@@ -1,0 +1,76 @@
+<resources>
+
+    <!-- 通用 -->
+    <string name="app_name">Agora-API</string>
+    <string name="agora_app_id" translatable="false"/>
+    <string name="agora_access_token" translatable="false"/>
+
+    <string name="custom_app_id">自定义APPID（或者清除自定义APPID）</string>
+
+    <string name="btn_exit">Exit</string>
+    <string name="btn_join">Join</string>
+    <string name="btn_icon_back">back</string>
+    <string name="channel_name">频道名称</string>
+    <string name="mute">静音</string>
+    <string name="speaker">扬声器</string>
+    <string name="earpiece">听筒</string>
+    <string name="adjust_volume_down">调低音量</string>
+    <string name="adjust_volume_up">调高音量</string>
+    <string name="channel_name_required">channelName required</string>
+    <string name="show_channel_name">(%s)</string>
+
+    <string name="app_id_title">APPID 设置</string>
+    <string name="app_id_alert">[agora_app_id]未配置\n此为演示功能所必须\n请至官网注册获取，若已有可👇手动输入</string>
+    <string name="app_id_alert_user">您可手动指定APPID\n配置文件中[agora_app_id]：[%s]</string>
+    <string name="app_id_error">请输入正确的 agora APP ID</string>
+    <string name="permission_alert">缺少运行所需的必要权限，是否确认申请？</string>
+    <string name="permission_refused">运行此功能需要的必要权限未被授予。</string>
+
+
+    <string name="local_user_id_format">local_%s</string>
+    <string name="duration_format">%02d:%02d:%02d</string>
+
+
+<!--    页面相关-->
+
+<!--    媒体播放器-->
+    <string name="demo_video_url">https://vfx.mtime.cn/Video/2021/05/03/mp4/210503222942653184.mp4</string>
+    <string name="file_url">媒体文件地址</string>
+    <string name="open">打开</string>
+    <string name="play">播放</string>
+    <string name="pause">暂停</string>
+
+    <!--    屏幕共享-->
+    <string name="screen_share_request_denied">Screen share cancelled</string>
+    <string name="screen_share_version_unsupported">Screen Share do not support on this Android version</string>
+    <string name="notify_recording_screen">正在录制屏幕内容…</string>
+    <string name="notify_service_desc">Notice that we are trying to capture the screen!!</string>
+    <string name="notify_channel_id">agora_media_project</string>
+
+    <!-- 数据相关-->
+    <string name="demo_string_basic">基本</string>
+    <string name="demo_string_advanced">高级</string>
+
+    <string name="args_nav_type">type</string>
+    <string name="args_nav_desc">desc</string>
+    <string name="args_nav_permission">perm</string>
+
+
+
+    <!-- 分页面管理 -->
+
+
+    <!-- 页面描述统一管理 -->
+    <string name="title_join_channel_video">加入视频通话</string>
+    <string name="desc_join_channel_video">加入视频通话agora加入视频通话agora\n加入视频通话agora加入视频通话agora</string>
+    <string name="title_join_channel_audio">加入音频通话</string>
+    <string name="desc_join_channel_audio">加入音频通话agora加入音频通话agora\n加入音频通话agora加入音频通话agora</string>
+    <string name="title_media_player">媒体播放</string>
+    <string name="desc_media_player">媒体播放agora媒体播放agora\n媒体播放agora媒体播放agora</string>
+    <string name="title_screen_share">屏幕共享</string>
+    <string name="desc_screen_share">屏幕共享agora屏幕共享agora\n屏幕共享agora屏幕共享agora</string>
+    <string name="title_simple_extension">插件演示</string>
+    <string name="desc_simple_extension">插件演示agora插件演示agora\n插件演示agora插件演示agora</string>
+
+
+</resources>

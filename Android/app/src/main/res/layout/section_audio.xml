@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
+
+    <androidx.cardview.widget.CardView
+            android:id="@+id/section_audio_main"
+            app:cardBackgroundColor="?attr/colorSurface"
+            app:cardCornerRadius="@dimen/space_medium"
+            android:layout_marginHorizontal="@dimen/space_large"
+            app:contentPadding="@dimen/space_large"
+            android:visibility="gone"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+                android:animateLayoutChanges="true"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+            <com.google.android.material.button.MaterialButton
+                    android:id="@+id/mute_btn_section_audio"
+                    android:text="@string/mute"
+                    android:checkable="true"
+                    app:icon="@drawable/selector_mic_checkable"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+            <com.google.android.material.button.MaterialButtonToggleGroup
+                    android:id="@+id/voice_switch_group_section_audio"
+                    app:singleSelection="true"
+                    app:selectionRequired="true"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/mute_btn_section_audio"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                <com.google.android.material.button.MaterialButton
+                        android:id="@+id/earpiece_btn_section_audio"
+                        android:text="@string/earpiece"
+                        android:enabled="false"
+                        app:icon="@drawable/ic_earpiece_white"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                <com.google.android.material.button.MaterialButton
+                        android:id="@+id/speaker_btn_section_audio"
+                        android:text="@string/speaker"
+                        android:enabled="false"
+                        app:icon="@drawable/ic_volume_up_white"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+            </com.google.android.material.button.MaterialButtonToggleGroup>
+
+            <ImageButton
+                    android:id="@+id/volume_down_btn_section_audio"
+                    app:tint="?attr/colorPrimary"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/adjust_volume_down"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/slider_volume_section_audio"
+                    app:layout_constraintTop_toTopOf="@id/slider_volume_section_audio"
+                    app:layout_constraintBottom_toBottomOf="@id/slider_volume_section_audio"
+                    android:src="@drawable/ic_volume_down_white"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+            <com.google.android.material.slider.Slider
+                    app:layout_constraintStart_toEndOf="@id/volume_down_btn_section_audio"
+                    app:layout_constraintEnd_toStartOf="@id/volume_up_btn_section_audio"
+                    android:id="@+id/slider_volume_section_audio"
+                    app:layout_constraintTop_toBottomOf="@id/mute_btn_section_audio"
+                    android:layout_marginTop="@dimen/space_medium"
+                    app:haloColor="@android:color/transparent"
+                    app:tickVisible="false"
+                    app:labelBehavior="gone"
+                    android:stepSize="1"
+                    android:valueFrom="0"
+                    tools:value="50"
+                    android:valueTo="100"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content" />
+
+            <ImageButton
+                    android:id="@+id/volume_up_btn_section_audio"
+                    app:tint="?attr/colorPrimary"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/adjust_volume_up"
+                    app:layout_constraintStart_toEndOf="@id/slider_volume_section_audio"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/slider_volume_section_audio"
+                    app:layout_constraintBottom_toBottomOf="@id/slider_volume_section_audio"
+                    android:src="@drawable/ic_volume_up_white"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
+</merge>
