@@ -4,7 +4,6 @@ import static android.app.Activity.RESULT_OK;
 
 import android.content.Context;
 import android.content.Intent;
-import android.media.projection.MediaProjection;
 import android.media.projection.MediaProjectionManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -18,7 +17,6 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 
 import java.util.List;
-import java.util.Random;
 
 import io.agora.ng_api.MyApp;
 import io.agora.ng_api.R;
@@ -42,6 +40,7 @@ public class ScreenShareFragment extends BaseDemoFragment<FragmentScreenShareBin
 
     @Nullable
     private AgoraRteScreenVideoTrack screenVideoTrack;
+    // 请求权限
     private ActivityResultLauncher<Intent> activityResultLauncher;
 
     @Override
@@ -51,7 +50,7 @@ public class ScreenShareFragment extends BaseDemoFragment<FragmentScreenShareBin
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             initView();
             initListener();
-            if (!MyApp.debugMine) {
+            if (!MyApp.justDebugUIPart) {
                 initAgoraRteSDK();
                 joinChannel();
             }
@@ -205,7 +204,7 @@ public class ScreenShareFragment extends BaseDemoFragment<FragmentScreenShareBin
     }
 
     private void joinChannel() {
-        doJoinChannel(channelName, mLocalUserId, "");
+        doJoinChannel(channelName, mLocalStreamId, "");
     }
 
     @Override

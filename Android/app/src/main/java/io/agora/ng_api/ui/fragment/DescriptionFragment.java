@@ -216,9 +216,12 @@ public class DescriptionFragment extends BaseFragment<FragmentDescriptionBinding
         inputEditText.setPaddingRelative(dp15, inputEditText.getPaddingTop(), dp15, inputEditText.getPaddingBottom());
         inputEditText.setBackground(null);
         inputEditText.setInputType(InputType.TYPE_CLASS_TEXT);
+        inputEditText.setImeOptions(EditorInfo.IME_ACTION_DONE);
         inputEditText.setText(ExampleUtil.getSp(requireContext()).getString(ExampleUtil.APPID,""));
         if (!triggeredByUser) {
             inputEditText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(32)});
+            // Clear error status when text changes
+            // 新的输入到来时清除"错误"状态
             inputEditText.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -264,8 +267,12 @@ public class DescriptionFragment extends BaseFragment<FragmentDescriptionBinding
                 dialog.dismiss();
             }else {
                 if (appId.length() != inputLayout.getCounterMaxLength()){
-                    inputLayout.setErrorEnabled(true);
-                    inputLayout.setError(requireContext().getString(R.string.app_id_error));
+                    if(inputLayout.isErrorEnabled()) {
+                        ExampleUtil.shakeViewAndVibrateToAlert(inputLayout);
+                    }else {
+                        inputLayout.setErrorEnabled(true);
+                        inputLayout.setError(requireContext().getString(R.string.app_id_error));
+                    }
                 }else {
                     ExampleUtil.getSp(requireContext()).edit().putString(ExampleUtil.APPID, appId).apply();
                     dialog.dismiss();

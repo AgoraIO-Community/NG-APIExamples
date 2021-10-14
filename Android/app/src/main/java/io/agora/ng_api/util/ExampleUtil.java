@@ -8,30 +8,30 @@ import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Color;
-import android.graphics.drawable.Icon;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.HapticFeedbackConstants;
 import android.view.View;
 import android.view.Window;
-import android.view.WindowInsets;
 import android.view.animation.OvershootInterpolator;
-import android.view.inputmethod.InputMethodManager;
+
 import androidx.annotation.AttrRes;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.navigation.NavOptions;
+
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.android.material.transition.MaterialArcMotion;
 import com.google.android.material.transition.MaterialContainerTransform;
-import io.agora.ng_api.R;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
+import io.agora.ng_api.R;
 
 public class ExampleUtil {
     public static String APPID = "APPID";
@@ -125,7 +125,7 @@ public class ExampleUtil {
     }
 
     public static void utilLog(String msg) {
-        Log.d("lq", msg);
+        Log.d("ng-api", msg);
     }
 
     public static ColorStateList getTint(int tintColor) {

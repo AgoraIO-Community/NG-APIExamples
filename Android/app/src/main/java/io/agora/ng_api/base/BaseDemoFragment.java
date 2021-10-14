@@ -1,16 +1,12 @@
 package io.agora.ng_api.base;
 
-import android.media.AudioManager;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
 import androidx.viewbinding.ViewBinding;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
-import io.agora.base.internal.ContextUtils;
 import io.agora.extension.ExtensionManager;
 import io.agora.ng_api.MyApp;
 import io.agora.ng_api.R;
@@ -19,14 +15,12 @@ import io.agora.ng_api.util.ExampleUtil;
 import io.agora.rte.AgoraRteSDK;
 import io.agora.rte.AgoraRteSdkConfig;
 import io.agora.rte.base.AgoraRteLogConfig;
-import io.agora.rte.media.stream.AgoraRteMediaStreamInfo;
 import io.agora.rte.media.track.AgoraRteCameraVideoTrack;
 import io.agora.rte.media.track.AgoraRteMicrophoneAudioTrack;
 import io.agora.rte.scene.AgoraRteScene;
 import io.agora.rte.scene.AgoraRteSceneConfig;
 import io.agora.rte.scene.AgoraRteSceneEventHandler;
 import io.agora.rte.scene.AgoraRteSceneJoinOptions;
-import io.agora.rte.user.AgoraRteUserInfo;
 
 /**
  * On Jetpack navigation
@@ -37,6 +31,7 @@ public abstract class BaseDemoFragment<B extends ViewBinding> extends BaseFragme
 
     // COMMON FILED
     public final String mLocalUserId = String.valueOf(new Random().nextInt(Integer.MAX_VALUE/2));
+    public final String mLocalStreamId = String.valueOf(new Random().nextInt(Integer.MAX_VALUE/2));
     public final String mLocalMediaStreamId = "media-" + new Random().nextInt(Integer.MAX_VALUE/2) + Integer.MAX_VALUE/2;
     public String channelName;
     public AgoraRteScene mScene;
@@ -61,16 +56,19 @@ public abstract class BaseDemoFragment<B extends ViewBinding> extends BaseFragme
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        if (!MyApp.debugMine) {
+        if (!MyApp.justDebugUIPart) {
             doExitChannel();
         }
     }
 
+    public void initAgoraRteSDK() {
+        initAgoraRteSDK(false);
+    }
     /**
      * app id 优先级
      * 用户主动输入 > strings 内置
      */
-    public void initAgoraRteSDK() {
+    public void initAgoraRteSDK(boolean enableExtension) {
         AgoraRteSdkConfig profile = new AgoraRteSdkConfig();
         // check SP
         String appId = ExampleUtil.getSp(requireContext()).getString(ExampleUtil.APPID, "");
@@ -78,10 +76,11 @@ public abstract class BaseDemoFragment<B extends ViewBinding> extends BaseFragme
         if (appId.isEmpty()) appId = getString(R.string.agora_app_id);
         profile.appId = appId;
         profile.context = requireContext();
+
+        if(enableExtension)
+            profile.addExtension(ExtensionManager.EXTENSION_NAME);
         profile.logConfig = new AgoraRteLogConfig(requireContext().getFilesDir().getAbsolutePath());
         AgoraRteSDK.init(profile);
-
-//        if (res != 0) Toast.makeText(requireContext(), "AGORA SDK init error, code: " + res, Toast.LENGTH_SHORT).show();
     }
 
     /**

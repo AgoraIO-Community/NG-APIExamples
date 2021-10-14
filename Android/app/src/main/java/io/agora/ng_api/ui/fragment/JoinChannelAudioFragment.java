@@ -40,7 +40,7 @@ public class JoinChannelAudioFragment extends BaseDemoFragment<FragmentJoinChann
         super.onViewCreated(view, savedInstanceState);
         initView();
         initListener();
-        if (!MyApp.debugMine) {
+        if (!MyApp.justDebugUIPart) {
             initAgoraRteSDK();
             joinChannel();
         }
@@ -53,6 +53,7 @@ public class JoinChannelAudioFragment extends BaseDemoFragment<FragmentJoinChann
 
         mAgoraHandler = new AgoraRteSceneEventHandler() {
 
+//            joinChannelSuccess
             @Override
             public void onConnectionStateChanged(AgoraRteSceneConnState state, AgoraRteSceneConnState state1, io.agora.rte.scene.AgoraRteConnectionChangedReason reason) {
                 ExampleUtil.utilLog("onConnectionStateChanged: " + state.getValue() + ", " + state1.getValue() + ",reason: " + reason.getValue() + "，\nThread:" + Thread.currentThread().getName());
@@ -146,7 +147,7 @@ public class JoinChannelAudioFragment extends BaseDemoFragment<FragmentJoinChann
     }
 
     private void joinChannel() {
-        doJoinChannel(channelName, mLocalUserId, "");
+        doJoinChannel(channelName, mLocalStreamId, "");
     }
 
     @Override

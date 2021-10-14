@@ -47,6 +47,9 @@
     <string name="notify_service_desc">Notice that we are trying to capture the screen!!</string>
     <string name="notify_channel_id">agora_media_project</string>
 
+    <!--    插件演示-->
+    <string name="water_mark">水印</string>
+
     <!-- 数据相关-->
     <string name="demo_string_basic">基本</string>
     <string name="demo_string_advanced">高级</string>

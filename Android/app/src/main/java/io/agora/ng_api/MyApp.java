@@ -7,7 +7,7 @@ import androidx.annotation.StringRes;
 
 public class MyApp extends Application {
     private static MyApp instance;
-    public static boolean debugMine = false;
+    public static boolean justDebugUIPart = false;
 
     @Override
     protected void attachBaseContext(Context base) {

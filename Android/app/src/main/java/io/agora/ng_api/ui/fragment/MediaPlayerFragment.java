@@ -1,8 +1,6 @@
 package io.agora.ng_api.ui.fragment;
 
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.text.Editable;
 import android.view.TextureView;
 import android.view.View;
@@ -48,7 +46,7 @@ public class MediaPlayerFragment extends BaseDemoFragment<FragmentMediaPlayerBin
         initView();
         initListener();
 
-        if (!MyApp.debugMine) {
+        if (!MyApp.justDebugUIPart) {
             initAgoraRteSDK();
             joinChannel();
         }
@@ -194,7 +192,7 @@ public class MediaPlayerFragment extends BaseDemoFragment<FragmentMediaPlayerBin
     }
 
     public void joinChannel() {
-        doJoinChannel(channelName, mLocalUserId, "");
+        doJoinChannel(channelName, mLocalStreamId, "");
     }
 
     private void addMediaView() {

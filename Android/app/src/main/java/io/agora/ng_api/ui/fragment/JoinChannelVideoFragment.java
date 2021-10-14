@@ -36,7 +36,7 @@ public class JoinChannelVideoFragment extends BaseDemoFragment<FragmentJoinChann
         initView();
         initListener();
 
-        if (!MyApp.debugMine) {
+        if (!MyApp.justDebugUIPart) {
             initAgoraRteSDK();
             joinChannel();
         }
@@ -96,13 +96,14 @@ public class JoinChannelVideoFragment extends BaseDemoFragment<FragmentJoinChann
                 if (mBinding == null) return;
                 for (AgoraRteMediaStreamInfo info : list) {
                     mBinding.containerJoinChannelVideo.dynamicRemoveViewWithTag(info.getStreamId());
+
                 }
             }
         };
     }
 
     private void joinChannel() {
-        doJoinChannel(channelName, mLocalUserId, "");
+        doJoinChannel(channelName, mLocalStreamId, "");
     }
 
     /**
@@ -127,6 +128,7 @@ public class JoinChannelVideoFragment extends BaseDemoFragment<FragmentJoinChann
 
         // Set RenderMode
         canvas.renderMode = AgoraRteVideoCanvas.RENDER_MODE_HIDDEN;
+
         // Remote related stuff
         if(remoteStreamIdOrNull != null){
             mScene.setRemoteVideoCanvas(remoteStreamIdOrNull, canvas);

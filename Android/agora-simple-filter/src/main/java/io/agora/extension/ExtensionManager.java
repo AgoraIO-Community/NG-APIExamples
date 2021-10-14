@@ -9,6 +9,8 @@ public class ExtensionManager {
     public static final String EXTENSION_VIDEO_FILTER_NAME = "Watermark"; // Video filter name defined in ExtensionProvider.h
     public static final String EXTENSION_AUDIO_FILTER_NAME = "VolumeChange"; // Audio filter name defined in ExtensionProvider.h
 
-    public static final String KEY_ENABLE_WATER_MARK = "wmEffectEnabled";
+    public static final String KEY_ENABLE_WATER_MARK = "key";
+    public static final String ENABLE_WATER_MARK_FLAG = "plugin.watermark.wmEffectEnabled";
+    public static final String ENABLE_WATER_MARK_STRING = "plugin.watermark.wmStr";
     public static final String KEY_ADJUST_VOLUME_CHANGE = "volume";
 }
