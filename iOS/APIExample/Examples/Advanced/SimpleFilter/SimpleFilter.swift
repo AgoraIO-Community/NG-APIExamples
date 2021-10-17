@@ -1,5 +1,5 @@
 //
-//  JoinChannelAudioMain.swift
+//  SimpleFilter.swift
 //  APIExample
 //
 //  Created by ADMIN on 2020/5/18.
@@ -58,51 +58,47 @@ class SimpleFilterMain: BaseViewController {
     override func viewDidLoad(){
         super.viewDidLoad()
         
+        // get channel name from configs
         guard let channelName = configs["channelName"] as? String
             else { return }
+        
         // layout render view
         localVideo.setPlaceholder(text: "Local Host".localized)
         remoteVideo.setPlaceholder(text: "Remote Host".localized)
         container.layoutStream(views: [localVideo, remoteVideo])
         
-        // set up agora instance when view loaded
+        // initialize sdk
         let profile = AgoraRteSdkProfile()
         profile.appid = KeyCenter.AppId
         agoraKit = AgoraRteSdk.sharedEngine(with: profile)
-        let config = AgoraRteSceneConfg()
-        config.enableAudioRecordingOrPlayout = true
         
-        scene = agoraKit.createRteScene(withSceneId: channelName, sceneConfig: config)
-        
-        // set audio filter extension
-//        config.mediaFilterExtensions = [SimpleFilterManager()]
-        
-        scene?.setSceneDelegate(self)
-        
+        // initialize media control
         let mediaControl = agoraKit.rteMediaFactory()
         cameraTrack = mediaControl?.createCameraVideoTrack()
-        cameraTrack.enableExtension(withProviderName: SimpleFilterManager.vendorName(), extensionName: VIDEO_FILTER_NAME)
         microphoneTrack = mediaControl?.createMicrophoneAudioTrack()
-        microphoneTrack.enableExtension(withProviderName: SimpleFilterManager.vendorName(), extensionName: AUDIO_FILTER_NAME)
-        let joinOption = AgoraRteJoinOptions()
-        joinOption.isUserVisibleToRemote = true
         
-        scene.joinScene(withUserId: LOCAL_USER_ID, token: "", joinOptions: joinOption)
+        // audio
+        microphoneTrack?.enableExtension(withProviderName: SimpleFilterManager.vendorName(), extensionName: AUDIO_FILTER_NAME)
         microphoneTrack?.startRecording()
         
+        // video
         let videoCanvas = AgoraRtcVideoCanvas()
         videoCanvas.uid = 0
         videoCanvas.view = localVideo.videoView
         videoCanvas.renderMode = .hidden
         cameraTrack?.setPreviewCanvas(videoCanvas)
+        cameraTrack?.enableExtension(withProviderName: SimpleFilterManager.vendorName(), extensionName: VIDEO_FILTER_NAME)
+        cameraTrack?.startCapture();
         
+        //initilize streaming control
+        scene = agoraKit.createRteScene(withSceneId: channelName, sceneConfig: AgoraRteSceneConfg())
+        scene?.setSceneDelegate(self)
+        scene.joinScene(withUserId: LOCAL_USER_ID, token: "", joinOptions: AgoraRteJoinOptions())
         let streamOption = AgoraRteRtcStreamOptions()
         streamOption.token = ""
-        cameraTrack.startCapture();
         scene?.createOrUpdateRTCStream(LOCAL_STREAM_ID, rtcStreamOptions: streamOption)
         scene?.publishLocalAudioTrack(LOCAL_STREAM_ID, rteAudioTrack: microphoneTrack!)
-        scene.publishLocalVideoTrack(LOCAL_STREAM_ID, rteVideoTrack: cameraTrack!)
-        scene?.createOrUpdateRTCStream(PLAYER_STREAM_ID, rtcStreamOptions: streamOption)
+        scene?.publishLocalVideoTrack(LOCAL_STREAM_ID, rteVideoTrack: cameraTrack!)
     }
     
     override func willMove(toParent parent: UIViewController?) {
@@ -145,7 +141,6 @@ extension SimpleFilterMain: AgoraRteSceneDelegate {
             rteScene.subscribeRemoteAudio(info.streamId!)
             rteScene.subscribeRemoteVideo(info.streamId!, videoSubscribeOptions: option)
             print("didRemoteStreamAdded" + "stream_id == \(String(describing: info.streamId))")
-            users = (users + 1)%2
 
         }
     }
@@ -156,19 +151,6 @@ extension SimpleFilterMain: AgoraRteSceneDelegate {
     
     func agoraRteScene(_ rteScene: AgoraRteSceneProtocol, didLocalStreamStateChanged streams: AgoraRteStreamInfo?, mediaType: AgoraRteMediaType, steamMediaState oldState: AgoraRteStreamState, newState: AgoraRteStreamState, stateChangedReason reason: AgoraRteStreamStateChangedReason) {
         print("didLocalStreamStateChanged \(String(describing: streams?.streamId)), audio sentBitrate: \(String(describing: newState))")
-    }
-    
-    func agoraRteScene(_ rteScene: AgoraRteSceneProtocol, localStreamDidStats streamId: String?, stats: AgoraRteLocalStreamStats?) {
-        print("didLocalStreamStats \(String(describing: streamId)), audio sentBitrate: \(String(describing: stats?.audioStats?.sentBitrate))")
-        remoteVideo.statsInfo?.updateLocalVideoStats(stats!)
-    }
-    
-    func agoraRteScene(_ rteScene: AgoraRteSceneProtocol, sceneStats stats: AgoraRteSceneStats?) {
-        print("didSceneStats")
-        guard stats != nil else {
-            return
-        }
-        localVideo.statsInfo?.updateChannelStats(stats!)
     }
 }
 

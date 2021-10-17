@@ -3,7 +3,7 @@
 "4et-fL-YHJ.text" = "00 : 00";
 
 /* Class = "UITextField"; placeholder = "Enter channel name"; ObjectID = "GWc-L5-fZV"; */
-"GWc-L5-fZV.placeholder" = "输入频道名";
+"GWc-L5-fZV.placeholder" = "输入场景名";
 
 /* Class = "UIButton"; normalTitle = "Publish"; ObjectID = "Leb-Wc-wyE"; */
 "Leb-Wc-wyE.normalTitle" = "发流";
@@ -27,7 +27,7 @@
 "kIh-KH-AhZ.text" = "发流音量";
 
 /* Class = "UIButton"; normalTitle = "Join"; ObjectID = "kbN-ZR-nNn"; */
-"kbN-ZR-nNn.normalTitle" = "加入频道";
+"kbN-ZR-nNn.normalTitle" = "加入";
 
 /* Class = "UILabel"; text = "Playout Volume"; ObjectID = "nDn-o2-Vmd"; */
 "nDn-o2-Vmd.text" = "播放音量";

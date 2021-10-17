@@ -62,6 +62,14 @@ class MediaPlayerMain: BaseViewController, UITextFieldDelegate {
         player.openUrl(url, startPos: 0)
     }
     
+    @IBAction func pause(sender: UIButton) {
+        player.pause()
+    }
+    
+    @IBAction func doAdjustPlayoutVolume(sender: UISlider) {
+        player.adjustPlayoutVolume(Int(sender.value))
+    }
+    
     var agoraKit: AgoraRteSdk!
     var player : AgoraRteMediaPlayerProtocol!
     
@@ -114,6 +122,11 @@ class MediaPlayerMain: BaseViewController, UITextFieldDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        // get channel name from configs
+        guard let channelName = configs["channelName"] as? String else {return}
+        
+        // setup view
         mediaUrlField.delegate = self
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillAppear), name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillDisappear), name: UIResponder.keyboardWillHideNotification, object: nil)
@@ -121,55 +134,45 @@ class MediaPlayerMain: BaseViewController, UITextFieldDelegate {
         localVideo.setPlaceholder(text: "No Player Loaded")
         remoteVideo.setPlaceholder(text: "Remote Host".localized)
         container.layoutStream1x2(views: [localVideo, remoteVideo])
-        // get channel name from configs
-        guard let channelName = configs["channelName"] as? String else {return}
         
+        // initialize sdk
         let profile = AgoraRteSdkProfile()
         profile.appid = KeyCenter.AppId
         agoraKit = AgoraRteSdk.sharedEngine(with: profile)
-        let config = AgoraRteSceneConfg()
-        config.enableAudioRecordingOrPlayout = true
-        scene = agoraKit.createRteScene(withSceneId: channelName, sceneConfig: config)
         
-        scene?.setSceneDelegate(self)
-        
+        // initialize media control
         let mediaControl = agoraKit.rteMediaFactory()
         cameraTrack = mediaControl?.createCameraVideoTrack()
         microphoneTrack = mediaControl?.createMicrophoneAudioTrack()
+        
+        // audio
+        microphoneTrack?.startRecording()
+        
+        // camera
+        let videoCanvas = AgoraRtcVideoCanvas()
+        videoCanvas.uid = 0
+        videoCanvas.view = localVideo.videoView
+        videoCanvas.renderMode = .hidden
+        cameraTrack?.setPreviewCanvas(videoCanvas)
+        cameraTrack?.startCapture();
+        
+        // media player
         player = mediaControl?.createMediaPlayer()
         player.setView(localVideo.videoView)
         player.setAgoraRtePlayerDelegate(self)
-        let joinOption = AgoraRteJoinOptions()
-        joinOption.isUserVisibleToRemote = true
         
-        scene.joinScene(withUserId: LOCAL_USER_ID, token: "", joinOptions: joinOption)
-        microphoneTrack?.startRecording()
-        
+        //initilize streaming control
+        scene = agoraKit.createRteScene(withSceneId: channelName, sceneConfig: AgoraRteSceneConfg())
+        scene?.setSceneDelegate(self)
+        scene.joinScene(withUserId: LOCAL_USER_ID, token: "", joinOptions: AgoraRteJoinOptions())
         let streamOption = AgoraRteRtcStreamOptions()
         streamOption.token = ""
-        cameraTrack.startCapture();
         scene?.createOrUpdateRTCStream(LOCAL_STREAM_ID, rtcStreamOptions: streamOption)
         scene?.publishLocalAudioTrack(LOCAL_STREAM_ID, rteAudioTrack: microphoneTrack!)
-        scene.publishLocalVideoTrack(LOCAL_STREAM_ID, rteVideoTrack: cameraTrack!)
+        scene?.publishLocalVideoTrack(LOCAL_STREAM_ID, rteVideoTrack: cameraTrack!)
         scene?.createOrUpdateRTCStream(PLAYER_STREAM_ID, rtcStreamOptions: streamOption)
         scene.publishMediaPlayer(PLAYER_STREAM_ID, mediaPlayer: player)
         
-    }
-    
-    @IBAction func doPlay(sender: UIButton) {
-        player.play()
-    }
-    
-    @IBAction func doStop(sender: UIButton) {
-        player.stop()
-    }
-    
-    @IBAction func doPause(sender: UIButton) {
-        player.pause()
-    }
-    
-    @IBAction func doAdjustPlayoutVolume(sender: UISlider) {
-        player.adjustPlayoutVolume(Int(sender.value))
     }
     
     override func willMove(toParent parent: UIViewController?) {
@@ -207,7 +210,6 @@ extension MediaPlayerMain: AgoraRteSceneDelegate {
             rteScene.subscribeRemoteAudio(info.streamId!)
             rteScene.subscribeRemoteVideo(info.streamId!, videoSubscribeOptions: option)
             print("didRemoteStreamAdded" + "stream_id == \(String(describing: info.streamId))")
-            users = (users + 1)%2
 
         }
     }
@@ -218,19 +220,6 @@ extension MediaPlayerMain: AgoraRteSceneDelegate {
     
     func agoraRteScene(_ rteScene: AgoraRteSceneProtocol, didLocalStreamStateChanged streams: AgoraRteStreamInfo?, mediaType: AgoraRteMediaType, steamMediaState oldState: AgoraRteStreamState, newState: AgoraRteStreamState, stateChangedReason reason: AgoraRteStreamStateChangedReason) {
         print("didLocalStreamStateChanged \(String(describing: streams?.streamId)), audio sentBitrate: \(String(describing: newState))")
-    }
-    
-    func agoraRteScene(_ rteScene: AgoraRteSceneProtocol, localStreamDidStats streamId: String?, stats: AgoraRteLocalStreamStats?) {
-        print("didLocalStreamStats \(String(describing: streamId)), audio sentBitrate: \(String(describing: stats?.audioStats?.sentBitrate))")
-        remoteVideo.statsInfo?.updateLocalVideoStats(stats!)
-    }
-    
-    func agoraRteScene(_ rteScene: AgoraRteSceneProtocol, sceneStats stats: AgoraRteSceneStats?) {
-        print("didSceneStats")
-        guard stats != nil else {
-            return
-        }
-        localVideo.statsInfo?.updateChannelStats(stats!)
     }
 }
 

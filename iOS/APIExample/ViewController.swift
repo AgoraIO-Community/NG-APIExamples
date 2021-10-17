@@ -25,13 +25,12 @@ struct MenuItem {
 class ViewController: AGViewController {
     var menus:[MenuSection] = [
         MenuSection(name: "Basic", rows: [
-            MenuItem(name: "Join a channel (Video)".localized, storyboard: "JoinChannelVideo", controller: ""),
-            MenuItem(name: "Join a channel (Audio)".localized, storyboard: "JoinChannelAudio", controller: "")
+            MenuItem(name: "Join a Scene (Video)".localized, storyboard: "BasicVideo", controller: ""),
+            MenuItem(name: "Join a Scene (Audio)".localized, storyboard: "BasicAudio", controller: "")
         ]),
         MenuSection(name: "Anvanced", rows: [
             MenuItem(name: "Simple Filter".localized, storyboard: "SimpleFilter", controller: ""),
             MenuItem(name: "Media Player".localized, storyboard: "MediaPlayer", controller: ""),
-//            MenuItem(name: "Screen Share".localized, storyboard: "ScreenShare+Socket", controller: ""),
         ]),
     ]
     override func viewDidLoad() {

@@ -6,7 +6,7 @@
 "DJt-Y7-fkM.text" = "采集音量";
 
 /* Class = "UITextField"; placeholder = "Enter channel name"; ObjectID = "GWc-L5-fZV"; */
-"GWc-L5-fZV.placeholder" = "输入频道名";
+"GWc-L5-fZV.placeholder" = "输入场景名";
 
 /* Class = "UILabel"; text = "Audio Scenario"; ObjectID = "Q0E-5B-IED"; */
 "Q0E-5B-IED.text" = "音频使用场景";
@@ -27,7 +27,7 @@
 "jxp-ZN-2yG.title" = "实时音频通话/直播";
 
 /* Class = "UIButton"; normalTitle = "Join"; ObjectID = "kbN-ZR-nNn"; */
-"kbN-ZR-nNn.normalTitle" = "加入频道";
+"kbN-ZR-nNn.normalTitle" = "加入";
 
 /* Class = "UIButton"; normalTitle = "Button"; ObjectID = "myR-6e-1zj"; */
 "myR-6e-1zj.normalTitle" = "Button";

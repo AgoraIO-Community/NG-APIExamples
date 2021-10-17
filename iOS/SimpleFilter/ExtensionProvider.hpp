@@ -5,7 +5,7 @@
 #ifndef AGORA_EXTENSION_PROVIDER_H
 #define AGORA_EXTENSION_PROVIDER_H
 
-#include "AgoraRtcKit/NGIAgoraExtensionProvider.h"
+#include <AgoraRtcKit/NGIAgoraExtensionProvider.h>
 #include "ExtensionAudioFilter.hpp"
 #include "ExtensionVideoFilter.hpp"
 
