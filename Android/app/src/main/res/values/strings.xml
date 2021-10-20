@@ -64,16 +64,41 @@
 
 
     <!-- 页面描述统一管理 -->
-    <string name="title_basic_video">加入视频通话</string>
-    <string name="desc_basic_video">加入视频通话agora加入视频通话agora\n加入视频通话agora加入视频通话agora</string>
     <string name="title_basic_audio">加入音频通话</string>
-    <string name="desc_basic_audio">加入音频通话agora加入音频通话agora\n加入音频通话agora加入音频通话agora</string>
+    <string name="desc_basic_audio"><![CDATA[
+            此示例主要演示<br/><br/>
+            使用 Agora SDK 集成 <font color=\'#0091FC\'>语音通话</font>
+        ]]>
+    </string>
+    <string name="title_basic_video">加入视频通话</string>
+    <string name="desc_basic_video"><![CDATA[
+            此示例主要演示<br/><br/>
+            使用 Agora SDK 集成 <font color=\'#0091FC\'>音视频通话</font>
+        ]]>
+    </string>
     <string name="title_media_player">媒体播放</string>
-    <string name="desc_media_player">媒体播放agora媒体播放agora\n媒体播放agora媒体播放agora</string>
+    <string name="desc_media_player"><![CDATA[
+        此示例主要演示<br/><br/>
+        使用 Agora SDK 集成音视频通话的同时<br/>
+        向场景内推送 <font color=\'#0091FC\'>在线视频流</font>
+        ]]>
+    </string>
     <string name="title_screen_share">屏幕共享</string>
-    <string name="desc_screen_share">屏幕共享agora屏幕共享agora\n屏幕共享agora屏幕共享agora</string>
+    <string name="desc_screen_share"><![CDATA[
+        此示例主要演示<br/><br/>
+        使用 Agora SDK 集成音视频通话的同时<br/>
+        向场景内推送<font color=\'#0091FC\'>本机屏幕内容</font><br/>
+        需要安卓版本5.0及以上
+        ]]>
+    </string>
     <string name="title_simple_extension">插件演示</string>
-    <string name="desc_simple_extension">插件演示agora插件演示agora\n插件演示agora插件演示agora</string>
+    <string name="desc_simple_extension"><![CDATA[
+        此示例主要演示<br/><br/>
+        使用 Agora SDK 集成音视频通话的同时<br/>
+        通过加载插件给音频流、视频流<br/>
+        分别添加 <font color=\'#0091FC\'>调整推流音量</font> 和 <font color=\'#0091FC\'>添加水印</font> 的功能。
+        ]]>
+    </string>
 
 
 </resources>

@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.Html;
 import android.text.InputFilter;
 import android.text.InputType;
 import android.text.TextWatcher;
@@ -88,7 +89,7 @@ public class DescriptionFragment extends BaseFragment<FragmentDescriptionBinding
 
     private void initView() {
 
-        mBinding.textDescFgDesc.setText(demoInfo.getDesc());
+        mBinding.textDescFgDesc.setText(Html.fromHtml(getString(demoInfo.getDesc())));
 
         // press 'Enter' trigger Button click event
         // 按下 'Enter' 触发点击事件
