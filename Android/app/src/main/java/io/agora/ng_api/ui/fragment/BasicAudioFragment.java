@@ -29,7 +29,7 @@ import io.agora.rte.statistics.AgoraRteLocalAudioStats;
 import io.agora.rte.statistics.AgoraRteRemoteAudioStats;
 
 /**
- * This demo demonstrates how to make a one-to-one video call version 2
+ * This demo demonstrates how to make a Basic Audio Scene
  */
 public class BasicAudioFragment extends BaseDemoFragment<FragmentBasicAudioBinding> {
 
@@ -53,24 +53,23 @@ public class BasicAudioFragment extends BaseDemoFragment<FragmentBasicAudioBindi
 
         mAgoraHandler = new AgoraRteSceneEventHandler() {
 
-//            joinSceneSuccess
             @Override
             public void onConnectionStateChanged(AgoraRteSceneConnState state, AgoraRteSceneConnState state1, io.agora.rte.scene.AgoraRteConnectionChangedReason reason) {
                 ExampleUtil.utilLog("onConnectionStateChanged: " + state.getValue() + ", " + state1.getValue() + ",reason: " + reason.getValue() + "，\nThread:" + Thread.currentThread().getName());
                 if (mBinding == null) return;
                 // 连接建立完成
+                /*
+                    1. createOrUpdateRTCStream
+                    2. addVoiceView
+                    3. initBasicLocalAudioTrack
+                 */
                 if (state1 == AgoraRteSceneConnState.CONN_STATE_CONNECTED && mLocalAudioTrack == null) {
-                    AgoraRtcStreamOptions option = new AgoraRtcStreamOptions();
-                    mScene.createOrUpdateRTCStream(mLocalUserId, option);
-                    // 必须先添加setPreviewCanvas，然后才能 startCapture
+                    // Step 1
+                    mScene.createOrUpdateRTCStream(mLocalUserId, new AgoraRtcStreamOptions());
+                    // Step 2
                     addVoiceView(null);
-
-                    // 准备音频采集
-                    mLocalAudioTrack = AgoraRteSDK.getRteMediaFactory().createMicrophoneAudioTrack();
-                    mLocalAudioTrack.startRecording();
-                    mScene.publishLocalAudioTrack(mLocalUserId, mLocalAudioTrack);
-                } else if (state1 == AgoraRteSceneConnState.CONN_STATE_DISCONNECTED) {
-                    ExampleUtil.utilLog("onConnectionStateChanged: CONN_STATE_DISCONNECTED");
+                    // Step 3
+                    initBasicLocalAudioTrack();
                 }
             }
 
@@ -87,15 +86,18 @@ public class BasicAudioFragment extends BaseDemoFragment<FragmentBasicAudioBindi
                 if (mBinding == null) return;
 
                 for (AgoraRteMediaStreamInfo info : list) {
-
-                    // Stop update stat
-                    LiveData<String> test = liveStat.get(info.getStreamId());
-                    if (test != null) {
-                        test.removeObservers(getViewLifecycleOwner());
-                        liveStat.remove(info.getStreamId());
-                    }
                     // Remove view
                     mBinding.containerBasicAudio.dynamicRemoveViewWithTag(info.getStreamId());
+
+                    /*
+                        Stop update stat
+                        停止信息展示监听
+                     */
+                    LiveData<String> currentLiveData = liveStat.get(info.getStreamId());
+                    if (currentLiveData != null) {
+                        currentLiveData.removeObservers(getViewLifecycleOwner());
+                        liveStat.remove(info.getStreamId());
+                    }
                 }
             }
 
@@ -103,10 +105,10 @@ public class BasicAudioFragment extends BaseDemoFragment<FragmentBasicAudioBindi
             public void onLocalStreamAudioStats(String streamId, AgoraRteLocalAudioStats stats) {
                 MutableLiveData<String> test = liveStat.get(mLocalUserId);
                 if (test != null) {
-                    String sb = "ChannelCount:" + stats.getNumChannels() + "\n" +
+                    String localStatInfo = "ChannelCount:" + stats.getNumChannels() + "\n" +
                             stats.getSendBitrateInKbps() + "Kbps " +
                             stats.getSentSampleRate() + "Hz";
-                    test.setValue(sb);
+                    test.setValue(localStatInfo);
                 }
             }
 
@@ -114,25 +116,48 @@ public class BasicAudioFragment extends BaseDemoFragment<FragmentBasicAudioBindi
             public void onRemoteStreamAudioStats(String streamId, AgoraRteRemoteAudioStats stats) {
                 MutableLiveData<String> test = liveStat.get(streamId);
                 if (test != null) {
-                    String sb = "ChannelCount:" + stats.getNumChannels() + "\n" +
+                    String remoteStatInfo = "ChannelCount:" + stats.getNumChannels() + "\n" +
                             stats.getReceivedBitrate() + "Kbps " +
-                            stats.getReceivedSampleRate() + "Hz "+stats.getAudioLossRate()+"%";
-                    test.setValue(sb);
+                            stats.getReceivedSampleRate() + "Hz " + stats.getAudioLossRate() + "%";
+                    test.setValue(remoteStatInfo);
                 }
             }
         };
 
     }
 
+    private void initBasicLocalAudioTrack() {
+        mLocalAudioTrack = AgoraRteSDK.getRteMediaFactory().createMicrophoneAudioTrack();
+        mLocalAudioTrack.startRecording();
+        mScene.publishLocalAudioTrack(mLocalStreamId, mLocalAudioTrack);
+    }
 
+    /**
+     * Every time a user joined scene, we add a view
+     * 每当有用户加入场景，在界面上添加一个View
+     *
+     * @param info 用户信息
+     *             若为 null 则表示为本机用户，不会订阅音频流.
+     *             if info is null, just add a view
+     *             indicates that we have successfully
+     *             joined this scene and will not subscribe
+     *             a audio stream.
+     */
     private void addVoiceView(@Nullable AgoraRteMediaStreamInfo info) {
+        // 用 streamId 作为 tag 标记每个用户
         String tag = info == null ? null : info.getStreamId();
+        // 本地视图 title 为 local_{userId}，远端为 {userId}
         String title = info == null ? getString(R.string.local_user_id_format, mLocalUserId) : info.getUserId();
+        // 工具方法，直接返回一个 CardView, 内部包含一个 TextView
         CardView cardView = ScrollableLinearLayout.getChildAudioCardView(requireContext(), tag, title);
+        // 工具方法，简化属性设置流程, 直接添加View
+        mBinding.containerBasicAudio.dynamicAddView(cardView);
 
-        mBinding.containerBasicAudio.demoAddView(cardView);
+        /*
+            Start listen data changes
+            监听音频信息变化并展示在界面上
+         */
 
-        // Start listen data
         MutableLiveData<String> mutableLiveData = new MutableLiveData<>();
         mutableLiveData.observe(getViewLifecycleOwner(), s -> ((TextView) cardView.getChildAt(0)).setText(s));
 
@@ -140,14 +165,14 @@ public class BasicAudioFragment extends BaseDemoFragment<FragmentBasicAudioBindi
             liveStat.put(tag, mutableLiveData);
             // Start receive audio data
             mScene.subscribeRemoteAudio(tag);
-        }else{
+        } else {
             liveStat.put(mLocalUserId, mutableLiveData);
         }
 
     }
 
     private void joinScene() {
-        doJoinScene(sceneName, mLocalStreamId, "");
+        doJoinScene(sceneName, mLocalUserId, "");
     }
 
     @Override

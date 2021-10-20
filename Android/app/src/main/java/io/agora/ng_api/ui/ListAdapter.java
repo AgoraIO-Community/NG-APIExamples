@@ -1,22 +1,22 @@
 package io.agora.ng_api.ui;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
+
+import java.util.List;
+
 import io.agora.ng_api.R;
-import io.agora.ng_api.base.BaseFragment;
 import io.agora.ng_api.bean.DemoInfo;
 import io.agora.ng_api.ui.activity.MainActivity;
 import io.agora.ng_api.util.ExampleUtil;
-
-import java.util.List;
 
 public class ListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private final List<DemoInfo> demoInfoList;

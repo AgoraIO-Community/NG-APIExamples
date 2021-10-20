@@ -1,7 +1,9 @@
 package io.agora.ng_api.base;
 
 import android.os.Bundle;
+import android.view.TextureView;
 
+import androidx.annotation.IntRange;
 import androidx.annotation.Nullable;
 import androidx.viewbinding.ViewBinding;
 
@@ -12,11 +14,13 @@ import io.agora.ng_api.MyApp;
 import io.agora.ng_api.R;
 import io.agora.ng_api.ui.fragment.DescriptionFragment;
 import io.agora.ng_api.util.ExampleUtil;
+import io.agora.ng_api.view.DynamicView;
 import io.agora.rte.AgoraRteSDK;
 import io.agora.rte.AgoraRteSdkConfig;
 import io.agora.rte.base.AgoraRteLogConfig;
 import io.agora.rte.media.track.AgoraRteCameraVideoTrack;
 import io.agora.rte.media.track.AgoraRteMicrophoneAudioTrack;
+import io.agora.rte.media.video.AgoraRteVideoCanvas;
 import io.agora.rte.scene.AgoraRteScene;
 import io.agora.rte.scene.AgoraRteSceneConfig;
 import io.agora.rte.scene.AgoraRteSceneEventHandler;
@@ -109,4 +113,38 @@ public abstract class BaseDemoFragment<B extends ViewBinding> extends BaseFragme
         }
         AgoraRteSDK.deInit();
     }
+
+    public void initLocalAudioTrack(){
+        mLocalAudioTrack = AgoraRteSDK.getRteMediaFactory().createMicrophoneAudioTrack();
+        if(mLocalAudioTrack != null) {
+            mLocalAudioTrack.startRecording();
+            mScene.publishLocalAudioTrack(mLocalStreamId, mLocalAudioTrack);
+        }
+    }
+
+    public void initLocalVideoTrack(DynamicView dynamicView){
+        mLocalVideoTrack = AgoraRteSDK.getRteMediaFactory().createCameraVideoTrack();
+        // 必须先添加setPreviewCanvas，然后才能 startCapture
+        // Must first setPreviewCanvas, then we can startCapture
+        addLocalView(dynamicView);
+        if (mLocalVideoTrack != null) {
+            mLocalVideoTrack.startCapture(null);
+            mScene.publishLocalVideoTrack(mLocalStreamId, mLocalVideoTrack);
+        }
+    }
+
+    public void addLocalView(DynamicView dynamicView) {
+        addLocalView(dynamicView,AgoraRteVideoCanvas.RENDER_MODE_FIT);
+    }
+
+    public void addLocalView(DynamicView dynamicView, @IntRange(from = 1,to = 3) int renderMode) {
+        TextureView textureView = new TextureView(requireContext());
+        dynamicView.dynamicAddView(textureView);
+
+        AgoraRteVideoCanvas videoCanvas = new AgoraRteVideoCanvas(textureView);
+        videoCanvas.renderMode = renderMode;
+        if (mLocalVideoTrack != null)
+            mLocalVideoTrack.setPreviewCanvas(videoCanvas);
+    }
+
 }

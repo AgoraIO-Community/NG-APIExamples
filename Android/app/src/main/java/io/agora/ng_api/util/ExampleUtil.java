@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import io.agora.ng_api.BuildConfig;
 import io.agora.ng_api.R;
 
 public class ExampleUtil {
@@ -125,7 +126,8 @@ public class ExampleUtil {
     }
 
     public static void utilLog(String msg) {
-        Log.d("ng-api", msg);
+        if(BuildConfig.DEBUG)
+            Log.d("ng-api", msg);
     }
 
     public static ColorStateList getTint(int tintColor) {
