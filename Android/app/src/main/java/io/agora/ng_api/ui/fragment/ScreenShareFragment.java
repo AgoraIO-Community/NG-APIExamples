@@ -102,7 +102,7 @@ public class ScreenShareFragment extends BaseDemoFragment<FragmentScreenShareBin
                 super.onConnectionStateChanged(oldState, newState, reason);
                 if (newState == AgoraRteSceneConnState.CONN_STATE_CONNECTED && mLocalAudioTrack == null) {
                     // Step 1
-                    mScene.createOrUpdateRTCStream(mLocalUserId, new AgoraRtcStreamOptions());
+                    mScene.createOrUpdateRTCStream(mLocalStreamId, new AgoraRtcStreamOptions());
                     // Step 2
                     initLocalAudioTrack();
                     // Step 3

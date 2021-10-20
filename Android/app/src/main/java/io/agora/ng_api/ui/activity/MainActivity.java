@@ -200,7 +200,7 @@ public final class MainActivity extends BaseActivity {
             BaseDemoFragment<?> f = checkDemoAvailable();
             if (f != null && f.mScene != null && f.mLocalAudioTrack != null) {
                 if (isChecked) f.mScene.unpublishLocalAudioTrack(f.mLocalAudioTrack);
-                else f.mScene.publishLocalAudioTrack(f.mLocalUserId, f.mLocalAudioTrack);
+                else f.mScene.publishLocalAudioTrack(f.mLocalStreamId, f.mLocalAudioTrack);
             }
         });
 

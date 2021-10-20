@@ -151,13 +151,13 @@ public class SimpleExtensionFragment extends BaseDemoFragment<FragmentSimpleExte
 
     private int setAudioVolumeProperty(String jsonValue) {
         if (mLocalAudioTrack != null)
-            return mLocalAudioTrack.setExtensionProperty(new AgoraRteExtensionProperty(mLocalUserId, ExtensionManager.EXTENSION_VENDOR_NAME, ExtensionManager.EXTENSION_AUDIO_FILTER_VOLUME, ExtensionManager.KEY_ADJUST_VOLUME_CHANGE, jsonValue));
+            return mLocalAudioTrack.setExtensionProperty(new AgoraRteExtensionProperty(mLocalStreamId, ExtensionManager.EXTENSION_VENDOR_NAME, ExtensionManager.EXTENSION_AUDIO_FILTER_VOLUME, ExtensionManager.KEY_ADJUST_VOLUME_CHANGE, jsonValue));
         return -1;
     }
 
     private int setVideoWaterMarkProperty(String jsonValue) {
         if (mLocalVideoTrack != null)
-            return mLocalVideoTrack.setExtensionProperty(new AgoraRteExtensionProperty(mLocalUserId, ExtensionManager.EXTENSION_VENDOR_NAME, ExtensionManager.EXTENSION_VIDEO_FILTER_WATERMARK, ExtensionManager.KEY_ENABLE_WATER_MARK, jsonValue));
+            return mLocalVideoTrack.setExtensionProperty(new AgoraRteExtensionProperty(mLocalStreamId, ExtensionManager.EXTENSION_VENDOR_NAME, ExtensionManager.EXTENSION_VIDEO_FILTER_WATERMARK, ExtensionManager.KEY_ENABLE_WATER_MARK, jsonValue));
         return -1;
     }
 

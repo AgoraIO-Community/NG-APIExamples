@@ -65,7 +65,7 @@ public class BasicAudioFragment extends BaseDemoFragment<FragmentBasicAudioBindi
                  */
                 if (state1 == AgoraRteSceneConnState.CONN_STATE_CONNECTED && mLocalAudioTrack == null) {
                     // Step 1
-                    mScene.createOrUpdateRTCStream(mLocalUserId, new AgoraRtcStreamOptions());
+                    mScene.createOrUpdateRTCStream(mLocalStreamId, new AgoraRtcStreamOptions());
                     // Step 2
                     addVoiceView(null);
                     // Step 3
@@ -103,7 +103,7 @@ public class BasicAudioFragment extends BaseDemoFragment<FragmentBasicAudioBindi
 
             @Override
             public void onLocalStreamAudioStats(String streamId, AgoraRteLocalAudioStats stats) {
-                MutableLiveData<String> test = liveStat.get(mLocalUserId);
+                MutableLiveData<String> test = liveStat.get(mLocalStreamId);
                 if (test != null) {
                     String localStatInfo = "ChannelCount:" + stats.getNumChannels() + "\n" +
                             stats.getSendBitrateInKbps() + "Kbps " +
@@ -166,7 +166,7 @@ public class BasicAudioFragment extends BaseDemoFragment<FragmentBasicAudioBindi
             // Start receive audio data
             mScene.subscribeRemoteAudio(tag);
         } else {
-            liveStat.put(mLocalUserId, mutableLiveData);
+            liveStat.put(mLocalStreamId, mutableLiveData);
         }
 
     }
