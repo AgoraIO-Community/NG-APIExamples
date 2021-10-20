@@ -28,11 +28,11 @@
             android:name="io.agora.ng_api.ui.fragment.DescriptionFragment"
             android:label="DescriptionFragment">
         <action
-                android:id="@+id/action_descriptionFragment_to_joinChannelVideo"
-                app:destination="@id/order_b_joinChannelVideo"/>
+                android:id="@+id/action_descriptionFragment_to_basicVideo"
+                app:destination="@id/order_b_basicVideo"/>
         <action
-                android:id="@+id/action_descriptionFragment_to_joinChannelAudio"
-                app:destination="@id/order_a_joinChannelAudio"/>
+                android:id="@+id/action_descriptionFragment_to_basicAudio"
+                app:destination="@id/order_a_basicAudio"/>
         <action
                 android:id="@+id/action_descriptionFragment_to_mediaPlayer"
                 app:destination="@id/order_c_mediaPlayer"/>
@@ -63,10 +63,10 @@
                 android:defaultValue="@string/desc_media_player"/>
     </fragment>
     <fragment
-            tools:layout="@layout/fragment_join_channel_video"
-            android:id="@+id/order_b_joinChannelVideo"
-            android:name="io.agora.ng_api.ui.fragment.JoinChannelVideoFragment"
-            android:label="@string/title_join_channel_video">
+            tools:layout="@layout/fragment_basic_video"
+            android:id="@+id/order_b_basicVideo"
+            android:name="io.agora.ng_api.ui.fragment.BasicVideoFragment"
+            android:label="@string/title_basic_video">
         <argument
                 android:name="@string/args_nav_type"
                 app:argType="integer"
@@ -78,13 +78,13 @@
         <argument
                 android:name="@string/args_nav_desc"
                 app:argType="reference"
-                android:defaultValue="@string/desc_join_channel_video"/>
+                android:defaultValue="@string/desc_basic_video"/>
     </fragment>
     <fragment
-            tools:layout="@layout/fragment_join_channel_audio"
-            android:id="@+id/order_a_joinChannelAudio"
-            android:name="io.agora.ng_api.ui.fragment.JoinChannelAudioFragment"
-            android:label="@string/title_join_channel_audio">
+            tools:layout="@layout/fragment_basic_audio"
+            android:id="@+id/order_a_basicAudio"
+            android:name="io.agora.ng_api.ui.fragment.BasicAudioFragment"
+            android:label="@string/title_basic_audio">
         <argument
                 android:name="@string/args_nav_type"
                 app:argType="integer"
@@ -96,7 +96,7 @@
         <argument
                 android:name="@string/args_nav_desc"
                 app:argType="reference"
-                android:defaultValue="@string/desc_join_channel_audio"/>
+                android:defaultValue="@string/desc_basic_audio"/>
     </fragment>
     <fragment
             android:id="@+id/order_d_screenShareFragment"

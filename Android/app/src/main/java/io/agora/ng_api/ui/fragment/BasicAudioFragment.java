@@ -17,7 +17,7 @@ import java.util.Map;
 import io.agora.ng_api.MyApp;
 import io.agora.ng_api.R;
 import io.agora.ng_api.base.BaseDemoFragment;
-import io.agora.ng_api.databinding.FragmentJoinChannelAudioBinding;
+import io.agora.ng_api.databinding.FragmentBasicAudioBinding;
 import io.agora.ng_api.util.ExampleUtil;
 import io.agora.ng_api.view.ScrollableLinearLayout;
 import io.agora.rte.AgoraRteSDK;
@@ -31,7 +31,7 @@ import io.agora.rte.statistics.AgoraRteRemoteAudioStats;
 /**
  * This demo demonstrates how to make a one-to-one video call version 2
  */
-public class JoinChannelAudioFragment extends BaseDemoFragment<FragmentJoinChannelAudioBinding> {
+public class BasicAudioFragment extends BaseDemoFragment<FragmentBasicAudioBinding> {
 
     private final Map<String, MutableLiveData<String>> liveStat = new HashMap<>();
 
@@ -42,7 +42,7 @@ public class JoinChannelAudioFragment extends BaseDemoFragment<FragmentJoinChann
         initListener();
         if (!MyApp.justDebugUIPart) {
             initAgoraRteSDK();
-            joinChannel();
+            joinScene();
         }
     }
 
@@ -53,7 +53,7 @@ public class JoinChannelAudioFragment extends BaseDemoFragment<FragmentJoinChann
 
         mAgoraHandler = new AgoraRteSceneEventHandler() {
 
-//            joinChannelSuccess
+//            joinSceneSuccess
             @Override
             public void onConnectionStateChanged(AgoraRteSceneConnState state, AgoraRteSceneConnState state1, io.agora.rte.scene.AgoraRteConnectionChangedReason reason) {
                 ExampleUtil.utilLog("onConnectionStateChanged: " + state.getValue() + ", " + state1.getValue() + ",reason: " + reason.getValue() + "，\nThread:" + Thread.currentThread().getName());
@@ -95,7 +95,7 @@ public class JoinChannelAudioFragment extends BaseDemoFragment<FragmentJoinChann
                         liveStat.remove(info.getStreamId());
                     }
                     // Remove view
-                    mBinding.containerJoinChannelAudio.dynamicRemoveViewWithTag(info.getStreamId());
+                    mBinding.containerBasicAudio.dynamicRemoveViewWithTag(info.getStreamId());
                 }
             }
 
@@ -130,7 +130,7 @@ public class JoinChannelAudioFragment extends BaseDemoFragment<FragmentJoinChann
         String title = info == null ? getString(R.string.local_user_id_format, mLocalUserId) : info.getUserId();
         CardView cardView = ScrollableLinearLayout.getChildAudioCardView(requireContext(), tag, title);
 
-        mBinding.containerJoinChannelAudio.demoAddView(cardView);
+        mBinding.containerBasicAudio.demoAddView(cardView);
 
         // Start listen data
         MutableLiveData<String> mutableLiveData = new MutableLiveData<>();
@@ -146,8 +146,8 @@ public class JoinChannelAudioFragment extends BaseDemoFragment<FragmentJoinChann
 
     }
 
-    private void joinChannel() {
-        doJoinChannel(channelName, mLocalStreamId, "");
+    private void joinScene() {
+        doJoinScene(sceneName, mLocalStreamId, "");
     }
 
     @Override

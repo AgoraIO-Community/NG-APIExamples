@@ -41,7 +41,7 @@ import io.agora.ng_api.util.ExampleUtil;
  * fragment contains all demo fragment
  */
 public class DescriptionFragment extends BaseFragment<FragmentDescriptionBinding> {
-    public static final String channelName = "CHANNEL_NAME";
+    public static final String sceneName = "SCENE_NAME";
 
     private DemoInfo demoInfo;
     private String tempName = "";
@@ -92,7 +92,7 @@ public class DescriptionFragment extends BaseFragment<FragmentDescriptionBinding
 
         // press 'Enter' trigger Button click event
         // 按下 'Enter' 触发点击事件
-        mBinding.inputChannelFgDesc.setOnEditorActionListener((v, action, keyEvent) -> {
+        mBinding.inputSceneFgDesc.setOnEditorActionListener((v, action, keyEvent) -> {
             // Button pressed
             // 按下按钮的判断标志
             if (action == EditorInfo.IME_ACTION_DONE || (keyEvent != null && keyEvent.getKeyCode() == KeyEvent.KEYCODE_ENTER)) {
@@ -109,11 +109,11 @@ public class DescriptionFragment extends BaseFragment<FragmentDescriptionBinding
             v.postDelayed(() -> v.setEnabled(true), 300);
 
             // 输入合法判断
-            Editable editable = mBinding.inputChannelFgDesc.getText();
+            Editable editable = mBinding.inputSceneFgDesc.getText();
             if(editable!=null) tempName = editable.toString().trim();
 
             if (tempName.isEmpty()) {
-                ExampleUtil.shakeViewAndVibrateToAlert(mBinding.layoutInputChannelFgDesc);
+                ExampleUtil.shakeViewAndVibrateToAlert(mBinding.layoutInputSceneFgDesc);
             } else {
                 ExampleUtil.hideKeyboard(requireActivity().getWindow(), v);
 
@@ -133,9 +133,9 @@ public class DescriptionFragment extends BaseFragment<FragmentDescriptionBinding
     }
 
     private void toNextFragment() {
-        ExampleUtil.hideKeyboard(requireActivity().getWindow(),mBinding.inputChannelFgDesc);
+        ExampleUtil.hideKeyboard(requireActivity().getWindow(),mBinding.inputSceneFgDesc);
         Bundle bundle = new Bundle();
-        bundle.putString(DescriptionFragment.channelName, tempName);
+        bundle.putString(DescriptionFragment.sceneName, tempName);
         navigate(demoInfo.getDestId(), bundle);
     }
 
@@ -297,9 +297,9 @@ public class DescriptionFragment extends BaseFragment<FragmentDescriptionBinding
 
         mBinding.textDescFgDesc.setTextColor(colorText);
         mBinding.dividerFgDesc.setBackgroundColor(colorSurface);
-        mBinding.layoutInputChannelFgDesc.setBoxBackgroundColor(colorSurface);
-        mBinding.inputChannelFgDesc.setTextColor(colorText);
-        mBinding.inputChannelFgDesc.setHintTextColor(colorHint);
+        mBinding.layoutInputSceneFgDesc.setBoxBackgroundColor(colorSurface);
+        mBinding.inputSceneFgDesc.setTextColor(colorText);
+        mBinding.inputSceneFgDesc.setHintTextColor(colorHint);
         mBinding.btnJoinFgDesc.setTextColor(colorOnPrimary);
     }
 }

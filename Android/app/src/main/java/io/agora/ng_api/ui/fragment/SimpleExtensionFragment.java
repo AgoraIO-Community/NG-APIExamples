@@ -37,7 +37,7 @@ public class SimpleExtensionFragment extends BaseDemoFragment<FragmentSimpleExte
         initListener();
         if (!MyApp.justDebugUIPart) {
             initAgoraRteSDK(true);
-            joinChannel();
+            joinScene();
         }
     }
 
@@ -91,8 +91,8 @@ public class SimpleExtensionFragment extends BaseDemoFragment<FragmentSimpleExte
         mBinding.sliderFgSimpleExtension.setValue(100);
     }
 
-    private void joinChannel() {
-        doJoinChannel(channelName, mLocalStreamId, "");
+    private void joinScene() {
+        doJoinScene(sceneName, mLocalStreamId, "");
     }
 
     private void enableWaterMark(boolean enable) {

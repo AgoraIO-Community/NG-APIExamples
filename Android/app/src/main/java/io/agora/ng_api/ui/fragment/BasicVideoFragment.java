@@ -12,7 +12,7 @@ import java.util.List;
 import io.agora.ng_api.MyApp;
 import io.agora.ng_api.R;
 import io.agora.ng_api.base.BaseDemoFragment;
-import io.agora.ng_api.databinding.FragmentJoinChannelVideoBinding;
+import io.agora.ng_api.databinding.FragmentBasicVideoBinding;
 import io.agora.ng_api.util.ExampleUtil;
 import io.agora.ng_api.view.DynamicView;
 import io.agora.ng_api.view.ScrollableLinearLayout;
@@ -27,7 +27,7 @@ import io.agora.rte.scene.AgoraRteSceneEventHandler;
 /**
  * This demo demonstrates how to make a one-to-one video call version 2
  */
-public class JoinChannelVideoFragment extends BaseDemoFragment<FragmentJoinChannelVideoBinding> {
+public class BasicVideoFragment extends BaseDemoFragment<FragmentBasicVideoBinding> {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -38,7 +38,7 @@ public class JoinChannelVideoFragment extends BaseDemoFragment<FragmentJoinChann
 
         if (!MyApp.justDebugUIPart) {
             initAgoraRteSDK();
-            joinChannel();
+            joinScene();
         }
     }
 
@@ -47,9 +47,9 @@ public class JoinChannelVideoFragment extends BaseDemoFragment<FragmentJoinChann
         mBinding.toggleGroupFgVideo.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
             if (!isChecked) return;
             if (checkedId == R.id.toggle_btn_flex_fg_video) {
-                mBinding.containerJoinChannelVideo.setLayoutStyle(DynamicView.STYLE_FLEX);
+                mBinding.containerBasicVideo.setLayoutStyle(DynamicView.STYLE_FLEX);
             } else {
-                mBinding.containerJoinChannelVideo.setLayoutStyle(DynamicView.STYLE_SCROLL);
+                mBinding.containerBasicVideo.setLayoutStyle(DynamicView.STYLE_SCROLL);
             }
         });
         mBinding.toggleGroupFgVideo.check(R.id.toggle_btn_flex_fg_video);
@@ -95,15 +95,15 @@ public class JoinChannelVideoFragment extends BaseDemoFragment<FragmentJoinChann
             public void onRemoteStreamRemoved(List<AgoraRteMediaStreamInfo> list) {
                 if (mBinding == null) return;
                 for (AgoraRteMediaStreamInfo info : list) {
-                    mBinding.containerJoinChannelVideo.dynamicRemoveViewWithTag(info.getStreamId());
+                    mBinding.containerBasicVideo.dynamicRemoveViewWithTag(info.getStreamId());
 
                 }
             }
         };
     }
 
-    private void joinChannel() {
-        doJoinChannel(channelName, mLocalStreamId, "");
+    private void joinScene() {
+        doJoinScene(sceneName, mLocalStreamId, "");
     }
 
     /**
@@ -114,7 +114,7 @@ public class JoinChannelVideoFragment extends BaseDemoFragment<FragmentJoinChann
         CardView cardView = ScrollableLinearLayout.getChildVideoCardView(requireContext(), remoteStreamIdOrNull);
 
         // Add CardView
-        mBinding.containerJoinChannelVideo.demoAddView(cardView);
+        mBinding.containerBasicVideo.demoAddView(cardView);
         // Create AgoraRteVideoCanvas
         AgoraRteVideoCanvas canvas = new AgoraRteVideoCanvas(cardView.getChildAt(0));
 

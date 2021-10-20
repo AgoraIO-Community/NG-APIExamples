@@ -48,7 +48,7 @@ public class MediaPlayerFragment extends BaseDemoFragment<FragmentMediaPlayerBin
 
         if (!MyApp.justDebugUIPart) {
             initAgoraRteSDK();
-            joinChannel();
+            joinScene();
         }
     }
 
@@ -191,8 +191,8 @@ public class MediaPlayerFragment extends BaseDemoFragment<FragmentMediaPlayerBin
         mScene.publishMediaPlayer(mLocalMediaStreamId, mPlayer);
     }
 
-    public void joinChannel() {
-        doJoinChannel(channelName, mLocalStreamId, "");
+    private void joinScene() {
+        doJoinScene(sceneName, mLocalStreamId, "");
     }
 
     private void addMediaView() {

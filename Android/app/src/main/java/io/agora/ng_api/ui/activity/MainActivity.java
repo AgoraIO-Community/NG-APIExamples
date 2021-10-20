@@ -2,8 +2,6 @@ package io.agora.ng_api.ui.activity;
 
 import android.content.res.ColorStateList;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -175,9 +173,9 @@ public final class MainActivity extends BaseActivity {
 
                 if(destination.getId() != R.id.listFragment) {
                     if(arguments != null) {
-                        String channelName = arguments.getString(DescriptionFragment.channelName);
-                        if(channelName!=null)
-                            title += getString(R.string.show_channel_name,channelName);
+                        String sceneName = arguments.getString(DescriptionFragment.sceneName);
+                        if(sceneName!=null)
+                            title += getString(R.string.show_scene_name,sceneName);
                     }
                 }
                 mBinding.tFabMain.show();

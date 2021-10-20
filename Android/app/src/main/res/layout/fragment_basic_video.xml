@@ -27,7 +27,7 @@
     </com.google.android.material.button.MaterialButtonToggleGroup>
 
     <io.agora.ng_api.view.DynamicView
-            android:id="@+id/container_join_channel_video"
+            android:id="@+id/container_basic_video"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginTop="48dp"

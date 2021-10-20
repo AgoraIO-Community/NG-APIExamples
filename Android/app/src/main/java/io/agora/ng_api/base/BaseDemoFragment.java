@@ -33,7 +33,7 @@ public abstract class BaseDemoFragment<B extends ViewBinding> extends BaseFragme
     public final String mLocalUserId = String.valueOf(new Random().nextInt(Integer.MAX_VALUE/2));
     public final String mLocalStreamId = String.valueOf(new Random().nextInt(Integer.MAX_VALUE/2));
     public final String mLocalMediaStreamId = "media-" + new Random().nextInt(Integer.MAX_VALUE/2) + Integer.MAX_VALUE/2;
-    public String channelName;
+    public String sceneName;
     public AgoraRteScene mScene;
     public AgoraRteSceneEventHandler mAgoraHandler;
     @Nullable
@@ -44,20 +44,20 @@ public abstract class BaseDemoFragment<B extends ViewBinding> extends BaseFragme
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // ensure channelName
-        if (getArguments() == null || getArguments().get(DescriptionFragment.channelName) == null) {
-            MyApp.getInstance().shortToast(R.string.channel_name_required);
+        // ensure sceneName
+        if (getArguments() == null || getArguments().get(DescriptionFragment.sceneName) == null) {
+            MyApp.getInstance().shortToast(R.string.scene_name_required);
             getNavController().popBackStack();
             return;
         }
-        channelName = getArguments().getString(DescriptionFragment.channelName);
+        sceneName = getArguments().getString(DescriptionFragment.sceneName);
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         if (!MyApp.justDebugUIPart) {
-            doExitChannel();
+            doExitScene();
         }
     }
 
@@ -84,21 +84,21 @@ public abstract class BaseDemoFragment<B extends ViewBinding> extends BaseFragme
     }
 
     /**
-     * @param channelName channel name
+     * @param sceneName scene name
      * @param userId      userId
      * @param token       access token
      */
-    public void doJoinChannel(String channelName, String userId, String token) {
-        doJoinChannel(channelName, userId, token, new AgoraRteSceneConfig());
+    public void doJoinScene(String sceneName, String userId, String token) {
+        doJoinScene(sceneName, userId, token, new AgoraRteSceneConfig());
     }
 
-    public void doJoinChannel(String channelName, String userId, String token, AgoraRteSceneConfig config) {
-        mScene = AgoraRteSDK.createRteScene(channelName, config);
+    public void doJoinScene(String sceneName, String userId, String token, AgoraRteSceneConfig config) {
+        mScene = AgoraRteSDK.createRteScene(sceneName, config);
         mScene.registerSceneEventHandler(mAgoraHandler);
         mScene.join(userId, token, new AgoraRteSceneJoinOptions());
     }
 
-    public void doExitChannel() {
+    public void doExitScene() {
         if(mLocalAudioTrack != null)
             mLocalAudioTrack.destroy();
         if(mLocalVideoTrack != null)

@@ -52,7 +52,7 @@ public class ScreenShareFragment extends BaseDemoFragment<FragmentScreenShareBin
             initListener();
             if (!MyApp.justDebugUIPart) {
                 initAgoraRteSDK();
-                joinChannel();
+                joinScene();
             }
         } else {
             MyApp.getInstance().shortToast(R.string.screen_share_version_unsupported);
@@ -203,8 +203,8 @@ public class ScreenShareFragment extends BaseDemoFragment<FragmentScreenShareBin
         mScene.subscribeRemoteAudio(streamId);
     }
 
-    private void joinChannel() {
-        doJoinChannel(channelName, mLocalStreamId, "");
+    private void joinScene() {
+        doJoinScene(sceneName, mLocalStreamId, "");
     }
 
     @Override

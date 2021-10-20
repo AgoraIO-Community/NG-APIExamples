@@ -31,8 +31,8 @@
 <br/>
 <br/>
 
-[basicAudio]: app/src/main/java/io/agora/ng_api/ui/fragment/JoinChannelAudioFragment.java
-[basicVideo]: app/src/main/java/io/agora/ng_api/ui/fragment/JoinChannelVideoFragment.java
+[basicAudio]: app/src/main/java/io/agora/ng_api/ui/fragment/BasicAudioFragment.java
+[basicVideo]: app/src/main/java/io/agora/ng_api/ui/fragment/BasicVideoFragment.java
 [mediaPlayer]: app/src/main/java/io/agora/ng_api/ui/fragment/MediaPlayerFragment.java
 [screenShare]: app/src/main/java/io/agora/ng_api/ui/fragment/ScreenShareFragment.java
 [simpleExtension]: app/src/main/java/io/agora/ng_api/ui/fragment/SimpleExtensionFragment.java
