@@ -70,16 +70,20 @@ public class SimpleExtensionFragment extends BaseDemoFragment<FragmentSimpleExte
             @Override
             public void onRemoteStreamAdded(List<AgoraRteMediaStreamInfo> streams) {
                 for (AgoraRteMediaStreamInfo info : streams) {
-                    addRemoteView(info.getStreamId());
+                    String remoteStreamId = info.getStreamId();
+                    addRemoteView(remoteStreamId);
+                    mScene.subscribeRemoteAudio(remoteStreamId);
+                    mScene.subscribeRemoteVideo(remoteStreamId, new AgoraRteVideoSubscribeOptions());
                 }
             }
 
             @Override
             public void onRemoteStreamRemoved(List<AgoraRteMediaStreamInfo> streams) {
                 for (AgoraRteMediaStreamInfo info : streams){
-                    mBinding.containerFgSimpleExtension.dynamicRemoveViewWithTag(info.getStreamId());
-                    mScene.unsubscribeRemoteAudio(info.getStreamId());
-                    mScene.unsubscribeRemoteVideo(info.getStreamId());
+                    String remoteStreamId = info.getStreamId();
+                    mBinding.containerFgSimpleExtension.dynamicRemoveViewWithTag(remoteStreamId);
+                    mScene.unsubscribeRemoteAudio(remoteStreamId);
+                    mScene.unsubscribeRemoteVideo(remoteStreamId);
                 }
             }
         };

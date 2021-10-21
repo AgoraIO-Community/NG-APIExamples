@@ -79,17 +79,21 @@ public class BasicVideoFragment extends BaseDemoFragment<FragmentBasicVideoBindi
 
             @Override
             public void onRemoteStreamAdded(List<AgoraRteMediaStreamInfo> list) {
-                if (mBinding == null) return;
                 for (AgoraRteMediaStreamInfo info : list) {
-                    addUserPreview(info.getStreamId());
+                    String remoteStreamId = info.getStreamId();
+                    addUserPreview(remoteStreamId);
+                    mScene.subscribeRemoteAudio(remoteStreamId);
+                    mScene.subscribeRemoteVideo(remoteStreamId, new AgoraRteVideoSubscribeOptions());
                 }
             }
 
             @Override
             public void onRemoteStreamRemoved(List<AgoraRteMediaStreamInfo> list) {
-                if (mBinding == null) return;
                 for (AgoraRteMediaStreamInfo info : list) {
-                    mBinding.containerBasicVideo.dynamicRemoveViewWithTag(info.getStreamId());
+                    String remoteStreamId = info.getStreamId();
+                    mBinding.containerBasicVideo.dynamicRemoveViewWithTag(remoteStreamId);
+                    mScene.unsubscribeRemoteAudio(remoteStreamId);
+                    mScene.unsubscribeRemoteVideo(remoteStreamId);
                 }
             }
         };
@@ -163,8 +167,6 @@ public class BasicVideoFragment extends BaseDemoFragment<FragmentBasicVideoBindi
         if(remoteStreamIdOrNull != null){
             // Step 3-2
             mScene.setRemoteVideoCanvas(remoteStreamIdOrNull, canvas);
-            mScene.subscribeRemoteAudio(remoteStreamIdOrNull);
-            mScene.subscribeRemoteVideo(remoteStreamIdOrNull, new AgoraRteVideoSubscribeOptions());
         }else if(mLocalVideoTrack != null){
             // Step 3-1
 

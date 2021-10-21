@@ -23,6 +23,7 @@ import io.agora.ng_api.view.ScrollableLinearLayout;
 import io.agora.rte.AgoraRteSDK;
 import io.agora.rte.media.stream.AgoraRtcStreamOptions;
 import io.agora.rte.media.stream.AgoraRteMediaStreamInfo;
+import io.agora.rte.media.video.AgoraRteVideoSubscribeOptions;
 import io.agora.rte.scene.AgoraRteSceneConnState;
 import io.agora.rte.scene.AgoraRteSceneEventHandler;
 import io.agora.rte.statistics.AgoraRteLocalAudioStats;
@@ -55,8 +56,6 @@ public class BasicAudioFragment extends BaseDemoFragment<FragmentBasicAudioBindi
 
             @Override
             public void onConnectionStateChanged(AgoraRteSceneConnState state, AgoraRteSceneConnState state1, io.agora.rte.scene.AgoraRteConnectionChangedReason reason) {
-                ExampleUtil.utilLog("onConnectionStateChanged: " + state.getValue() + ", " + state1.getValue() + ",reason: " + reason.getValue() + "，\nThread:" + Thread.currentThread().getName());
-                if (mBinding == null) return;
                 // 连接建立完成
                 /*
                     1. createOrUpdateRTCStream
@@ -75,19 +74,24 @@ public class BasicAudioFragment extends BaseDemoFragment<FragmentBasicAudioBindi
 
             @Override
             public void onRemoteStreamAdded(List<AgoraRteMediaStreamInfo> list) {
-                if (mBinding == null) return;
-                for (AgoraRteMediaStreamInfo info : list)
+                for (AgoraRteMediaStreamInfo info : list) {
+                    String remoteStreamId = info.getStreamId();
                     addVoiceView(info);
+
+                    mScene.subscribeRemoteAudio(remoteStreamId);
+                    mScene.subscribeRemoteVideo(remoteStreamId, new AgoraRteVideoSubscribeOptions());
+                }
             }
 
             @Override
             public void onRemoteStreamRemoved(List<AgoraRteMediaStreamInfo> list) {
-                ExampleUtil.utilLog("onRemoteStreamRemoved: " + Thread.currentThread().getName());
-                if (mBinding == null) return;
-
                 for (AgoraRteMediaStreamInfo info : list) {
+                    String remoteStreamId = info.getStreamId();
                     // Remove view
-                    mBinding.containerBasicAudio.dynamicRemoveViewWithTag(info.getStreamId());
+                    mBinding.containerBasicAudio.dynamicRemoveViewWithTag(remoteStreamId);
+
+                    mScene.unsubscribeRemoteAudio(remoteStreamId);
+                    mScene.unsubscribeRemoteVideo(remoteStreamId);
 
                     /*
                         Stop update stat

@@ -164,14 +164,20 @@ public class MediaPlayerFragment extends BaseDemoFragment<FragmentMediaPlayerBin
             @Override
             public void onRemoteStreamAdded(List<AgoraRteMediaStreamInfo> streams) {
                 for (AgoraRteMediaStreamInfo stream : streams) {
-                    addRemoteView(stream.getStreamId());
+                    String remoteStreamId = stream.getStreamId();
+                    addRemoteView(remoteStreamId);
+                    mScene.subscribeRemoteVideo(remoteStreamId, new AgoraRteVideoSubscribeOptions());
+                    mScene.subscribeRemoteAudio(remoteStreamId);
                 }
             }
 
             @Override
             public void onRemoteStreamRemoved(List<AgoraRteMediaStreamInfo> streams) {
                 for (AgoraRteMediaStreamInfo stream : streams) {
-                    mBinding.containerFgPlayer.dynamicRemoveViewWithTag(stream.getStreamId());
+                    String remoteStreamId = stream.getStreamId();
+                    mBinding.containerFgPlayer.dynamicRemoveViewWithTag(remoteStreamId);
+                    mScene.unsubscribeRemoteAudio(remoteStreamId);
+                    mScene.unsubscribeRemoteVideo(remoteStreamId);
                 }
             }
         };
@@ -234,9 +240,6 @@ public class MediaPlayerFragment extends BaseDemoFragment<FragmentMediaPlayerBin
         mBinding.containerFgPlayer.dynamicAddView(view);
         AgoraRteVideoCanvas canvas = new AgoraRteVideoCanvas(view);
         mScene.setRemoteVideoCanvas(streamId, canvas);
-
-        mScene.subscribeRemoteVideo(streamId, new AgoraRteVideoSubscribeOptions());
-        mScene.subscribeRemoteAudio(streamId);
     }
 
     @Override

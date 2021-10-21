@@ -115,14 +115,20 @@ public class ScreenShareFragment extends BaseDemoFragment<FragmentScreenShareBin
             @Override
             public void onRemoteStreamAdded(List<AgoraRteMediaStreamInfo> streams) {
                 for (AgoraRteMediaStreamInfo stream : streams) {
-                    addRemoteView(stream.getStreamId());
+                    String remoteStreamId = stream.getStreamId();
+                    addRemoteView(remoteStreamId);
+                    mScene.subscribeRemoteAudio(remoteStreamId);
+                    mScene.subscribeRemoteVideo(remoteStreamId, new AgoraRteVideoSubscribeOptions());
                 }
             }
 
             @Override
             public void onRemoteStreamRemoved(List<AgoraRteMediaStreamInfo> streams) {
                 for (AgoraRteMediaStreamInfo stream : streams) {
-                    mBinding.containerFgScreenShare.dynamicRemoveViewWithTag(stream.getStreamId());
+                    String remoteStreamId = stream.getStreamId();
+                    mBinding.containerFgScreenShare.dynamicRemoveViewWithTag(remoteStreamId);
+                    mScene.unsubscribeRemoteAudio(remoteStreamId);
+                    mScene.unsubscribeRemoteVideo(remoteStreamId);
                 }
             }
         };
@@ -183,9 +189,6 @@ public class ScreenShareFragment extends BaseDemoFragment<FragmentScreenShareBin
         mBinding.containerFgScreenShare.dynamicAddView(view);
         AgoraRteVideoCanvas canvas = new AgoraRteVideoCanvas(view);
         mScene.setRemoteVideoCanvas(streamId, canvas);
-
-        mScene.subscribeRemoteVideo(streamId, new AgoraRteVideoSubscribeOptions());
-        mScene.subscribeRemoteAudio(streamId);
     }
 
     private void joinScene() {
