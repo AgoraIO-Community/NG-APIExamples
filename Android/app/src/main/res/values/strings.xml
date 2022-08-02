@@ -10,14 +10,14 @@
     <string name="btn_exit">Exit</string>
     <string name="btn_join">Join</string>
     <string name="btn_icon_back">back</string>
-    <string name="channel_name">频道名称</string>
+    <string name="scene_name">场景名称</string>
     <string name="mute">静音</string>
     <string name="speaker">扬声器</string>
     <string name="earpiece">听筒</string>
     <string name="adjust_volume_down">调低音量</string>
     <string name="adjust_volume_up">调高音量</string>
-    <string name="channel_name_required">channelName required</string>
-    <string name="show_channel_name">(%s)</string>
+    <string name="scene_name_required">sceneName required</string>
+    <string name="show_scene_name">(%s)</string>
 
     <string name="app_id_title">APPID 设置</string>
     <string name="app_id_alert">[agora_app_id]未配置\n此为演示功能所必须\n请至官网注册获取，若已有可👇手动输入</string>
@@ -47,6 +47,9 @@
     <string name="notify_service_desc">Notice that we are trying to capture the screen!!</string>
     <string name="notify_channel_id">agora_media_project</string>
 
+    <!--    插件演示-->
+    <string name="water_mark">水印</string>
+
     <!-- 数据相关-->
     <string name="demo_string_basic">基本</string>
     <string name="demo_string_advanced">高级</string>
@@ -61,16 +64,41 @@
 
 
     <!-- 页面描述统一管理 -->
-    <string name="title_join_channel_video">加入视频通话</string>
-    <string name="desc_join_channel_video">加入视频通话agora加入视频通话agora\n加入视频通话agora加入视频通话agora</string>
-    <string name="title_join_channel_audio">加入音频通话</string>
-    <string name="desc_join_channel_audio">加入音频通话agora加入音频通话agora\n加入音频通话agora加入音频通话agora</string>
+    <string name="title_basic_audio">加入音频通话</string>
+    <string name="desc_basic_audio"><![CDATA[
+            此示例主要演示<br/><br/>
+            使用 Agora SDK 集成 <font color=\'#0091FC\'>语音通话</font>
+        ]]>
+    </string>
+    <string name="title_basic_video">加入视频通话</string>
+    <string name="desc_basic_video"><![CDATA[
+            此示例主要演示<br/><br/>
+            使用 Agora SDK 集成 <font color=\'#0091FC\'>音视频通话</font>
+        ]]>
+    </string>
     <string name="title_media_player">媒体播放</string>
-    <string name="desc_media_player">媒体播放agora媒体播放agora\n媒体播放agora媒体播放agora</string>
+    <string name="desc_media_player"><![CDATA[
+        此示例主要演示<br/><br/>
+        使用 Agora SDK 集成音视频通话的同时<br/>
+        向场景内推送 <font color=\'#0091FC\'>在线视频流</font>
+        ]]>
+    </string>
     <string name="title_screen_share">屏幕共享</string>
-    <string name="desc_screen_share">屏幕共享agora屏幕共享agora\n屏幕共享agora屏幕共享agora</string>
+    <string name="desc_screen_share"><![CDATA[
+        此示例主要演示<br/><br/>
+        使用 Agora SDK 集成音视频通话的同时<br/>
+        向场景内推送<font color=\'#0091FC\'>本机屏幕内容</font><br/>
+        需要安卓版本5.0及以上
+        ]]>
+    </string>
     <string name="title_simple_extension">插件演示</string>
-    <string name="desc_simple_extension">插件演示agora插件演示agora\n插件演示agora插件演示agora</string>
+    <string name="desc_simple_extension"><![CDATA[
+        此示例主要演示<br/><br/>
+        使用 Agora SDK 集成音视频通话的同时<br/>
+        通过加载插件给音频流、视频流<br/>
+        分别添加 <font color=\'#0091FC\'>调整推流音量</font> 和 <font color=\'#0091FC\'>添加水印</font> 的功能。
+        ]]>
+    </string>
 
 
 </resources>

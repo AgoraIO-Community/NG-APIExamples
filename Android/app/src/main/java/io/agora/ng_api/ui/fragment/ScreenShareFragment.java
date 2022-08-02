@@ -4,7 +4,6 @@ import static android.app.Activity.RESULT_OK;
 
 import android.content.Context;
 import android.content.Intent;
-import android.media.projection.MediaProjection;
 import android.media.projection.MediaProjectionManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -18,7 +17,6 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 
 import java.util.List;
-import java.util.Random;
 
 import io.agora.ng_api.MyApp;
 import io.agora.ng_api.R;
@@ -42,6 +40,7 @@ public class ScreenShareFragment extends BaseDemoFragment<FragmentScreenShareBin
 
     @Nullable
     private AgoraRteScreenVideoTrack screenVideoTrack;
+    // 请求权限
     private ActivityResultLauncher<Intent> activityResultLauncher;
 
     @Override
@@ -51,9 +50,9 @@ public class ScreenShareFragment extends BaseDemoFragment<FragmentScreenShareBin
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             initView();
             initListener();
-            if (!MyApp.debugMine) {
+            if (!MyApp.justDebugUIPart) {
                 initAgoraRteSDK();
-                joinChannel();
+                joinScene();
             }
         } else {
             MyApp.getInstance().shortToast(R.string.screen_share_version_unsupported);
@@ -71,7 +70,6 @@ public class ScreenShareFragment extends BaseDemoFragment<FragmentScreenShareBin
     private void initView() {
         mediaProjectionIntent = new Intent(requireActivity(), MediaProjectFgService.class);
 
-        // checked the button to record screen
         mBinding.btnOpenFgScreenShare.addOnCheckedChangeListener((button, isChecked) -> {
             // Must first startService then request permission
             screenCaptureOperation(isChecked);
@@ -96,28 +94,21 @@ public class ScreenShareFragment extends BaseDemoFragment<FragmentScreenShareBin
                 MyApp.getInstance().shortToast(R.string.screen_share_request_denied);
             }
         });
+
+        // Just a regular event handler
         mAgoraHandler = new AgoraRteSceneEventHandler() {
             @Override
             public void onConnectionStateChanged(AgoraRteSceneConnState oldState, AgoraRteSceneConnState newState, AgoraRteConnectionChangedReason reason) {
                 super.onConnectionStateChanged(oldState, newState, reason);
                 if (newState == AgoraRteSceneConnState.CONN_STATE_CONNECTED && mLocalAudioTrack == null) {
-                    mBinding.btnOpenFgScreenShare.setEnabled(true);
+                    // Step 1
+                    mScene.createOrUpdateRTCStream(mLocalStreamId, new AgoraRtcStreamOptions());
+                    // Step 2
+                    initLocalAudioTrack();
+                    // Step 3
+                    initLocalVideoTrack(mBinding.containerFgScreenShare);
 
-                    // RTC stream prepare
-                    AgoraRtcStreamOptions option = new AgoraRtcStreamOptions();
-                    mScene.createOrUpdateRTCStream(mLocalUserId, option);
-                    // 准备视频采集
-                    mLocalVideoTrack = AgoraRteSDK.getRteMediaFactory().createCameraVideoTrack();
-                    // 必须先添加setPreviewCanvas，然后才能 startCapture
-                    addLocalView();
-                    if (mLocalVideoTrack != null) {
-                        mLocalVideoTrack.startCapture(null);
-                    }
-                    mScene.publishLocalVideoTrack(mLocalUserId, mLocalVideoTrack);
-                    // 准备音频采集
-                    mLocalAudioTrack = AgoraRteSDK.getRteMediaFactory().createMicrophoneAudioTrack();
-                    mLocalAudioTrack.startRecording();
-                    mScene.publishLocalAudioTrack(mLocalUserId, mLocalAudioTrack);
+                    mBinding.btnOpenFgScreenShare.setEnabled(true);
                 }
             }
 
@@ -166,7 +157,7 @@ public class ScreenShareFragment extends BaseDemoFragment<FragmentScreenShareBin
         // Add View
         TextureView textureView = new TextureView(requireContext());
         textureView.setTag(mLocalMediaStreamId);
-        mBinding.containerFgScreenShare.demoAddView(textureView);
+        mBinding.containerFgScreenShare.dynamicAddView(textureView);
         // Create preview canvas
         AgoraRteVideoCanvas canvas = new AgoraRteVideoCanvas(textureView);
         // Create screenVideoTrack
@@ -179,24 +170,17 @@ public class ScreenShareFragment extends BaseDemoFragment<FragmentScreenShareBin
         mScene.publishLocalVideoTrack(mLocalMediaStreamId, screenVideoTrack);
     }
 
-    private void addLocalView() {
-        TextureView view = new TextureView(requireContext());
-        mBinding.containerFgScreenShare.demoAddView(view);
-        AgoraRteVideoCanvas canvas = new AgoraRteVideoCanvas(view);
-        if (mLocalVideoTrack != null) {
-            mLocalVideoTrack.setPreviewCanvas(canvas);
-        }
-    }
-
     /**
      * Add view to show remote stream data
      *
      * @param streamId related remote streamID
      */
     private void addRemoteView(String streamId) {
+        if(mBinding.containerFgScreenShare.findViewWithTag(streamId) != null) return;
+
         TextureView view = new TextureView(requireContext());
         view.setTag(streamId);
-        mBinding.containerFgScreenShare.demoAddView(view);
+        mBinding.containerFgScreenShare.dynamicAddView(view);
         AgoraRteVideoCanvas canvas = new AgoraRteVideoCanvas(view);
         mScene.setRemoteVideoCanvas(streamId, canvas);
 
@@ -204,8 +188,8 @@ public class ScreenShareFragment extends BaseDemoFragment<FragmentScreenShareBin
         mScene.subscribeRemoteAudio(streamId);
     }
 
-    private void joinChannel() {
-        doJoinChannel(channelName, mLocalUserId, "");
+    private void joinScene() {
+        doJoinScene(sceneName, mLocalUserId, "");
     }
 
     @Override

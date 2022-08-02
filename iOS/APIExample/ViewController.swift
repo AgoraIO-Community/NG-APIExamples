@@ -25,31 +25,13 @@ struct MenuItem {
 class ViewController: AGViewController {
     var menus:[MenuSection] = [
         MenuSection(name: "Basic", rows: [
-            MenuItem(name: "Join a channel (Video)".localized, storyboard: "JoinChannelVideo", controller: ""),
-            MenuItem(name: "Join a channel (Audio)".localized, storyboard: "JoinChannelAudio", controller: "")
+            MenuItem(name: "Join a Scene (Video)".localized, storyboard: "BasicVideo", controller: ""),
+            MenuItem(name: "Join a Scene (Audio)".localized, storyboard: "BasicAudio", controller: "")
         ]),
-//        MenuSection(name: "Anvanced", rows: [
-//            MenuItem(name: "Group Video Chat".localized, storyboard: "VideoChat", controller: "VideoChat"),
-//            MenuItem(name: "RTMP Streaming".localized, storyboard: "RTMPStreaming", controller: "RTMPStreaming"),
-//            MenuItem(name: "Video Metadata".localized, storyboard: "VideoMetadata", controller: "VideoMetadata".localized),
-//            MenuItem(name: "Voice Changer".localized, storyboard: "VoiceChanger", controller: ""),
-//            MenuItem(name: "Custom Audio Source".localized, storyboard: "CustomAudioSource", controller: "CustomAudioSource"),
-//            MenuItem(name: "Custom Audio Source(PCM)".localized, storyboard: "CustomPcmAudioSource", controller: "CustomPcmAudioSource"),
-//            MenuItem(name: "Custom Audio Render".localized, storyboard: "CustomAudioRender", controller: "CustomAudioRender"),
-//            MenuItem(name: "Custom Video Source(Push)".localized, storyboard: "CustomVideoSourcePush", controller: "CustomVideoSourcePush"),
-//            MenuItem(name: "Custom Video Render".localized, storyboard: "CustomVideoRender", controller: "CustomVideoRender"),
-//            MenuItem(name: "Raw Media Data".localized, storyboard: "RawMediaData", controller: "RawMediaData"),
-//            MenuItem(name: "Simple Audio Filter".localized, storyboard: "SimpleAudioFilter", controller: "SimpleAudioFilter"),
-//            MenuItem(name: "Quick Switch Channel".localized, controller: "QuickSwitchChannel"),
-//            MenuItem(name: "Join Multiple Channels".localized, storyboard: "JoinMultiChannel", controller: "JoinMultiChannel"),
-//            MenuItem(name: "Stream Encryption".localized, storyboard: "StreamEncryption", controller: ""),
-//            MenuItem(name: "Audio Mixing".localized, storyboard: "AudioMixing", controller: ""),
-//            MenuItem(name: "Precall Test".localized, storyboard: "PrecallTest", controller: ""),
-//            MenuItem(name: "Media Player".localized, storyboard: "MediaPlayer", controller: ""),
-//            MenuItem(name: "Screen Share".localized, storyboard: "ScreenShare", controller: ""),
-//            MenuItem(name: "Screen Share + Camera".localized, storyboard: "ScreenShare+Socket", controller: ""),
-//            MenuItem(name: "Media Channel Relay".localized, storyboard: "MediaChannelRelay", controller: "")
-//        ]),
+        MenuSection(name: "Anvanced", rows: [
+            MenuItem(name: "Simple Filter".localized, storyboard: "SimpleFilter", controller: ""),
+            MenuItem(name: "Media Player".localized, storyboard: "MediaPlayer", controller: ""),
+        ]),
     ]
     override func viewDidLoad() {
         super.viewDidLoad()

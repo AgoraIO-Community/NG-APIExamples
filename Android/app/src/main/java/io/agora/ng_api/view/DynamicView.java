@@ -3,7 +3,6 @@ package io.agora.ng_api.view;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
-import android.graphics.Color;
 import android.os.Build;
 import android.util.AttributeSet;
 import android.util.TypedValue;
@@ -30,7 +29,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.agora.ng_api.R;
-import io.agora.ng_api.util.ExampleUtil;
 
 /**
  * @author liuqiang
@@ -96,7 +94,7 @@ public class DynamicView extends ConstraintLayout {
         // for the preview
         if (this.isInEditMode()) {
             for (int i = 0; i < previewViewCount; i++) {
-                demoAddView(ScrollableLinearLayout.getChildAudioCardView(getContext(), null, "V"+(i+1)));
+                dynamicAddView(ScrollableLinearLayout.getChildAudioCardView(getContext(), null, "V"+(i+1)));
             }
         }
     }
@@ -217,7 +215,7 @@ public class DynamicView extends ConstraintLayout {
                 configViewIfIsSurfaceView(child, false);
                 if (!needCustomClick)
                     child.setOnClickListener(null);
-                demoAddView(child);
+                dynamicAddView(child);
             }
             regroupFlexChildren();
         } else {
@@ -231,7 +229,7 @@ public class DynamicView extends ConstraintLayout {
                     configViewIfIsSurfaceView(child, true);
                     if (!needCustomClick) child.setOnClickListener(this::switchView);
                 }
-                demoAddView(child);
+                dynamicAddView(child);
             }
         }
         oldChildren.clear();
@@ -332,7 +330,7 @@ public class DynamicView extends ConstraintLayout {
     /**
      * For a better control we override child's LayoutParams
      */
-    public void demoAddView(View child) {
+    public void dynamicAddView(View child) {
         if (child.getId() == View.NO_ID)
             child.setId(ViewCompat.generateViewId());
 
@@ -349,7 +347,7 @@ public class DynamicView extends ConstraintLayout {
         }
     }
 
-    public void demoRemoveView(View view) {
+    public void dynamicRemoveView(View view) {
         if (layoutStyle == DynamicView.STYLE_FLEX) {
             removeChildInFlexLayout(view);
         } else {

@@ -113,6 +113,67 @@ enum RAW_AUDIO_FRAME_OP_MODE_TYPE {
 }  // namespace rtc
 
 namespace media {
+  /** 
+ * The type of media device.
+ */
+enum MEDIA_SOURCE_TYPE {
+  /** 
+   * 0: The audio playback device.
+   */
+  AUDIO_PLAYOUT_SOURCE = 0,
+  /** 
+   * 1: Microphone.
+   */
+  AUDIO_RECORDING_SOURCE = 1,
+  /**
+   * 2: Video captured by primary camera.
+   */
+  PRIMARY_CAMERA_SOURCE = 2,
+  /**
+   * 3: Video captured by secondary camera.
+   */
+  SECONDARY_CAMERA_SOURCE = 3,
+  /**
+   * 4: Video captured by primary screen capturer.
+   */
+  PRIMARY_SCREEN_SOURCE = 4,
+  /**
+   * 5: Video captured by secondary screen capturer.
+   */
+  SECONDARY_SCREEN_SOURCE = 5,
+  /**
+   * 6: Video captured by custom video source.
+   */
+  CUSTOM_VIDEO_SOURCE = 6,
+  /**
+   * 7: Video for media player sharing.
+   */
+  MEDIA_PLAYER_SOURCE = 7,
+  /**
+   * 8: Video for png image.
+   */
+  RTC_IMAGE_PNG_SOURCE = 8,
+  /**
+   * 9: Video for jpeg image.
+   */
+  RTC_IMAGE_JPEG_SOURCE = 9,
+  /**
+   * 10: Video for gif image.
+   */
+  RTC_IMAGE_GIF_SOURCE = 10,
+  /**
+   * 11: Remote video received from network.
+   */
+  REMOTE_VIDEO_SOURCE = 11,
+  /**
+   * 12: Video for transcoded.
+   */
+  TRANSCODED_VIDEO_SOURCE = 12,
+  /**
+   * 100: unknown media source.
+   */
+  UNKNOWN_MEDIA_SOURCE = 100
+};
 namespace base {
 
 typedef void* view_t;

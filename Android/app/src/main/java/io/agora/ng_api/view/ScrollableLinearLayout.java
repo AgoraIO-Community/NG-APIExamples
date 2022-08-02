@@ -515,7 +515,6 @@ public class ScrollableLinearLayout extends LinearLayoutCompat {
         ExampleUtil.utilLog("xScrollVelocity:" + xScrollVelocity + ",yScrollVelocity:" + yScrollVelocity);
         if (currentDirection == -1) return;
 
-        ExampleUtil.utilLog("x:" + xScrollVelocity + ",y:" + yScrollVelocity);
         // SIZING/TRANS ANIMATION
         if ((currentDirection != getOrientation())) {
             int currentSize = getCurrentContentSize();
@@ -586,10 +585,23 @@ public class ScrollableLinearLayout extends LinearLayoutCompat {
     private void startSizeAnimation(float velocityX, float velocityY, float fraction, boolean isByUser) {
         float velocity = 0f;
         float defaultSpeed = 1000f;
-        if (gravityFlag == Gravity.START || gravityFlag == Gravity.END) {
-            if (velocityX != 0) velocity = velocityX > 0f ? defaultSpeed : -defaultSpeed;
-        } else {
-            if (velocityY != 0) velocity = velocityY > 0f ? defaultSpeed : -defaultSpeed;
+
+        if(velocityX != 0) velocityX = velocityX > 0f ? defaultSpeed : -defaultSpeed;
+        if(velocityY != 0) velocityY = velocityY > 0f ? defaultSpeed : -defaultSpeed;
+
+        switch (gravityFlag){
+            case Gravity.START:
+                velocity = velocityX;
+                break;
+            case Gravity.TOP:
+                velocity = velocityY;
+                break;
+            case Gravity.END:
+                velocity = -velocityX;
+                break;
+            case Gravity.BOTTOM:
+                velocity = -velocityY;
+                break;
         }
 
         if (fraction == 0f || fraction == 1) {

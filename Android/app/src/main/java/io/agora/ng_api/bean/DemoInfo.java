@@ -1,11 +1,12 @@
 package io.agora.ng_api.bean;
 
 import androidx.annotation.IntRange;
+import androidx.annotation.Keep;
 import androidx.annotation.StringRes;
 import io.agora.ng_api.R;
 
 import java.io.Serializable;
-
+@Keep
 public class DemoInfo implements Serializable {
     public static final String key = "DemoInfo";
     public static final int TYPE_BASIC = 0;

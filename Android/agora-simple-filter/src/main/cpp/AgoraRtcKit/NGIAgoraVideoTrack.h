@@ -213,6 +213,11 @@ struct LocalVideoTrackStats {
    */
   uint32_t uplink_cost_time_ms;
 
+  /**
+   * The packet loss rate of uplink.
+   */
+  int tx_packet_loss_rate;
+
   LocalVideoTrackStats() : number_of_streams(0),
                            bytes_major_stream(0),
                            bytes_minor_stream(0),
@@ -228,7 +233,8 @@ struct LocalVideoTrackStats {
                            width(0),
                            height(0),
                            encoder_type(0),
-                           uplink_cost_time_ms(0) {}
+                           uplink_cost_time_ms(0),
+                           tx_packet_loss_rate(0) {}
 };
 
 /**

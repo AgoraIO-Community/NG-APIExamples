@@ -3010,6 +3010,10 @@ struct LocalAudioStats
    * The internal payload type
    */
   int internalCodec;
+  /**
+   * The packet loss rate of uplink.
+   */
+  int txPacketLossRate;
 };
 
 
@@ -3386,7 +3390,7 @@ struct TranscodingVideoStream {
   /**
    * Source type of video stream.
    */
-  VIDEO_SOURCE_TYPE sourceType;
+  agora::media::MEDIA_SOURCE_TYPE sourceType;
   /**
    * Remote user uid if sourceType is VIDEO_SOURCE_REMOTE.
    */
@@ -3427,7 +3431,7 @@ struct TranscodingVideoStream {
   bool mirror;
 
   TranscodingVideoStream()
-      : sourceType(VIDEO_SOURCE_CAMERA_PRIMARY),
+      : sourceType(agora::media::PRIMARY_CAMERA_SOURCE),
         remoteUserUid(0),
         imageUrl(NULL),
         x(0),

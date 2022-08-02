@@ -10,7 +10,7 @@
             android:id="@+id/text_desc_fg_desc"
             android:paddingHorizontal="@dimen/space_large"
             android:gravity="center"
-            tools:text="@string/desc_join_channel_audio"
+            tools:text="@string/desc_basic_audio"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toTopOf="@id/divider_fg_desc"
             android:layout_width="match_parent"
@@ -31,7 +31,7 @@
             android:layout_height="64dp">
 
         <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/layout_input_channel_fg_desc"
+                android:id="@+id/layout_input_scene_fg_desc"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_weight="1"
                 android:layout_width="0dp"
@@ -47,12 +47,12 @@
                 app:boxStrokeWidthFocused="0dp">
 
             <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/input_channel_fg_desc"
+                    android:id="@+id/input_scene_fg_desc"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="@null"
                     android:textSize="14sp"
-                    android:hint="@string/channel_name"
+                    android:hint="@string/scene_name"
                     android:paddingVertical="8dp"
                     android:inputType="text"
                     tools:text="@string/speaker"

@@ -1,8 +1,6 @@
 package io.agora.ng_api.ui.fragment;
 
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.text.Editable;
 import android.view.TextureView;
 import android.view.View;
@@ -48,9 +46,9 @@ public class MediaPlayerFragment extends BaseDemoFragment<FragmentMediaPlayerBin
         initView();
         initListener();
 
-        if (!MyApp.debugMine) {
+        if (!MyApp.justDebugUIPart) {
             initAgoraRteSDK();
-            joinChannel();
+            joinScene();
         }
     }
 
@@ -64,15 +62,18 @@ public class MediaPlayerFragment extends BaseDemoFragment<FragmentMediaPlayerBin
     }
 
     private void initView() {
+        // 点击按钮播放 url 文件
         mBinding.btnOpenFgPlayer.setOnClickListener(v -> openURL());
+        // 初始化 视频控制View
         mVideoView = new VideoView(requireContext());
+        // 设置播放按钮事件
         mVideoView.mPlayBtn.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (!buttonView.isPressed()) return;
             mVideoView.showOverlay();
             if (isChecked) mPlayer.play();
             else mPlayer.pause();
         });
-
+        // 设置拖动条拖动事件
         mVideoView.mProgressSlider.addOnSliderTouchListener(new Slider.OnSliderTouchListener() {
             @Override
             public void onStartTrackingTouch(@NonNull Slider slider) { }
@@ -84,6 +85,109 @@ public class MediaPlayerFragment extends BaseDemoFragment<FragmentMediaPlayerBin
         });
     }
 
+    private void initListener() {
+        mPlayerObserver = new AgoraRteMediaPlayerObserver() {
+            @Override
+            public void onVideoFrame(AgoraRteFileInfo fileInfo, AgoraRteVideoFrame videoFrame) {
+                // We want the playerView's size matches the video frame's size,
+                // so when the first frame shows we adjust view's size immediately.
+                // 我们希望视图的宽高与视频的宽高匹配
+                // 所以当第一帧出现时立即改变视图宽高
+                if(!initVideoView){
+                    initVideoView = true;
+
+//                    new Handler(Looper.getMainLooper()).postAtFrontOfQueue(() -> {
+//                        mVideoView.mTextureView.getLayoutParams().height = mVideoView.mTextureView.getMeasuredWidth() * videoFrame.getHeight() / videoFrame.getWidth();
+//                        mVideoView.mTextureView.requestLayout();
+//                    });
+                }
+            }
+
+            @Override
+            public void onPlayerStateChanged(AgoraRteFileInfo fileInfo, AgoraRteMediaPlayerState state, AgoraRteMediaPlayerError error) {
+                ExampleUtil.utilLog(fileInfo.beginTime + "/" + fileInfo.duration + "state: " + state + ", error: " + error);
+                /*
+                    监听到文件打开成功
+                    1. Duration setup
+                    2. Start to play
+                    3. Hide the loading
+                 */
+                if (state == AgoraRteMediaPlayerState.PLAYER_STATE_OPEN_COMPLETED) {
+                    // Step 1
+                    mVideoView.mProgressSlider.setValueTo(mPlayer.getDuration());
+                    // Step 2
+                    mPlayer.play();
+                    // Step 3
+                    mVideoView.mLoadingView.setVisibility(View.GONE);
+                } else if (state == AgoraRteMediaPlayerState.PLAYER_STATE_PLAYBACK_COMPLETED) {
+                    // Play COMPLETED -> set the play button state to pause.
+                    mVideoView.mPlayBtn.setChecked(false);
+                }
+            }
+
+            @Override
+            public void onPositionChanged(AgoraRteFileInfo fileInfo, long position) {
+                super.onPositionChanged(fileInfo, position);
+                // Indicate current position is changed
+                if(!mVideoView.mProgressSlider.isPressed())
+                    mVideoView.mProgressSlider.setValue(position);
+            }
+
+        };
+        mAgoraHandler = new AgoraRteSceneEventHandler() {
+            @Override
+            public void onConnectionStateChanged(AgoraRteSceneConnState oldState, AgoraRteSceneConnState newState, AgoraRteConnectionChangedReason reason) {
+                if (newState == AgoraRteSceneConnState.CONN_STATE_CONNECTED && mLocalAudioTrack == null) {
+                    ExampleUtil.utilLog("onConnectionStateChanged,Thread:"+Thread.currentThread().getName());
+                    // 连接建立完成 初始化 localAudioTrack、localVideoTrack
+                    /*
+                        1. CreateOrUpdateRTCStream
+                        2. InitLocalAudioTrack
+                        3. InitLocalVideoTrack
+                        4. InitAgoraMediaPlayer
+                        5. Enable button to
+                    */
+
+                    // Step 1
+                    mScene.createOrUpdateRTCStream(mLocalStreamId, new AgoraRtcStreamOptions());
+                    // Step 2
+                    initLocalAudioTrack();
+                    // Step 3
+                    initLocalVideoTrack(mBinding.containerFgPlayer);
+
+                    // MediaPlayer initiate
+                    initAgoraMediaPlayer();
+                    mBinding.btnOpenFgPlayer.setEnabled(true);
+                }
+            }
+
+            @Override
+            public void onRemoteStreamAdded(List<AgoraRteMediaStreamInfo> streams) {
+                for (AgoraRteMediaStreamInfo stream : streams) {
+                    addRemoteView(stream.getStreamId());
+                }
+            }
+
+            @Override
+            public void onRemoteStreamRemoved(List<AgoraRteMediaStreamInfo> streams) {
+                for (AgoraRteMediaStreamInfo stream : streams) {
+                    mBinding.containerFgPlayer.dynamicRemoveViewWithTag(stream.getStreamId());
+                }
+            }
+        };
+    }
+
+    private void initAgoraMediaPlayer(){
+        mPlayer = AgoraRteSDK.getRteMediaFactory().createMediaPlayer();
+        mPlayer.registerMediaPlayerObserver(mPlayerObserver);
+    }
+
+    /**
+     * Just a examination for the url
+     *
+     * Step 1. Check whether the url is valid
+     * Step 2. Valid -> play, invalid -> alert user
+     */
     private void openURL() {
         boolean valid = false;
         String url = "";
@@ -100,91 +204,6 @@ public class MediaPlayerFragment extends BaseDemoFragment<FragmentMediaPlayerBin
         else ExampleUtil.shakeViewAndVibrateToAlert(mBinding.layoutInputUrlFgPlayer);
     }
 
-    private void initListener() {
-        mPlayerObserver = new AgoraRteMediaPlayerObserver() {
-            @Override
-            public void onVideoFrame(AgoraRteFileInfo fileInfo, AgoraRteVideoFrame videoFrame) {
-                // We want the playerView's size matches the video frame's size,
-                // so when the first frame shows we adjust view's size immediately.
-                if(!initVideoView){
-                    initVideoView = true;
-
-//                    new Handler(Looper.getMainLooper()).postAtFrontOfQueue(() -> {
-//                        mVideoView.mTextureView.getLayoutParams().height = mVideoView.mTextureView.getMeasuredWidth() * videoFrame.getHeight() / videoFrame.getWidth();
-//                        mVideoView.mTextureView.requestLayout();
-//                    });
-                }
-            }
-
-            @Override
-            public void onPlayerStateChanged(AgoraRteFileInfo fileInfo, AgoraRteMediaPlayerState state, AgoraRteMediaPlayerError error) {
-                ExampleUtil.utilLog(fileInfo.beginTime + "/" + fileInfo.duration + "state: " + state + ", error: " + error);
-                if (state == AgoraRteMediaPlayerState.PLAYER_STATE_OPEN_COMPLETED) {
-                    // set duration
-                    mVideoView.mProgressSlider.setValueTo(mPlayer.getDuration());
-                    // start play
-                    mPlayer.play();
-                    // hide loading
-                    mVideoView.mLoadingView.setVisibility(View.GONE);
-                } else if (state == AgoraRteMediaPlayerState.PLAYER_STATE_PLAYBACK_COMPLETED) {
-                    mVideoView.mPlayBtn.setChecked(false);
-                }
-            }
-
-            @Override
-            public void onPositionChanged(AgoraRteFileInfo fileInfo, long position) {
-                super.onPositionChanged(fileInfo, position);
-                if(!mVideoView.mProgressSlider.isPressed())
-                    mVideoView.mProgressSlider.setValue(position);
-            }
-
-        };
-        mAgoraHandler = new AgoraRteSceneEventHandler() {
-            @Override
-            public void onConnectionStateChanged(AgoraRteSceneConnState oldState, AgoraRteSceneConnState newState, AgoraRteConnectionChangedReason reason) {
-                if (newState == AgoraRteSceneConnState.CONN_STATE_CONNECTED && mLocalAudioTrack == null) {
-                    ExampleUtil.utilLog("onConnectionStateChanged,Thread:"+Thread.currentThread().getName());
-                    // RTC stream prepare
-                    AgoraRtcStreamOptions option = new AgoraRtcStreamOptions();
-                    mScene.createOrUpdateRTCStream(mLocalUserId, option);
-                    // 准备视频采集
-                    mLocalVideoTrack = AgoraRteSDK.getRteMediaFactory().createCameraVideoTrack();
-                    // 必须先添加setPreviewCanvas，然后才能 startCapture
-                    addCameraView();
-                    if (mLocalVideoTrack != null) {
-                        mLocalVideoTrack.startCapture(null);
-                    }
-                    mScene.publishLocalVideoTrack(mLocalUserId, mLocalVideoTrack);
-                    // 准备音频采集
-                    mLocalAudioTrack = AgoraRteSDK.getRteMediaFactory().createMicrophoneAudioTrack();
-                    mLocalAudioTrack.startRecording();
-                    mScene.publishLocalAudioTrack(mLocalUserId, mLocalAudioTrack);
-
-                    // MediaPlayer initiate
-                    mPlayer = AgoraRteSDK.getRteMediaFactory().createMediaPlayer();
-                    mPlayer.registerMediaPlayerObserver(mPlayerObserver);
-                    mBinding.btnOpenFgPlayer.setEnabled(true);
-                }
-            }
-
-            @Override
-            public void onRemoteStreamAdded(List<AgoraRteMediaStreamInfo> streams) {
-                for (AgoraRteMediaStreamInfo stream : streams) {
-                    ExampleUtil.utilLog("sId:" + stream.getStreamId() + ",userId:" + stream.getUserId());
-                    addRemoteView(stream.getStreamId());
-                }
-            }
-
-            @Override
-            public void onRemoteStreamRemoved(List<AgoraRteMediaStreamInfo> streams) {
-                for (AgoraRteMediaStreamInfo stream : streams) {
-                    mBinding.containerFgPlayer.dynamicRemoveViewWithTag(stream.getStreamId());
-                }
-            }
-        };
-    }
-
-
     private void doOpenURL(String url) {
         addMediaView();
         mPlayer.open(url, 0);
@@ -193,28 +212,26 @@ public class MediaPlayerFragment extends BaseDemoFragment<FragmentMediaPlayerBin
         mScene.publishMediaPlayer(mLocalMediaStreamId, mPlayer);
     }
 
-    public void joinChannel() {
-        doJoinChannel(channelName, mLocalUserId, "");
+    private void joinScene() {
+        doJoinScene(sceneName, mLocalUserId, "");
     }
 
+    /**
+     * Add a view which contains some video control stuff like play button and progress bar
+     */
     private void addMediaView() {
-        mBinding.containerFgPlayer.demoAddView(mVideoView);
+        mBinding.containerFgPlayer.dynamicAddView(mVideoView);
         mPlayer.setView(mVideoView.mTextureView);
     }
 
-    private void addCameraView() {
-        TextureView view = new TextureView(requireContext());
-        mBinding.containerFgPlayer.demoAddView(view);
-        AgoraRteVideoCanvas canvas = new AgoraRteVideoCanvas(view);
-        if (mLocalVideoTrack != null) {
-            mLocalVideoTrack.setPreviewCanvas(canvas);
-        }
-    }
 
+    /**
+     * Add a view to preview remote video stream
+     */
     private void addRemoteView(String streamId) {
         TextureView view = new TextureView(requireContext());
         view.setTag(streamId);
-        mBinding.containerFgPlayer.demoAddView(view);
+        mBinding.containerFgPlayer.dynamicAddView(view);
         AgoraRteVideoCanvas canvas = new AgoraRteVideoCanvas(view);
         mScene.setRemoteVideoCanvas(streamId, canvas);
 

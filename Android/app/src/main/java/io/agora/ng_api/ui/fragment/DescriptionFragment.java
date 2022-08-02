@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.Html;
 import android.text.InputFilter;
 import android.text.InputType;
 import android.text.TextWatcher;
@@ -41,7 +42,7 @@ import io.agora.ng_api.util.ExampleUtil;
  * fragment contains all demo fragment
  */
 public class DescriptionFragment extends BaseFragment<FragmentDescriptionBinding> {
-    public static final String channelName = "CHANNEL_NAME";
+    public static final String sceneName = "SCENE_NAME";
 
     private DemoInfo demoInfo;
     private String tempName = "";
@@ -88,11 +89,11 @@ public class DescriptionFragment extends BaseFragment<FragmentDescriptionBinding
 
     private void initView() {
 
-        mBinding.textDescFgDesc.setText(demoInfo.getDesc());
+        mBinding.textDescFgDesc.setText(Html.fromHtml(getString(demoInfo.getDesc())));
 
         // press 'Enter' trigger Button click event
         // 按下 'Enter' 触发点击事件
-        mBinding.inputChannelFgDesc.setOnEditorActionListener((v, action, keyEvent) -> {
+        mBinding.inputSceneFgDesc.setOnEditorActionListener((v, action, keyEvent) -> {
             // Button pressed
             // 按下按钮的判断标志
             if (action == EditorInfo.IME_ACTION_DONE || (keyEvent != null && keyEvent.getKeyCode() == KeyEvent.KEYCODE_ENTER)) {
@@ -109,11 +110,11 @@ public class DescriptionFragment extends BaseFragment<FragmentDescriptionBinding
             v.postDelayed(() -> v.setEnabled(true), 300);
 
             // 输入合法判断
-            Editable editable = mBinding.inputChannelFgDesc.getText();
+            Editable editable = mBinding.inputSceneFgDesc.getText();
             if(editable!=null) tempName = editable.toString().trim();
 
             if (tempName.isEmpty()) {
-                ExampleUtil.shakeViewAndVibrateToAlert(mBinding.layoutInputChannelFgDesc);
+                ExampleUtil.shakeViewAndVibrateToAlert(mBinding.layoutInputSceneFgDesc);
             } else {
                 ExampleUtil.hideKeyboard(requireActivity().getWindow(), v);
 
@@ -133,9 +134,9 @@ public class DescriptionFragment extends BaseFragment<FragmentDescriptionBinding
     }
 
     private void toNextFragment() {
-        ExampleUtil.hideKeyboard(requireActivity().getWindow(),mBinding.inputChannelFgDesc);
+        ExampleUtil.hideKeyboard(requireActivity().getWindow(),mBinding.inputSceneFgDesc);
         Bundle bundle = new Bundle();
-        bundle.putString(DescriptionFragment.channelName, tempName);
+        bundle.putString(DescriptionFragment.sceneName, tempName);
         navigate(demoInfo.getDestId(), bundle);
     }
 
@@ -216,9 +217,12 @@ public class DescriptionFragment extends BaseFragment<FragmentDescriptionBinding
         inputEditText.setPaddingRelative(dp15, inputEditText.getPaddingTop(), dp15, inputEditText.getPaddingBottom());
         inputEditText.setBackground(null);
         inputEditText.setInputType(InputType.TYPE_CLASS_TEXT);
+        inputEditText.setImeOptions(EditorInfo.IME_ACTION_DONE);
         inputEditText.setText(ExampleUtil.getSp(requireContext()).getString(ExampleUtil.APPID,""));
         if (!triggeredByUser) {
             inputEditText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(32)});
+            // Clear error status when text changes
+            // 新的输入到来时清除"错误"状态
             inputEditText.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -264,8 +268,12 @@ public class DescriptionFragment extends BaseFragment<FragmentDescriptionBinding
                 dialog.dismiss();
             }else {
                 if (appId.length() != inputLayout.getCounterMaxLength()){
-                    inputLayout.setErrorEnabled(true);
-                    inputLayout.setError(requireContext().getString(R.string.app_id_error));
+                    if(inputLayout.isErrorEnabled()) {
+                        ExampleUtil.shakeViewAndVibrateToAlert(inputLayout);
+                    }else {
+                        inputLayout.setErrorEnabled(true);
+                        inputLayout.setError(requireContext().getString(R.string.app_id_error));
+                    }
                 }else {
                     ExampleUtil.getSp(requireContext()).edit().putString(ExampleUtil.APPID, appId).apply();
                     dialog.dismiss();
@@ -290,9 +298,9 @@ public class DescriptionFragment extends BaseFragment<FragmentDescriptionBinding
 
         mBinding.textDescFgDesc.setTextColor(colorText);
         mBinding.dividerFgDesc.setBackgroundColor(colorSurface);
-        mBinding.layoutInputChannelFgDesc.setBoxBackgroundColor(colorSurface);
-        mBinding.inputChannelFgDesc.setTextColor(colorText);
-        mBinding.inputChannelFgDesc.setHintTextColor(colorHint);
+        mBinding.layoutInputSceneFgDesc.setBoxBackgroundColor(colorSurface);
+        mBinding.inputSceneFgDesc.setTextColor(colorText);
+        mBinding.inputSceneFgDesc.setHintTextColor(colorHint);
         mBinding.btnJoinFgDesc.setTextColor(colorOnPrimary);
     }
 }
